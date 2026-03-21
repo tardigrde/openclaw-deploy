@@ -5,7 +5,7 @@
 
 SHELL := /bin/bash
 .PHONY: init plan apply destroy ssh ssh-root tunnel output ip fmt validate clean help \
-        bootstrap deploy setup-auth backup-now backup-pull restore logs status shell exec \
+        bootstrap bootstrap-check deploy deploy-check setup-auth backup-now backup-pull restore logs status shell exec \
         tailscale-enable tailscale-setup tailscale-status tailscale-ip tailscale-up \
         workspace-sync \
         secrets-generate-key secrets-encrypt secrets-decrypt secrets-edit
@@ -146,10 +146,20 @@ bootstrap: ## First-time VPS setup: dirs, Tailscale, docker build, config push, 
 	@echo -e "$(BLUE)[DEPLOY]$(NC) Bootstrapping OpenClaw on VPS..."
 	@$(ANSIBLE) $(PLAYBOOK) --extra-vars "tailscale_auth_key=$${TAILSCALE_AUTH_KEY:-}"
 
+bootstrap-check: ## Dry-run of bootstrap (--check --diff), shows what would change
+	$(call check-server-ip)
+	@echo -e "$(BLUE)[CHECK]$(NC) Dry-run bootstrap on VPS (check + diff)..."
+	@$(ANSIBLE) $(PLAYBOOK) --check --diff --extra-vars "tailscale_auth_key=$${TAILSCALE_AUTH_KEY:-}"
+
 deploy: ## Push config/env to VPS and restart containers (REBUILD=1 to also rebuild Docker images)
 	$(call check-server-ip)
 	@echo -e "$(BLUE)[DEPLOY]$(NC) Deploying to VPS (tags: $(DEPLOY_TAGS))..."
 	@$(ANSIBLE) $(PLAYBOOK) --tags $(DEPLOY_TAGS)
+
+deploy-check: ## Dry-run of deploy (--check --diff), shows what would change (REBUILD=1 to include docker)
+	$(call check-server-ip)
+	@echo -e "$(BLUE)[CHECK]$(NC) Dry-run deploy on VPS (tags: $(DEPLOY_TAGS), check + diff)..."
+	@$(ANSIBLE) $(PLAYBOOK) --tags $(DEPLOY_TAGS) --check --diff
 
 setup-auth: ## Set up Claude subscription auth on the VPS
 	$(call check-server-ip)
@@ -331,7 +341,9 @@ help: ## Show this help message
 	@echo ""
 	@echo -e "$(BOLD)Deploy:$(NC)"
 	@echo -e "  $(BLUE)bootstrap$(NC)           First-time VPS setup (dirs, timers, Docker build, config push, start)"
+	@echo -e "  $(BLUE)bootstrap-check$(NC)     Dry-run bootstrap (--check --diff), shows what would change"
 	@echo -e "  $(BLUE)deploy$(NC)              Push config/env to VPS and restart containers"
+	@echo -e "  $(BLUE)deploy-check$(NC)        Dry-run deploy (--check --diff), shows what would change"
 	@echo -e "  $(BLUE)deploy REBUILD=1$(NC)    Also rebuild Docker images before restart"
 	@echo -e "  $(BLUE)setup-auth$(NC)          Set up Claude subscription auth"
 	@echo ""
