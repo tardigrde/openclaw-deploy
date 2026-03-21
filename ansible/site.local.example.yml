@@ -1,0 +1,18 @@
+---
+# Copy to ansible/site.local.yml (gitignored).
+# Imports the core site.yml first, then adds optional/local plays.
+# Plays in this file use `never` tags and only run when explicitly requested.
+#
+# Usage: make deploy  (Makefile auto-detects site.local.yml if present)
+
+- ansible.builtin.import_playbook: site.yml
+
+# -------------------------------------------------------------------------
+# Optional plays — uncomment to enable, then use make targets to run them.
+# -------------------------------------------------------------------------
+
+# Addons
+- ansible.builtin.import_playbook: plays/addons.yml        # make addon-weather
+
+# Add your own plays here:
+# - ansible.builtin.import_playbook: plays/my_service.local.yml

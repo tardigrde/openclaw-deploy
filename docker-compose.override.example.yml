@@ -1,0 +1,73 @@
+# docker-compose.override.yml — Docker Compose merges this automatically.
+# Copy to docker-compose.override.yml (gitignored) and customize.
+#
+# All variables from .env are available. Services defined here are merged
+# with docker-compose.yml — no flags needed.
+
+services:
+  mission-control:
+    build:
+      context: ./mission-control
+    env_file: .env
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      DATABASE_PATH: /app/data/mission-control.db
+      WORKSPACE_BASE_PATH: /app/workspace
+      PROJECTS_PATH: /app/workspace/projects
+      OPENCLAW_GATEWAY_URL: ws://openclaw-gateway:18789
+      OPENCLAW_GATEWAY_TOKEN: ${OPENCLAW_GATEWAY_TOKEN}
+      MC_API_TOKEN: ${MC_API_TOKEN:-}
+      WEBHOOK_SECRET: ${WEBHOOK_SECRET:-}
+    volumes:
+      - mission-control-data:/app/data
+      - mission-control-workspace:/app/workspace
+    ports:
+      - "127.0.0.1:4000:4000"
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"fetch('http://127.0.0.1:4000/').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))\""]
+      interval: 30s
+      timeout: 5s
+      start_period: 120s
+      retries: 3
+    depends_on:
+      - openclaw-gateway
+
+  openclaw-dashboard:
+    build:
+      context: ./openclaw-dashboard
+    restart: unless-stopped
+    group_add:
+      - "${DOCKER_SOCKET_GID:-988}"
+    environment:
+      NODE_ENV: production
+      DASHBOARD_PORT: "3001"
+      DASHBOARD_ALLOW_HTTP: "true"
+      WORKSPACE_DIR: /app/workspace
+      DOCKER_HOST: unix:///var/run/docker.sock
+    volumes:
+      - ${OPENCLAW_WORKSPACE_DIR:-/home/openclaw/.openclaw/workspace}:/app/workspace
+      - ${OPENCLAW_CONFIG_DIR:-/home/openclaw/.openclaw}:/home/node/.openclaw:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    ports:
+      - "127.0.0.1:3001:3001"  # localhost only — change to 0.0.0.0 if you need Tailscale access (ensure firewall blocks port 3001 externally)
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://127.0.0.1:3001/"]
+      interval: 30s
+      timeout: 5s
+      start_period: 30s
+      retries: 3
+
+  # --- Add your own services here ---
+  # Example: a custom web app that connects to the gateway
+  # my-service:
+  #   image: my-org/my-service:latest
+  #   restart: unless-stopped
+  #   environment:
+  #     OPENCLAW_GATEWAY_URL: ws://openclaw-gateway:18789
+  #   depends_on:
+  #     - openclaw-gateway
+
+volumes:
+  mission-control-data:
+  mission-control-workspace:

@@ -1,0 +1,157 @@
+---
+# =============================================================================
+# Restore Play — restore from backup archive
+# =============================================================================
+# Tags: restore  (never runs by default — must be explicitly requested)
+#
+# Behavior:
+#   Default (no extra-vars): lists available backups on VPS — no changes made.
+#   With --extra-vars "execute=true backup_file=<filename>":
+#     1. Stops containers
+#     2. Creates a safety backup of current state
+#     3. Replaces ~/.openclaw with the backup contents
+#     4. Restores Mission Control database (if matching backup exists)
+#     5. Restarts containers
+#
+# Usage:
+#   make restore                    # dry-run: list available backups
+#   make restore EXECUTE=1 BACKUP=openclaw_backup_20260101_030000.tar.gz
+# =============================================================================
+
+- name: Restore OpenClaw from backup
+  hosts: all
+  gather_facts: false
+
+  tasks:
+
+    # -------------------------------------------------------------------------
+    # Dry-run: list available backups (runs when execute is not true)
+    # -------------------------------------------------------------------------
+
+    - name: List available backups on VPS
+      ansible.builtin.shell: |
+        echo "=== Available backups on VPS ==="
+        ls -lh ~/backups/openclaw_backup_*.tar.gz 2>/dev/null || echo "  (none found)"
+        echo ""
+        echo "To restore, run:"
+        echo "  make restore EXECUTE=1 BACKUP=<filename>"
+      args:
+        executable: /bin/bash
+      register: backup_list
+      changed_when: false
+      when: not (execute | default('false') | bool)
+      tags: [never, restore]
+
+    - name: Show available backups
+      ansible.builtin.debug:
+        msg: "{{ backup_list.stdout_lines }}"
+      when: not (execute | default('false') | bool)
+      tags: [never, restore]
+
+    # -------------------------------------------------------------------------
+    # Execute: perform actual restore (only when execute=true)
+    # -------------------------------------------------------------------------
+
+    - name: Fail if backup_file not specified
+      ansible.builtin.fail:
+        msg: |
+          backup_file is required for restore.
+          Usage: make restore EXECUTE=1 BACKUP=openclaw_backup_<timestamp>.tar.gz
+      when:
+        - execute | default('false') | bool
+        - backup_file | default('') == ''
+      tags: [never, restore]
+
+    - name: Verify backup file exists on VPS
+      ansible.builtin.stat:
+        path: ~/backups/{{ backup_file | default('') }}
+      register: backup_stat
+      when: execute | default('false') | bool
+      tags: [never, restore]
+
+    - name: Fail if backup file not found on VPS
+      ansible.builtin.fail:
+        msg: "Backup file not found on VPS: ~/backups/{{ backup_file | default('') }}"
+      when:
+        - execute | default('false') | bool
+        - not backup_stat.stat.exists
+      tags: [never, restore]
+
+    - name: Stop containers before restore
+      ansible.builtin.command:
+        cmd: docker compose stop
+        chdir: ~/openclaw
+      changed_when: true
+      when: execute | default('false') | bool
+      tags: [never, restore]
+
+    - name: Create safety backup of current state
+      ansible.builtin.shell: |
+        TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
+        tar -czf ~/backups/openclaw_pre_restore_${TIMESTAMP}.tar.gz -C ~ .openclaw
+        echo "Safety backup created: ~/backups/openclaw_pre_restore_${TIMESTAMP}.tar.gz"
+        if docker volume inspect openclaw_mission-control-data > /dev/null 2>&1; then
+          docker run --rm \
+            -v openclaw_mission-control-data:/data \
+            -v ~/backups:/backup \
+            alpine sh -c "apk add -q sqlite > /dev/null 2>&1 && sqlite3 /data/mission-control.db '.backup /backup/mc_pre_restore_'${TIMESTAMP}'.db'"
+          echo "MC DB safety backup created: ~/backups/mc_pre_restore_${TIMESTAMP}.db"
+        fi
+      args:
+        executable: /bin/bash
+      when:
+        - execute | default('false') | bool
+      changed_when: true
+      tags: [never, restore]
+
+    - name: Remove current .openclaw directory
+      ansible.builtin.file:
+        path: ~/.openclaw
+        state: absent
+      when: execute | default('false') | bool
+      tags: [never, restore]
+
+    - name: Extract backup archive
+      ansible.builtin.command:
+        cmd: tar -xzf ~/backups/{{ backup_file | default('') }} -C ~
+      changed_when: true
+      when: execute | default('false') | bool
+      tags: [never, restore]
+
+    - name: Derive Mission Control backup filename
+      ansible.builtin.set_fact:
+        mc_backup_file: "{{ (backup_file | default('')) | regex_replace('openclaw_backup_', 'mc_backup_') | regex_replace('\\.tar\\.gz$', '.db') }}"
+      when: execute | default('false') | bool
+      tags: [never, restore]
+
+    - name: Check if Mission Control backup exists
+      ansible.builtin.stat:
+        path: ~/backups/{{ mc_backup_file | default('') }}
+      register: mc_backup_stat
+      when: execute | default('false') | bool
+      tags: [never, restore]
+
+    - name: Restore Mission Control database
+      ansible.builtin.command:
+        cmd: >
+          docker run --rm
+          -v openclaw_mission-control-data:/data
+          -v ~/backups:/backup
+          alpine sh -c
+          "cp /backup/{{ mc_backup_file }} /data/mission-control.db
+          && rm -f /data/mission-control.db-wal /data/mission-control.db-shm"
+      changed_when: true
+      when:
+        - execute | default('false') | bool
+        - mc_backup_stat.stat.exists
+      tags: [never, restore]
+
+    - name: Restart containers after restore
+      ansible.builtin.shell: |
+        docker compose up -d
+      args:
+        chdir: ~/openclaw
+        executable: /bin/bash
+      changed_when: true
+      when: execute | default('false') | bool
+      tags: [never, restore]

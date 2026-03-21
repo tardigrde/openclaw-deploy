@@ -1,0 +1,56 @@
+---
+# =============================================================================
+# OpenClaw Site Playbook — Entry Point
+# =============================================================================
+#
+# Prerequisites:
+#   1. cp secrets/inputs.example.sh secrets/inputs.sh && vim secrets/inputs.sh
+#   2. source secrets/inputs.sh
+#   3. make init && make plan && make apply
+#   4. cp secrets/.env.example secrets/.env && vim secrets/.env
+#
+# Usage (via Makefile — recommended):
+#   make bootstrap                  # First-time setup
+#   make deploy                     # Day-to-day config push + restart
+#   make deploy REBUILD=1           # Also rebuild Docker images
+#   make setup-auth                 # Configure Claude subscription auth
+#   make backup-now                 # Run backup immediately
+#   make backup-pull                # Download latest backup locally
+#   make restore                    # List available backups (dry-run)
+#   make restore EXECUTE=1 BACKUP=<filename>  # Actually restore
+#   make addon-weather              # Install morning-weather cron (requires site.local.yml + Makefile.local)
+#   make patch-devices              # Fix device pairing issues (requires site.local.yml + Makefile.local)
+#
+# Direct usage (with tags):
+#   ansible-playbook site.yml                                         # Full bootstrap
+#   ansible-playbook site.yml --tags config,start                     # Day-to-day deploy
+#   ansible-playbook site.yml --tags tailscale --extra-vars "tailscale_auth_key=<key>"  # Tailscale only
+#   ansible-playbook site.yml --tags setup_auth      # Auth setup
+#   ansible-playbook site.yml --tags backup_now      # Trigger backup
+#   ansible-playbook site.yml --tags backup_pull     # Download backup
+#   ansible-playbook site.yml --tags restore         # List backups
+#   ansible-playbook site.yml --tags restore --extra-vars "execute=true backup_file=<name>"
+#   ansible-playbook site.yml --check --diff         # Dry run
+#
+# Tag reference:
+#   bootstrap            — first-time VPS dirs, systemd timers (runs on plain make bootstrap)
+#   tailscale            — install Tailscale + register node (runs on make bootstrap / make tailscale-setup)
+#   docker               — clone MC, copy compose + Dockerfiles, build images
+#   config               — validate & copy openclaw.json, .env
+#   start                — manage containers, prune images
+#   setup_auth           — write auth-profiles.json, restart gateway [never by default]
+#   backup_now           — trigger backup systemd service [never by default]
+#   backup_pull          — fetch latest backup archives locally [never by default]
+#   restore              — list backups (dry-run) or execute restore [never by default]
+#   addon-weather-report — install morning-weather cron [never; opt-in via site.local.yml]
+#   patch_devices        — fix device pairing [never; local-only play, see site.local.yml]
+# =============================================================================
+
+- ansible.builtin.import_playbook: plays/bootstrap.yml
+- ansible.builtin.import_playbook: plays/tailscale.yml
+- ansible.builtin.import_playbook: plays/docker.yml
+- ansible.builtin.import_playbook: plays/config.yml
+- ansible.builtin.import_playbook: plays/start.yml
+- ansible.builtin.import_playbook: plays/setup_auth.yml
+- ansible.builtin.import_playbook: plays/backup.yml
+- ansible.builtin.import_playbook: plays/restore.yml

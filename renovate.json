@@ -1,0 +1,163 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended"
+  ],
+  "labels": [
+    "dependencies"
+  ],
+  "schedule": [
+    "every weekend"
+  ],
+  "prConcurrentLimit": 10,
+  "packageRules": [
+    {
+      "description": "Group GitHub Actions updates — low-risk, auto-merge",
+      "matchManagers": [
+        "github-actions"
+      ],
+      "groupName": "GitHub Actions",
+      "automerge": true,
+      "automergeType": "pr",
+      "platformAutomerge": true
+    },
+    {
+      "description": "Never auto-merge OpenClaw: check release notes and run backup-now first",
+      "matchPackageNames": [
+        "openclaw"
+      ],
+      "automerge": false,
+      "labels": [
+        "dependencies",
+        "openclaw-upgrade"
+      ]
+    },
+    {
+      "description": "Group Docker base image updates for manual review",
+      "matchManagers": [
+        "dockerfile",
+        "docker-compose"
+      ],
+      "groupName": "Docker base images",
+      "automerge": false
+    },
+    {
+      "description": "Group Terraform provider and CLI updates for manual review",
+      "matchManagers": [
+        "terraform",
+        "github-actions"
+      ],
+      "matchPackageNames": [
+        "hashicorp/terraform"
+      ],
+      "groupName": "Terraform",
+      "automerge": false
+    },
+    {
+      "description": "SOPS updates: group Dockerfile + CI, SHA256 must be updated manually",
+      "matchPackageNames": [
+        "getsops/sops"
+      ],
+      "groupName": "SOPS",
+      "automerge": false,
+      "prBodyNotes": [
+        "**Manual step required:** Update `SOPS_SHA256` in CI workflows (`.github/workflows/deploy.yml` and `rollback.yml`). Get the correct SHA256 from the [SOPS release page](https://github.com/getsops/sops/releases)."
+      ]
+    }
+  ],
+  "customManagers": [
+    {
+      "description": "Track OpenClaw version pinned via Dockerfile ARG",
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^docker/Dockerfile$/"
+      ],
+      "matchStrings": [
+        "ARG OPENCLAW_VERSION=(?<currentValue>[\\d]+\\.[\\d]+\\.[\\d]+)"
+      ],
+      "depNameTemplate": "openclaw",
+      "datasourceTemplate": "npm",
+      "versioningTemplate": "npm"
+    },
+    {
+      "description": "Track notesmd-cli binary release referenced in Dockerfile download URL",
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^docker/Dockerfile$/"
+      ],
+      "matchStrings": [
+        "ARG NOTESMD_CLI_VERSION=(?<currentValue>[\\d]+\\.[\\d]+\\.[\\d]+)"
+      ],
+      "depNameTemplate": "Yakitrak/notesmd-cli",
+      "datasourceTemplate": "github-releases",
+      "extractVersionTemplate": "^v(?<version>.+)$"
+    },
+    {
+      "description": "Track Mission Control version pinned in Ansible plays",
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^ansible/plays/docker\\.yml$/",
+        "/^ansible/deploy\\.yml$/"
+      ],
+      "matchStrings": [
+        "crshdn/mission-control\\.git[\\s\\S]*?version: v?(?<currentValue>[\\d]+\\.[\\d]+\\.[\\d]+)"
+      ],
+      "depNameTemplate": "crshdn/mission-control",
+      "datasourceTemplate": "github-releases",
+      "extractVersionTemplate": "^v(?<version>.+)$"
+    },
+    {
+      "description": "Track OpenClaw Dashboard version pinned in Ansible plays",
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^ansible/plays/docker\\.yml$/"
+      ],
+      "matchStrings": [
+        "tugcantopaloglu/openclaw-dashboard\\.git[\\s\\S]*?version: v?(?<currentValue>[\\d]+\\.[\\d]+\\.[\\d]+)"
+      ],
+      "depNameTemplate": "tugcantopaloglu/openclaw-dashboard",
+      "datasourceTemplate": "github-releases",
+      "extractVersionTemplate": "^v(?<version>.+)$"
+    },
+    {
+      "description": "Track SOPS binary release referenced in Dockerfile",
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^docker/Dockerfile$/"
+      ],
+      "matchStrings": [
+        "ARG SOPS_VERSION=(?<currentValue>[\\d]+\\.[\\d]+(?:\\.[\\d]+)?)"
+      ],
+      "depNameTemplate": "getsops/sops",
+      "datasourceTemplate": "github-releases",
+      "extractVersionTemplate": "^v(?<version>.+)$"
+    },
+    {
+      "description": "Track SOPS binary release in CI workflows and Ansible config play (SHA256 must be updated manually)",
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^\\.github/workflows/[^/]+\\.yml$/",
+        "/^ansible/plays/config\\.yml$/"
+      ],
+      "matchStrings": [
+        "SOPS_VERSION=(?<currentValue>[\\d]+\\.[\\d]+(?:\\.[\\d]+)?)"
+      ],
+      "depNameTemplate": "getsops/sops",
+      "datasourceTemplate": "github-releases",
+      "extractVersionTemplate": "^v(?<version>.+)$"
+    },
+    {
+      "description": "Track ansible-core lower bound in GitHub Actions workflows (range: >=X.Y,<Z)",
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^\\.github/workflows/[^/]+\\.yml$/"
+      ],
+      "matchStrings": [
+        "pip install \"ansible-core>=(?<currentValue>[\\d]+\\.[\\d]+(?:\\.[\\d]+)?),<[\\d]+\""
+      ],
+      "depNameTemplate": "ansible-core",
+      "datasourceTemplate": "pypi",
+      "versioningTemplate": "pep440"
+    }
+  ]
+}

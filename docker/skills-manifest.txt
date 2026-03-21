@@ -1,0 +1,28 @@
+# OpenClaw Skills Manifest
+# These skills are auto-installed on container startup via entrypoint.sh
+# To add a skill: add its ClawHub name here, rebuild and deploy.
+# To remove a skill: remove the line, then manually remove from workspace/skills/ on VPS.
+
+# YouTube — transcript fetching, video search, channel lookup. No API key needed.
+yt
+
+# Agent Browser — headless browser for JS-heavy/paywalled pages
+agent-browser
+
+# Conventional Commits — format commit messages properly
+conventional-commits
+
+# GitHub — interact with GitHub (issues, PRs, CI runs) via gh CLI
+github
+
+# Summarize — summarize URLs, PDFs, images, audio, and YouTube videos
+summarize
+
+# Weather
+weather
+
+# Skill Vetter — pre-install security review for agent skills
+skill-vetter
+
+# Find Skills — search ClawHub for useful skills
+find-skills

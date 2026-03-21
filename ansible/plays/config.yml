@@ -1,0 +1,248 @@
+---
+# =============================================================================
+# Config Play — push config files and decrypt secrets
+# =============================================================================
+# Tags: config
+#
+# Pushes openclaw.json to ~/.openclaw/ on the VPS, then deploys secrets via
+# one of two paths:
+#   1. Pre-decrypted secrets/.env exists (CI) → pushed directly to VPS
+#   2. Only secrets/.env.enc + age key exist (local) → pushed, decrypted on VPS
+#
+# Required var: OPENCLAW_GATEWAY_TOKEN
+# Optional vars (warn only): TELEGRAM_BOT_TOKEN, GIT_WORKSPACE_REPO
+# =============================================================================
+
+- name: Push config files and environment
+  hosts: all
+  gather_facts: false
+  vars:
+    remote_config_dir: /home/openclaw/.openclaw
+    remote_env_path: /home/openclaw/openclaw/.env
+    required_env_vars:
+      - OPENCLAW_GATEWAY_TOKEN
+    optional_env_vars:
+      - TELEGRAM_BOT_TOKEN
+      - GIT_WORKSPACE_REPO
+
+  tasks:
+
+    - name: Validate required .env variables
+      ansible.builtin.shell: |
+        set -e
+        ENV_FILE="{{ playbook_dir }}/../../secrets/.env"
+        if [[ ! -f "$ENV_FILE" ]]; then
+          echo "[WARN] secrets/.env not found — skipping env validation."
+          exit 0
+        fi
+        for var in {{ required_env_vars | join(' ') }}; do
+          val=$(grep -E "^${var}=.+" "$ENV_FILE" | head -1 | cut -d= -f2-)
+          if [[ -z "$val" ]]; then
+            echo "[ERROR] Missing required variable in secrets/.env: $var" >&2
+            exit 1
+          fi
+        done
+      args:
+        executable: /bin/bash
+      delegate_to: localhost
+      changed_when: false
+      tags: [config]
+
+    - name: Warn about missing optional .env variables
+      ansible.builtin.shell: |
+        ENV_FILE="{{ playbook_dir }}/../../secrets/.env"
+        if [[ ! -f "$ENV_FILE" ]]; then
+          exit 0
+        fi
+        for var in {{ optional_env_vars | join(' ') }}; do
+          val=$(grep -E "^${var}=.+" "$ENV_FILE" | head -1 | cut -d= -f2-)
+          if [[ -z "$val" ]]; then
+            echo "[WARN] Optional variable not set in secrets/.env: $var"
+          fi
+        done
+      args:
+        executable: /bin/bash
+      delegate_to: localhost
+      register: optional_var_warnings
+      changed_when: false
+      tags: [config]
+
+    - name: Show optional variable warnings
+      ansible.builtin.debug:
+        msg: "{{ optional_var_warnings.stdout_lines }}"
+      when: optional_var_warnings.stdout != ''
+      tags: [config]
+
+    - name: Ensure remote config directory has secure permissions
+      ansible.builtin.file:
+        path: "{{ remote_config_dir }}"
+        state: directory
+        mode: "0700"
+      tags: [config]
+
+    - name: Push openclaw.json
+      ansible.builtin.copy:
+        src: ../../openclaw.json
+        dest: "{{ remote_config_dir }}/openclaw.json"
+        mode: "0600"
+      tags: [config]
+
+    # -----------------------------------------------------------------
+    # Secrets deployment — two paths:
+    #   1. Pre-decrypted secrets/.env exists (CI: decrypted by workflow)
+    #      → push directly to VPS
+    #   2. Only secrets/.env.enc + age key exist (local dev)
+    #      → push both to VPS, decrypt on VPS
+    # -----------------------------------------------------------------
+
+    - name: Check if pre-decrypted .env exists locally
+      ansible.builtin.stat:
+        path: "{{ playbook_dir }}/../../secrets/.env"
+      delegate_to: localhost
+      register: env_plaintext_file
+      tags: [config]
+
+    - name: Push pre-decrypted .env directly to VPS
+      ansible.builtin.copy:
+        src: ../../secrets/.env
+        dest: "{{ remote_env_path }}"
+        mode: "0600"
+      when: env_plaintext_file.stat.exists
+      tags: [config]
+
+    - name: Check if encrypted .env.enc exists
+      ansible.builtin.stat:
+        path: "{{ playbook_dir }}/../../secrets/.env.enc"
+      delegate_to: localhost
+      register: env_enc_file
+      tags: [config]
+
+    - name: Ensure secrets directory exists on VPS
+      ansible.builtin.file:
+        path: /home/openclaw/openclaw/secrets
+        state: directory
+        mode: "0700"
+      tags: [config]
+
+    - name: Push encrypted .env.enc file
+      ansible.builtin.copy:
+        src: ../../secrets/.env.enc
+        dest: /home/openclaw/openclaw/secrets/.env.enc
+        mode: "0600"
+      when: env_enc_file.stat.exists
+      tags: [config]
+
+    - name: Check if SOPS age key exists locally
+      ansible.builtin.stat:
+        path: "{{ playbook_dir }}/../../secrets/age-key.txt"
+      delegate_to: localhost
+      register: age_key_file
+      tags: [config]
+
+    - name: Ensure SOPS config directory exists on VPS
+      ansible.builtin.file:
+        path: /home/openclaw/.config/sops/age
+        state: directory
+        mode: "0700"
+      when: age_key_file.stat.exists
+      tags: [config]
+
+    - name: Push SOPS age key
+      ansible.builtin.copy:
+        src: ../../secrets/age-key.txt
+        dest: /home/openclaw/.config/sops/age/keys.txt
+        mode: "0600"
+      when: age_key_file.stat.exists
+      tags: [config]
+
+    - name: Check if SOPS is installed on VPS
+      ansible.builtin.command: sops --version
+      register: sops_check
+      changed_when: false
+      failed_when: false
+      when: env_enc_file.stat.exists and age_key_file.stat.exists
+      tags: [config]
+
+    - name: Install SOPS on VPS
+      ansible.builtin.shell: |
+        mkdir -p ~/.local/bin
+        curl -fsSL "https://github.com/getsops/sops/releases/download/v3.9.4/sops-v3.9.4.linux.amd64" -o ~/.local/bin/sops
+        echo "5488e32bc471de7982ad895dd054bbab3ab91c417a118426134551e9626e4e85  ~/.local/bin/sops" | sha256sum --check
+        chmod +x ~/.local/bin/sops
+      args:
+        executable: /bin/bash
+      when: env_enc_file.stat.exists and age_key_file.stat.exists and sops_check.rc != 0
+      tags: [config]
+
+    - name: Decrypt .env.enc on VPS
+      ansible.builtin.shell: |
+        set -e
+        export PATH="$HOME/.local/bin:$PATH"
+        export SOPS_AGE_KEY_FILE=/home/openclaw/.config/sops/age/keys.txt
+        sops -d --input-type dotenv --output-type dotenv /home/openclaw/openclaw/secrets/.env.enc > "{{ remote_env_path }}"
+        chmod 0600 "{{ remote_env_path }}"
+      args:
+        executable: /bin/bash
+      when: not env_plaintext_file.stat.exists and env_enc_file.stat.exists and age_key_file.stat.exists
+      changed_when: true
+      tags: [config]
+
+    - name: Warn if no secrets could be deployed
+      ansible.builtin.debug:
+        msg: "No secrets deployed — neither secrets/.env nor secrets/.env.enc + age key found. Containers will start without updated secrets."
+      when: not env_plaintext_file.stat.exists and not (env_enc_file.stat.exists and age_key_file.stat.exists)
+      tags: [config]
+
+    - name: Copy workspace sync script
+      ansible.builtin.copy:
+        src: ../../scripts/workspace-sync.sh
+        dest: ~/openclaw/workspace-sync.sh
+        mode: "0755"
+      tags: [config]
+
+    - name: Check if workspace sync is enabled
+      ansible.builtin.shell: |
+        grep -qE '^GIT_WORKSPACE_REPO=.+' ~/openclaw/.env 2>/dev/null && echo 'enabled' || echo 'disabled'
+      args:
+        executable: /bin/bash
+      register: workspace_sync_state
+      changed_when: false
+      tags: [config]
+
+    - name: Get workspace sync schedule
+      ansible.builtin.shell: |
+        schedule=$(grep -E '^GIT_WORKSPACE_SYNC_SCHEDULE=' ~/openclaw/.env | head -1 | cut -d= -f2-)
+        echo "${schedule:-0 4 * * *}"
+      args:
+        executable: /bin/bash
+      register: workspace_sync_schedule
+      changed_when: false
+      when: workspace_sync_state.stdout == 'enabled'
+      tags: [config]
+
+    - name: Ensure logs directory exists
+      ansible.builtin.file:
+        path: ~/openclaw/logs
+        state: directory
+        mode: "0755"
+      when: workspace_sync_state.stdout == 'enabled'
+      tags: [config]
+
+    - name: Install workspace sync cron
+      ansible.builtin.cron:
+        name: openclaw-workspace-sync
+        minute: "{{ workspace_sync_schedule.stdout.strip().split(' ')[0] }}"
+        hour: "{{ workspace_sync_schedule.stdout.strip().split(' ')[1] }}"
+        day: "{{ workspace_sync_schedule.stdout.strip().split(' ')[2] }}"
+        month: "{{ workspace_sync_schedule.stdout.strip().split(' ')[3] }}"
+        weekday: "{{ workspace_sync_schedule.stdout.strip().split(' ')[4] }}"
+        job: "~/openclaw/workspace-sync.sh >> ~/openclaw/logs/workspace-sync.log 2>&1"
+      when: workspace_sync_state.stdout == 'enabled'
+      tags: [config]
+
+    - name: Remove workspace sync cron if disabled
+      ansible.builtin.cron:
+        name: openclaw-workspace-sync
+        state: absent
+      when: workspace_sync_state.stdout == 'disabled'
+      tags: [config]

@@ -1,0 +1,78 @@
+name: Deploy to VPS
+
+# Triggered automatically when relevant files change on main.
+# Copy to deploy.yml and configure the required secrets in your repo settings.
+#
+# Required secrets:
+#   SERVER_IP          — VPS hostname or IP (e.g. Tailscale MagicDNS name or public IP)
+#   SSH_PRIVATE_KEY    — private key for the deploy user (openclaw)
+#   SOPS_AGE_KEY       — age private key used to decrypt secrets/.env.enc
+#
+# Optional (Tailscale users only):
+#   TAILSCALE_OAUTH_CLIENT_ID      — OAuth client ID from tailscale.com/settings/oauth
+#   TAILSCALE_OAUTH_CLIENT_SECRET  — OAuth client secret
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docker/**'
+      - 'docker-compose.yml'
+      - 'ansible/**'
+      - 'secrets/.env.enc'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 2
+
+      # Remove this step if not using Tailscale — set SERVER_IP to your VPS public IP instead.
+      - name: Connect to Tailscale
+        uses: tailscale/github-action@v4
+        with:
+          oauth-client-id: ${{ secrets.TAILSCALE_OAUTH_CLIENT_ID }}
+          oauth-secret: ${{ secrets.TAILSCALE_OAUTH_CLIENT_SECRET }}
+          tags: tag:ci-runner
+
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/ci_deploy_key
+          chmod 600 ~/.ssh/ci_deploy_key
+
+      - name: Install Ansible
+        run: pip install "ansible-core>=2.20.3,<3"
+
+      - name: Install SOPS
+        # NOTE: SOPS version must match ARG in docker/Dockerfile
+        run: |
+          SOPS_VERSION=3.9.4
+          SOPS_SHA256=5488e32bc471de7982ad895dd054bbab3ab91c417a118426134551e9626e4e85
+          curl -fsSL "https://github.com/getsops/sops/releases/download/v${SOPS_VERSION}/sops-v${SOPS_VERSION}.linux.amd64" -o /usr/local/bin/sops
+          echo "${SOPS_SHA256}  /usr/local/bin/sops" | sha256sum --check
+          chmod +x /usr/local/bin/sops
+
+      - name: Decrypt secrets
+        env:
+          SOPS_AGE_KEY: ${{ secrets.SOPS_AGE_KEY }}
+        run: sops --decrypt --input-type dotenv --output-type dotenv secrets/.env.enc > secrets/.env
+
+      - name: Deploy
+        env:
+          SERVER_IP: ${{ secrets.SERVER_IP }}
+          SSH_KEY: ~/.ssh/ci_deploy_key
+        run: |
+          if git diff --name-only HEAD~1 HEAD | grep -qE '^docker/|^docker-compose\.yml'; then
+            make deploy REBUILD=1
+          else
+            make deploy
+          fi
+
+      - name: Cleanup secrets
+        if: always()
+        run: |
+          shred -u secrets/.env 2>/dev/null || true
+          rm -f ~/.ssh/ci_deploy_key

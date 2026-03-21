@@ -1,0 +1,89 @@
+---
+# =============================================================================
+# Backup Play — trigger backup and/or download archives locally
+# =============================================================================
+# Tags:
+#   backup_now  — run the backup script on the VPS via systemd
+#   backup_pull — download the latest backup archive(s) to ./backups/ locally
+#
+# Both tags use `never` so they only run when explicitly requested.
+# =============================================================================
+
+- name: Backup OpenClaw data
+  hosts: all
+  gather_facts: false
+
+  tasks:
+
+    # -------------------------------------------------------------------------
+    # backup_now — trigger systemd backup service on the VPS
+    # -------------------------------------------------------------------------
+
+    - name: Run backup now via systemd
+      ansible.builtin.command: systemctl --user start openclaw-backup.service
+      changed_when: true
+      tags: [never, backup_now]
+
+    # -------------------------------------------------------------------------
+    # backup_pull — fetch latest backup archives to local ./backups/ directory
+    # -------------------------------------------------------------------------
+
+    - name: Ensure local backups directory exists
+      ansible.builtin.file:
+        path: "{{ playbook_dir }}/../../backups"
+        state: directory
+        mode: "0755"
+      delegate_to: localhost
+      run_once: true
+      tags: [never, backup_pull]
+
+    - name: Find latest openclaw backup on VPS
+      ansible.builtin.shell: ls -t ~/backups/openclaw_backup_*.tar.gz 2>/dev/null | head -1
+      args:
+        executable: /bin/bash
+      register: latest_oc_backup
+      changed_when: false
+      tags: [never, backup_pull]
+
+    - name: Fail if no openclaw backup found
+      ansible.builtin.fail:
+        msg: "No openclaw backup found on VPS. Run: make backup-now"
+      when: latest_oc_backup.stdout == ''
+      tags: [never, backup_pull]
+
+    - name: Find latest Mission Control backup on VPS
+      ansible.builtin.shell: ls -t ~/backups/mc_backup_*.db 2>/dev/null | head -1
+      args:
+        executable: /bin/bash
+      register: latest_mc_backup
+      changed_when: false
+      tags: [never, backup_pull]
+
+    - name: Fetch openclaw backup archive
+      ansible.builtin.fetch:
+        src: "{{ latest_oc_backup.stdout }}"
+        dest: "{{ playbook_dir }}/../../backups/"
+        flat: true
+      tags: [never, backup_pull]
+
+    - name: Fetch Mission Control backup
+      ansible.builtin.fetch:
+        src: "{{ latest_mc_backup.stdout }}"
+        dest: "{{ playbook_dir }}/../../backups/"
+        flat: true
+      when: latest_mc_backup.stdout != ''
+      tags: [never, backup_pull]
+
+    - name: Show downloaded backup files
+      ansible.builtin.shell: ls -lh "{{ playbook_dir }}/../../backups/"
+      args:
+        executable: /bin/bash
+      delegate_to: localhost
+      register: backup_ls
+      changed_when: false
+      tags: [never, backup_pull]
+
+    - name: Display backup files
+      ansible.builtin.debug:
+        msg: "{{ backup_ls.stdout_lines }}"
+      tags: [never, backup_pull]

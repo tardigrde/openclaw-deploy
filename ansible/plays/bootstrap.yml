@@ -1,0 +1,119 @@
+---
+# =============================================================================
+# Bootstrap Play — first-time VPS setup
+# =============================================================================
+# Tags: bootstrap
+#
+# Creates required directories, installs the backup systemd timer, enables
+# systemd lingering. Run once after `make apply`.
+#
+# Ansible connects as the `openclaw` user (created by cloud-init).
+# become: false — cloud-init already set up the user with correct permissions.
+# =============================================================================
+
+- name: Bootstrap OpenClaw VPS
+  hosts: all
+  gather_facts: false
+
+  tasks:
+
+    - name: Check that secrets/.env.enc exists before bootstrapping
+      ansible.builtin.stat:
+        path: "{{ playbook_dir }}/../../secrets/.env.enc"
+      delegate_to: localhost
+      register: env_enc_pre_bootstrap
+      tags: [bootstrap]
+
+    - name: Fail if secrets/.env.enc is missing
+      ansible.builtin.fail:
+        msg: >
+          secrets/.env.enc not found. Run make secrets-encrypt to create it,
+          then re-run: make bootstrap
+      when: not env_enc_pre_bootstrap.stat.exists
+      tags: [bootstrap]
+
+    - name: Check that secrets/age-key.txt exists before bootstrapping
+      ansible.builtin.stat:
+        path: "{{ playbook_dir }}/../../secrets/age-key.txt"
+      delegate_to: localhost
+      register: age_key_pre_bootstrap
+      tags: [bootstrap]
+
+    - name: Fail if secrets/age-key.txt is missing
+      ansible.builtin.fail:
+        msg: >
+          secrets/age-key.txt not found. Run make secrets-generate-key to
+          create it, then re-run: make bootstrap
+      when: not age_key_pre_bootstrap.stat.exists
+      tags: [bootstrap]
+
+    - name: Wait for cloud-init to complete
+      ansible.builtin.command: timeout 300 cloud-init status --wait
+      changed_when: false
+      failed_when: false
+      tags: [bootstrap]
+
+    - name: Create required directories
+      ansible.builtin.file:
+        path: "{{ item.path }}"
+        state: directory
+        mode: "{{ item.mode }}"
+      loop:
+        - { path: ~/openclaw,             mode: "0755" }
+        - { path: ~/.openclaw,            mode: "0700" }
+        - { path: ~/.openclaw/workspace,  mode: "0700" }
+        - { path: ~/backups,              mode: "0755" }
+        - { path: ~/scripts,              mode: "0755" }
+        - { path: ~/logs,                 mode: "0755" }
+        - { path: ~/.config/systemd/user, mode: "0755" }
+      tags: [bootstrap]
+
+    - name: Copy backup script
+      ansible.builtin.copy:
+        src: ../../scripts/backup.sh
+        dest: ~/scripts/backup.sh
+        mode: "0755"
+      tags: [bootstrap]
+
+    - name: Write backup systemd service
+      ansible.builtin.copy:
+        content: |
+          [Unit]
+          Description=OpenClaw Daily Backup
+
+          [Service]
+          Type=oneshot
+          ExecStart=/home/openclaw/scripts/backup.sh
+        dest: ~/.config/systemd/user/openclaw-backup.service
+        mode: "0644"
+      tags: [bootstrap]
+
+    - name: Write backup systemd timer
+      ansible.builtin.copy:
+        content: |
+          [Unit]
+          Description=OpenClaw Daily Backup Timer
+
+          [Timer]
+          OnCalendar=*-*-* 03:00:00
+          Persistent=true
+
+          [Install]
+          WantedBy=timers.target
+        dest: ~/.config/systemd/user/openclaw-backup.timer
+        mode: "0644"
+      tags: [bootstrap]
+
+    - name: Enable and start backup timer
+      ansible.builtin.systemd:
+        name: openclaw-backup.timer
+        scope: user
+        enabled: true
+        state: started
+        daemon_reload: true
+      tags: [bootstrap]
+
+    - name: Enable systemd lingering
+      ansible.builtin.command: loginctl enable-linger openclaw
+      changed_when: false
+      tags: [bootstrap]

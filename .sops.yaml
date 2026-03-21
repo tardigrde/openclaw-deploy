@@ -1,0 +1,9 @@
+# SOPS configuration
+# Run `make secrets-generate-key` to create the age key, then `make secrets-encrypt`
+creation_rules:
+  - path_regex: secrets/\.env(\.enc)?$
+    # Replace with your age public key after running: make secrets-generate-key
+    age: null
+    # dotenv format required — .env files contain # comments that break JSON parsing
+    input_type: dotenv
+    output_type: dotenv

@@ -1,0 +1,61 @@
+---
+# =============================================================================
+# Addons Play — optional addon installations
+# =============================================================================
+# Tags (uses `never` — only run when explicitly requested):
+#   addon-weather-report  — install morning-weather cron on VPS
+#
+# Usage:
+#   make addon-weather    # installs morning-weather cron (from Makefile.local)
+# =============================================================================
+
+- name: Install optional addons
+  hosts: all
+  gather_facts: false
+
+  tasks:
+
+    # -------------------------------------------------------------------------
+    # addon-weather-report — daily weather summary sent to Telegram
+    # -------------------------------------------------------------------------
+
+    - name: Check if morning-weather.py exists locally
+      ansible.builtin.stat:
+        path: "{{ playbook_dir }}/../../scripts/local/morning-weather.py"
+      delegate_to: localhost
+      register: morning_weather_script
+      tags: [never, addon-weather-report]
+
+    - name: Fail if morning-weather.py not found locally
+      ansible.builtin.fail:
+        msg: "scripts/local/morning-weather.py not found. Cannot install morning-weather addon."
+      when: not morning_weather_script.stat.exists
+      tags: [never, addon-weather-report]
+
+    - name: Copy morning-weather script to VPS
+      ansible.builtin.copy:
+        src: ../../scripts/local/morning-weather.py
+        dest: ~/morning-weather.py
+        mode: "0755"
+      tags: [never, addon-weather-report]
+
+    - name: Create morning-weather cron wrapper
+      ansible.builtin.copy:
+        content: |
+          #!/usr/bin/env bash
+          set -a
+          # shellcheck disable=SC1090
+          source ~/openclaw/.env 2>/dev/null || true
+          set +a
+          exec python3 ~/morning-weather.py
+        dest: ~/run-morning-weather.sh
+        mode: "0755"
+      tags: [never, addon-weather-report]
+
+    - name: Install morning-weather cron job
+      ansible.builtin.cron:
+        name: morning-weather
+        minute: "0"
+        hour: "5"
+        job: "~/run-morning-weather.sh >> ~/logs/morning-weather.log 2>&1"
+      tags: [never, addon-weather-report]

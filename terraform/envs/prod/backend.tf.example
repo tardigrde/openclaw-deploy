@@ -1,0 +1,16 @@
+# Copy to backend.tf (gitignored) and configure your backend.
+#
+# Option A — Local state (default, no setup required):
+terraform {
+  backend "local" {}
+}
+
+# Option B — GCS remote state (recommended for teams / CI):
+# See docs/remote-state.md for bucket creation steps and migration guide.
+#
+# terraform {
+#   backend "gcs" {
+#     bucket = "your-project-tfstate"
+#     prefix = "openclaw/prod"
+#   }
+# }

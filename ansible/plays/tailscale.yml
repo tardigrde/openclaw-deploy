@@ -1,0 +1,57 @@
+---
+# =============================================================================
+# Tailscale Play — install and register Tailscale VPN
+# =============================================================================
+# Tags: tailscale
+#
+# Runs as part of `make bootstrap` (no tag filter → all tasks execute).
+# Can also be run standalone: make tailscale-setup
+#
+# Skipped entirely when tailscale_auth_key is empty or not provided.
+# The auth key is never logged (no_log: true on the registration task).
+#
+# Variables (passed via --extra-vars from Makefile):
+#   tailscale_auth_key  — Tailscale pre-auth key.
+#                         Set TAILSCALE_AUTH_KEY in secrets/inputs.sh.
+#                         Use a reusable key so re-running bootstrap is safe.
+#
+# Runs as root (become: true) — package install and ufw require root.
+# The Hetzner firewall UDP 41641 rule is managed separately by Terraform
+# (enable_tailscale in terraform.tfvars). This play handles the in-guest layer.
+# =============================================================================
+
+- name: Configure Tailscale VPN
+  hosts: all
+  gather_facts: false
+  become: true
+  vars:
+    tailscale_auth_key: ""
+
+  tasks:
+
+    - name: Install and register Tailscale
+      when: tailscale_auth_key != ""
+      tags: [tailscale]
+      block:
+
+        - name: Install Tailscale
+          ansible.builtin.shell:
+            cmd: curl -fsSL https://tailscale.com/install.sh | sh
+            creates: /usr/bin/tailscale
+
+        - name: Enable and start tailscaled service
+          ansible.builtin.systemd:
+            name: tailscaled
+            enabled: true
+            state: started
+
+        - name: Allow Tailscale UDP through UFW
+          ansible.builtin.command: ufw allow 41641/udp comment 'Tailscale'
+          register: ufw_tailscale
+          changed_when: "'Rule added' in ufw_tailscale.stdout"
+
+        - name: Register Tailscale node
+          ansible.builtin.command:
+            cmd: tailscale up --auth-key="{{ tailscale_auth_key }}" --hostname="openclaw-prod" --accept-routes
+          no_log: true
+          changed_when: true

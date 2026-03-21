@@ -1,0 +1,74 @@
+---
+# =============================================================================
+# Setup Auth Play — write Claude subscription auth profile
+# =============================================================================
+# Tags: setup_auth  (never runs by default — must be explicitly requested)
+#
+# Reads CLAUDE_SETUP_TOKEN from the local environment, writes auth-profiles.json
+# to the VPS host volume, and restarts the gateway container.
+#
+# Prerequisites:
+#   1. Generate a setup token:  claude setup-token
+#   2. Export it:               export CLAUDE_SETUP_TOKEN="<token>"
+#   3. Run:                     make setup-auth
+#
+# The auth file is written to:
+#   ~/.openclaw/agents/main/agent/auth-profiles.json
+# This path is volume-mounted into the container and persists across deploys.
+# =============================================================================
+
+- name: Configure Claude subscription auth
+  hosts: all
+  gather_facts: false
+
+  tasks:
+
+    - name: Fail if CLAUDE_SETUP_TOKEN is not set
+      ansible.builtin.fail:
+        msg: |
+          CLAUDE_SETUP_TOKEN not set.
+
+          Generate a setup token and export it:
+            1. Run:  claude setup-token
+            2. Copy the token output
+            3. Add to secrets/inputs.sh:
+                 export CLAUDE_SETUP_TOKEN="<your-token>"
+            4. Run:  source secrets/inputs.sh && make setup-auth
+      when: lookup('env', 'CLAUDE_SETUP_TOKEN') == ''
+      run_once: true
+      tags: [never, setup_auth]
+
+    - name: Create auth directory
+      ansible.builtin.file:
+        path: ~/.openclaw/agents/main/agent
+        state: directory
+        mode: "0700"
+      tags: [never, setup_auth]
+
+    - name: Write auth-profiles.json
+      ansible.builtin.copy:
+        content: |
+          {
+            "version": 1,
+            "profiles": {
+              "anthropic:manual": {
+                "type": "token",
+                "provider": "anthropic",
+                "token": "{{ lookup('env', 'CLAUDE_SETUP_TOKEN') }}"
+              }
+            },
+            "order": {
+              "anthropic": ["anthropic:manual"]
+            }
+          }
+        dest: ~/.openclaw/agents/main/agent/auth-profiles.json
+        mode: "0600"
+      no_log: true
+      tags: [never, setup_auth]
+
+    - name: Restart openclaw-gateway container
+      ansible.builtin.command:
+        cmd: docker compose restart openclaw-gateway
+        chdir: ~/openclaw
+      changed_when: true
+      tags: [never, setup_auth]

@@ -1,0 +1,18 @@
+# =============================================================================
+# OpenClaw Workspace — Sensitive Data
+# =============================================================================
+# The workspace-sync script (git add -A) commits everything by default.
+# This file prevents sensitive OpenClaw dashboard data from being synced.
+# =============================================================================
+
+# Dashboard auth data
+data/credentials.json
+
+# Login audit log (IPs, usernames, timestamps)
+data/audit.log
+
+# Health check history
+data/health-history.json
+
+# External repos (cloned via gh, not part of workspace)
+repos/

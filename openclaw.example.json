@@ -1,0 +1,168 @@
+{
+  "gateway": {
+    "mode": "local",
+    "port": 18789,
+    "auth": {
+      "allowTailscale": true
+    },
+    "controlUi": {
+      "allowInsecureAuth": true,
+      "allowedOrigins": [
+        "localhost",
+        "127.0.0.1",
+        "https://<your-node>.<tailnet>.ts.net"
+      ]
+    },
+    "trustedProxies": [
+      "172.20.0.0/24"
+    ]
+  },
+  "channels": {
+    "telegram": {
+      "enabled": true,
+      "dmPolicy": "pairing",
+      "groupPolicy": "allowlist",
+      "groupAllowFrom": [
+        "<your-telegram-user-id>"
+      ],
+      "streaming": "partial",
+      "retry": {
+        "attempts": 3,
+        "minDelayMs": 400,
+        "maxDelayMs": 30000,
+        "jitter": 0.1
+      },
+      "groups": {
+        "*": {
+          "requireMention": true
+        }
+      }
+    }
+  },
+  "plugins": {
+    "entries": {
+      "telegram": {
+        "enabled": true
+      },
+      "lossless-claw": {
+        "enabled": true,
+        "config": {
+          "freshTailCount": 32,
+          "contextThreshold": 0.75,
+          "incrementalMaxDepth": -1
+        }
+      },
+      "diffs": {
+        "enabled": true,
+        "config": {
+          "defaults": {
+            "layout": "unified",
+            "theme": "dark",
+            "fileFormat": "png",
+            "fileQuality": "standard",
+            "fileScale": 2,
+            "fileMaxWidth": 960,
+            "mode": "both"
+          }
+        }
+      }
+    },
+    "slots": {
+      "contextEngine": "lossless-claw"
+    }
+  },
+  "agents": {
+    "defaults": {
+      "model": {
+        "primary": "anthropic/claude-sonnet-4-5"
+      },
+      "userTimezone": "UTC",
+      "timeFormat": "24",
+      "imageMaxDimensionPx": 800,
+      "contextTokens": 180000,
+      "compaction": {
+        "mode": "safeguard"
+      },
+      "maxConcurrent": 2
+    },
+    "list": [
+      {
+        "id": "main",
+        "workspace": "~/.openclaw/workspace",
+        "default": true,
+        "groupChat": {
+          "mentionPatterns": [
+            "@your_bot_username"
+          ]
+        }
+      }
+    ]
+  },
+  "tools": {
+    "exec": {
+      "security": "full",
+      "ask": "off"
+    },
+    "elevated": {
+      "enabled": true,
+      "allowFrom": {
+        "telegram": [
+          "<your-telegram-user-id>"
+        ]
+      }
+    }
+  },
+  "commands": {
+    "native": "auto",
+    "nativeSkills": "auto",
+    "bash": true,
+    "config": true,
+    "debug": true
+  },
+  "messages": {
+    "ackReactionScope": "group-mentions"
+  },
+  "auth": {
+    "profiles": {
+      "anthropic:manual": {
+        "provider": "anthropic",
+        "mode": "token"
+      }
+    },
+    "order": {
+      "anthropic": [
+        "anthropic:manual"
+      ]
+    }
+  },
+  "session": {
+    "maintenance": {
+      "maxDiskBytes": 5368709120,
+      "highWaterBytes": 4294967296
+    }
+  },
+  "browser": {
+    "profiles": {
+      "vps": {
+        "cdpUrl": "http://172.20.0.10:9222",
+        "color": "#00AA00"
+      }
+    }
+  },
+  "logging": {
+    "level": "info",
+    "consoleLevel": "info",
+    "redactSensitive": "tools"
+  },
+  "secrets": {
+    "providers": {
+      "sops_env": {
+        "source": "exec",
+        "command": "/bin/sh",
+        "args": ["-c", "sops -d --input-type dotenv --output-type dotenv /home/node/.openclaw/secrets/.env.enc | grep -E '^{{secret}}=' | cut -d= -f2- | tail -n1"],
+        "passEnv": ["SOPS_AGE_KEY_FILE"],
+        "jsonOnly": false
+      }
+    }
+  }
+}
