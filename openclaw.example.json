@@ -21,6 +21,9 @@
     "telegram": {
       "enabled": true,
       "dmPolicy": "pairing",
+      "allowFrom": [
+        "<your-telegram-user-id>"
+      ],
       "groupPolicy": "allowlist",
       "groupAllowFrom": [
         "<your-telegram-user-id>"
@@ -35,6 +38,11 @@
       "groups": {
         "*": {
           "requireMention": true
+        },
+        "<your-group-chat-id>": {
+          "requireMention": false,
+          "groupPolicy": "open",
+          "systemPrompt": "You're in a group chat..."
         }
       }
     }
@@ -92,7 +100,8 @@
         "default": true,
         "groupChat": {
           "mentionPatterns": [
-            "@your_bot_username"
+            "@your_bot_username",
+            "bot"
           ]
         }
       }
