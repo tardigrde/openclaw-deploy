@@ -206,7 +206,7 @@ Tailscale provides a WireGuard-based VPN mesh. When enabled, it allows SSH and g
 
 | Variable           | Default | Where set                                          | Description                        |
 |--------------------|---------|----------------------------------------------------|------------------------------------|
-| `enable_tailscale` | `false` | `terraform/envs/prod/terraform.tfvars`       | Opens Hetzner firewall UDP 41641   |
+| `enable_tailscale` | `false` | `terraform/envs/prod/terraform.tfvars` (copy from `terraform.tfvars.example`) | Opens Hetzner firewall UDP 41641   |
 
 The auth key is **not** a Terraform variable. It is passed to Ansible as `TAILSCALE_AUTH_KEY` (set in `secrets/inputs.sh`).
 

@@ -18,7 +18,6 @@ crash.*.log
 # Variable files (may contain secrets)
 *.tfvars
 !*.tfvars.example
-!terraform/envs/prod/terraform.tfvars
 
 # Backend config (personal — copy from backend.tf.example)
 backend.tf

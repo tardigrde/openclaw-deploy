@@ -167,6 +167,7 @@ Personal services, extra Make targets, addon scripts, and local Ansible plays us
 | Layer | What to customize | Override file | Template | Required? | Copy when |
 |-------|-------------------|---------------|----------|-----------|-----------|
 | Terraform | State backend | `terraform/envs/prod/backend.tf` | `backend.tf.example` | Required | Before `make init` |
+| Terraform | Infrastructure variables | `terraform/envs/prod/terraform.tfvars` | `terraform.tfvars.example` | Required | Before `make plan` |
 | Docker | Extra services | `docker-compose.override.yml` | `docker-compose.override.example.yml` | Optional | **Before `make bootstrap`** |
 | Make | Extra targets | `Makefile.local` | `Makefile.local.example` | Optional | Anytime |
 | Ansible | Extra plays | `ansible/site.local.yml` | `ansible/site.local.example.yml` | Optional | Anytime |
@@ -184,7 +185,7 @@ plays live in `ansible/plays/` with a `.local.yml` suffix (gitignored).
 
 ### Server Sizing
 
-Default: CX23 (2 vCPU, 4 GB RAM). To change, edit `terraform/envs/prod/terraform.tfvars`:
+Default: CX23 (2 vCPU, 4 GB RAM). To change, edit `terraform/envs/prod/terraform.tfvars` (copy from `terraform.tfvars.example` if you haven't already):
 
 ```hcl
 server_type = "cx32"  # 4 vCPU, 8 GB RAM
