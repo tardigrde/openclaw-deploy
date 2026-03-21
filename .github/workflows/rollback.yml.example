@@ -1,7 +1,7 @@
-name: Deploy to VPS
+name: Rollback deployment
 
-# Triggered automatically when relevant files change on main.
-# Copy to deploy.yml and configure the required secrets in your repo settings.
+# Manual rollback to a previous git SHA.
+# Copy to rollback.yml (remove the .example extension) and configure the required secrets in your repo settings.
 #
 # Required secrets:
 #   SERVER_IP          — VPS hostname or IP (e.g. Tailscale MagicDNS name or public IP)
@@ -13,21 +13,20 @@ name: Deploy to VPS
 #   TAILSCALE_OAUTH_CLIENT_SECRET  — OAuth client secret
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'docker/**'
-      - 'docker-compose.yml'
-      - 'ansible/**'
-      - 'secrets/.env.enc'
+  workflow_dispatch:
+    inputs:
+      git_sha:
+        description: 'Git SHA to roll back to (find via git log)'
+        required: true
+        type: string
 
 jobs:
-  deploy:
+  rollback:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
         with:
-          fetch-depth: 2
+          ref: ${{ inputs.git_sha }}
 
       # Remove this step if not using Tailscale — set SERVER_IP to your VPS public IP instead.
       - name: Connect to Tailscale
@@ -60,16 +59,11 @@ jobs:
           SOPS_AGE_KEY: ${{ secrets.SOPS_AGE_KEY }}
         run: sops --decrypt --input-type dotenv --output-type dotenv secrets/.env.enc > secrets/.env
 
-      - name: Deploy
+      - name: Rollback and deploy
         env:
           SERVER_IP: ${{ secrets.SERVER_IP }}
           SSH_KEY: ~/.ssh/ci_deploy_key
-        run: |
-          if git diff --name-only HEAD~1 HEAD | grep -qE '^docker/|^docker-compose\.yml'; then
-            make deploy REBUILD=1
-          else
-            make deploy
-          fi
+        run: make deploy REBUILD=1
 
       - name: Cleanup secrets
         if: always()

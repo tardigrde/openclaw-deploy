@@ -64,7 +64,7 @@ git commit -m "chore: add SOPS-encrypted secrets"
 | `TAILSCALE_OAUTH_CLIENT_ID` | From step 2 |
 | `TAILSCALE_OAUTH_CLIENT_SECRET` | From step 2 |
 | `SSH_PRIVATE_KEY` | Private key from step 1 |
-| `VPS_TAILSCALE_HOSTNAME` | Tailscale **IP** of the VPS (e.g. `100.x.x.x`) — use the IP, not the MagicDNS hostname (MagicDNS resolution is unreliable on ephemeral runners) |
+| `SERVER_IP` | Tailscale **IP** of the VPS (e.g. `100.x.x.x`) — use the IP, not the MagicDNS hostname (MagicDNS resolution is unreliable on ephemeral runners) |
 | `SOPS_AGE_KEY` | Full content of `secrets/age-key.txt` (the age private key — multiline is fine) |
 
 ## Updating Secrets

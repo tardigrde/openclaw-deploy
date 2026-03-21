@@ -306,14 +306,16 @@ Runs on every PR and push to `main`. Fails the build if any of these fail:
 
 ### Deploy (`deploy.yml`)
 
-Triggers on push to `main` when `config/`, `docker/`, `docker-compose.yml`, `ansible/`, or `secrets/.env.enc` change.
+Triggers on push to `main` when `docker/`, `docker-compose.yml`, `ansible/`, or `secrets/.env.enc` change.
 
 1. Connects to Tailscale using OAuth credentials (`TAILSCALE_OAUTH_CLIENT_ID`, `TAILSCALE_OAUTH_CLIENT_SECRET`) with tag `tag:ci-runner`
-2. Writes `CI_SSH_PRIVATE_KEY` to a temp key file (`0600`)
+2. Writes `SSH_PRIVATE_KEY` to a temp key file (`0600`)
 3. Installs SOPS, decrypts `secrets/.env.enc` using `SOPS_AGE_KEY` secret
 4. Runs `make deploy` (or `make deploy REBUILD=1` if Docker files changed)
 
-Required GitHub secrets: `TAILSCALE_OAUTH_CLIENT_ID`, `TAILSCALE_OAUTH_CLIENT_SECRET`, `CI_SSH_PRIVATE_KEY`, `VPS_TAILSCALE_HOSTNAME`, `SOPS_AGE_KEY`.
+Required GitHub secrets: `TAILSCALE_OAUTH_CLIENT_ID`, `TAILSCALE_OAUTH_CLIENT_SECRET`, `SSH_PRIVATE_KEY`, `SERVER_IP`, `SOPS_AGE_KEY`.
+
+Template: `.github/workflows/deploy.yml.example` — copy to `deploy.yml` to enable. See [GitOps auto-deploy](gitops-auto-deploy.md) for full setup.
 
 ### Rollback (`rollback.yml`)
 

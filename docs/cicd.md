@@ -2,7 +2,7 @@
 
 The built-in CI runs **Terraform only** (`plan` on PRs, `apply` on manual dispatch). Ansible is never run in CI — all `make bootstrap` / `make deploy` operations are local only.
 
-An optional GitOps deployment workflow is also included — copy `.github/workflows/deploy.example.yml` to `.github/workflows/deploy.yml` to enable automatic Ansible-based deployments on push. See [GitOps auto-deploy](gitops-auto-deploy.md) for setup instructions.
+An optional GitOps deployment workflow is also included — copy `.github/workflows/deploy.yml.example` to `.github/workflows/deploy.yml` to enable automatic Ansible-based deployments on push. See [GitOps auto-deploy](gitops-auto-deploy.md) for setup instructions.
 
 ## Terraform Plan (automatic on PRs)
 
