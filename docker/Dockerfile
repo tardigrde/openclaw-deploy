@@ -52,10 +52,8 @@ RUN npm install -g \
     openclaw@${OPENCLAW_VERSION} \
     clawhub \
     @steipete/summarize \
-    ws
-
-# Create OpenClaw directories owned by node
-RUN mkdir -p /home/node/.openclaw/workspace /.clawhub \
+    ws \
+  && mkdir -p /home/node/.openclaw/workspace /.clawhub \
   && chown -R node:node /home/node/.openclaw /.clawhub
 
 # Copy skills manifest, workspace templates, agent templates, and entrypoint
