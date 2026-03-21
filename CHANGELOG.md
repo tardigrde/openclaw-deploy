@@ -1,6 +1,21 @@
 # CHANGELOG
 
 
+## v0.3.0 (2026-03-21)
+
+### Features
+
+- Add agent workspace templates support and entrypoint extension hook
+  ([`919d36f`](https://github.com/tardigrde/openclaw-deploy/commit/919d36f5c98d0dafd124a20dc03ee98ae9a4e7d2))
+
+- Copy agent-workspace-templates/ into image at /opt/agent-workspace-templates/ - Seed templates
+  into workspace/agents/ on startup (no-clobber) - Source /usr/local/bin/entrypoint.local.sh if
+  present (private deployment hook) - Add empty docker/agent-workspace-templates/.gitkeep as
+  placeholder
+
+Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
+
+
 ## v0.2.0 (2026-03-21)
 
 ### Features
