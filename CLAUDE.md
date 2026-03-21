@@ -4,6 +4,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 > Note: it should be kept concise.
 
+> If `docs/local/CLAUDE.md` exists, read it now — it contains private deployment instructions for this instance.
+
 ## Overview
 
 This is an infrastructure-as-code repository for deploying the [OpenClaw](https://openclaw.ai) AI coding assistant on a Hetzner Cloud VPS.
