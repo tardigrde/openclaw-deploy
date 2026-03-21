@@ -58,7 +58,7 @@ Resilience for transient network errors (outbound `sendMessage`, `editMessage`, 
 ### Mention Patterns
 Added to `agents.list[].groupChat.mentionPatterns` for fallback detection:
 ```json
-"mentionPatterns": ["@your_bot_username", "clawdy", "bot"]
+"mentionPatterns": ["@your_bot_username", "bot"]
 ```
 These are case-insensitive regexes. Native Telegram @-mentions still work; patterns are a safety net.
 
