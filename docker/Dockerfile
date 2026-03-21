@@ -61,12 +61,14 @@ RUN mkdir -p /home/node/.openclaw/workspace /.clawhub \
 # Copy skills manifest, workspace templates, agent templates, and entrypoint
 COPY docker/skills-manifest.txt /opt/config/skills-manifest.txt
 COPY docker/workspace-templates/ /opt/workspace-templates/
+COPY docker/agent-workspace-templates/ /opt/agent-workspace-templates/
 COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
 USER node
 
 # Set git identity for agent commits
+# Override via docker-compose build args (e.g. in docker-compose.override.yml)
 ARG GIT_USER_NAME="OpenClaw"
 ARG GIT_USER_EMAIL="openclaw@users.noreply.local"
 RUN git config --global user.name "${GIT_USER_NAME}" \
