@@ -26,6 +26,9 @@ jobs:
 
       - run: pip install mkdocs-material
 
+      - name: Copy root docs into docs/
+        run: cp README.md docs/index.md && cp SECURITY.md docs/security.md
+
       - run: mkdocs build --strict
 
       - uses: actions/upload-pages-artifact@v3

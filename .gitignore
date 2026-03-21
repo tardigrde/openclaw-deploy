@@ -123,3 +123,7 @@ docs/local/
 -e 
 # MkDocs build output
 site/
+-e 
+# Copied in CI — do not commit
+docs/index.md
+docs/security.md

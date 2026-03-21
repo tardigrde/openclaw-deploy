@@ -73,6 +73,4 @@ nav:
       - Security Hardening: security-hardening.md
   - Addons:
       - Weather Report: addons/weather-report.md
-  - About:
-      - Changelog: changelog.md
-      - Claude Guidelines: claude.md
+
