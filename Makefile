@@ -26,6 +26,11 @@ TERRAFORM_DIR := terraform/envs/$(ENV)
 export TF_VAR_hcloud_token        := $(shell bash -c 'source secrets/inputs.sh 2>/dev/null && echo "$$HCLOUD_TOKEN"')
 export TF_VAR_ssh_key_fingerprint := $(shell bash -c 'source secrets/inputs.sh 2>/dev/null && echo "$$SSH_KEY_FINGERPRINT"')
 
+# Auto-read Tailscale auth key from Terraform output when not set in the environment.
+# This means after `make apply`, bootstrap/tailscale-enable work with no extra steps.
+# To override (e.g. use an existing key): export TAILSCALE_AUTH_KEY=tskey-... before running make.
+TAILSCALE_AUTH_KEY ?= $(shell cd $(TERRAFORM_DIR) && terraform output -raw tailscale_auth_key 2>/dev/null)
+
 # Server IP - read from secrets or Terraform state
 # Note: If using Tailscale, set SERVER_IP="openclaw-prod" in secrets/inputs.sh.
 SERVER_IP ?= $(shell cd $(TERRAFORM_DIR) && terraform output -raw server_ip 2>/dev/null)

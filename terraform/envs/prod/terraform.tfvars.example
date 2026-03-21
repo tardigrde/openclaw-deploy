@@ -10,3 +10,12 @@ server_location = "nbg1"
 # SSH is open to everyone by default. To harden, either restrict to your IP
 # or run `make tailscale-enable` to switch to Tailscale-only access.
 ssh_allowed_cidrs = ["0.0.0.0/0"]
+
+# Tailscale OAuth credentials — required when enable_tailscale = true.
+# Set via environment variables in secrets/inputs.sh (sensitive — do not commit).
+# Create at: https://login.tailscale.com/admin/settings/oauth
+# tailscale_oauth_client_id     = "..."  # set via TF_VAR_tailscale_oauth_client_id
+# tailscale_oauth_client_secret = "..."  # set via TF_VAR_tailscale_oauth_client_secret
+
+# Set to true to let Terraform manage your tailnet ACL (replaces existing ACL entirely).
+# tailscale_enable_acl = false
