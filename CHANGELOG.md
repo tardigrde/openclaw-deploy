@@ -1,6 +1,19 @@
 # CHANGELOG
 
 
+## v0.1.0 (2026-03-21)
+
+### Features
+
+- Make terraform.tfvars overridable like backend.tf
+  ([`4defed0`](https://github.com/tardigrde/openclaw-deploy/commit/4defed037690ff8816d9e7074776abca0667e1f7))
+
+Rename terraform.tfvars → terraform.tfvars.example so personal infrastructure variables
+  (ssh_allowed_cidrs, etc.) are gitignored in the OSS repo and tracked only in private forks.
+
+Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
+
+
 ## v0.0.1 (2026-03-21)
 
 ### Bug Fixes
