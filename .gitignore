@@ -120,3 +120,6 @@ scripts/local/
 docs/local/
 .github/workflows/deploy.yml
 .github/workflows/rollback.yml
+-e 
+# MkDocs build output
+site/
