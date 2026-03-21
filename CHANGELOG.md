@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v0.2.0 (2026-03-21)
+
+### Features
+
+- Add bootstrap-check and deploy-check dry-run targets
+  ([`96748d9`](https://github.com/tardigrde/openclaw-deploy/commit/96748d9a8b8b197e91b93df5de1528787505d8b8))
+
+
 ## v0.1.0 (2026-03-21)
 
 ### Features
