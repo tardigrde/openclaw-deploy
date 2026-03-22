@@ -80,7 +80,7 @@ variable "enable_tailscale" {
 }
 
 variable "tailscale_oauth_client_id" {
-  description = "Tailscale OAuth client ID — required when enable_tailscale=true. Create at https://login.tailscale.com/admin/settings/oauth (scopes: auth_keys:write, acls:write, settings:write)"
+  description = "Tailscale OAuth client ID — required when enable_tailscale=true. Create at https://login.tailscale.com/admin/settings/oauth (scopes: auth_keys:write, settings:write, dns:write; add acls:write if tailscale_enable_acl=true)"
   type        = string
   sensitive   = true
   default     = ""

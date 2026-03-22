@@ -73,7 +73,9 @@
             dest: /etc/tailscale/serve.json
             owner: root
             mode: "0644"
+          register: tailscale_serve_deployed
 
         - name: Apply Tailscale serve config
           ansible.builtin.command: tailscale serve --config /etc/tailscale/serve.json
+          when: tailscale_serve_deployed is changed
           changed_when: true
