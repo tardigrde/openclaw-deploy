@@ -1,3 +1,7 @@
+---
+title: "Weather Report"
+weight: 150
+---
 # Morning Weather Report
 
 A lightweight daily weather summary sent to Telegram each morning. Uses `wttr.in` and the Telegram Bot API — no LLM involved, zero token cost.

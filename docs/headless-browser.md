@@ -1,3 +1,7 @@
+---
+title: "Headless Browser"
+weight: 70
+---
 # Headless Browser
 
 The stack includes a `chromium` container (`chromedp/headless-shell`) so OpenClaw can use the browser tool on the VPS — useful for scraping JS-heavy or paywalled pages via the `agent-browser` skill.

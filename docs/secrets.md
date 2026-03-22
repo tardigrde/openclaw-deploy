@@ -1,3 +1,7 @@
+---
+title: "Secrets Reference"
+weight: 20
+---
 # Secrets Reference
 
 Two secret files are required. Neither is ever committed to git.

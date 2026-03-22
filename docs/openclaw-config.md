@@ -1,3 +1,7 @@
+---
+title: "OpenClaw Configuration"
+weight: 10
+---
 # OpenClaw Configuration
 
 ## Overview
