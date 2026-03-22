@@ -45,7 +45,7 @@ resource "tailscale_tailnet_key" "openclaw" {
   preauthorized = true
   expiry        = 7776000 # 90 days in seconds
   description   = "openclaw-${var.environment} bootstrap key"
-  tags = ["tag:openclaw-vps"]
+  tags          = ["tag:openclaw-vps"]
 }
 
 # =============================================================================

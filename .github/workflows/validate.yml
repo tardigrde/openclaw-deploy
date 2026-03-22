@@ -48,12 +48,20 @@ jobs:
         working-directory: terraform/modules/hetzner-vps
         run: tflint --recursive
 
-      - name: Terraform Init (module)
+      - name: Terraform Init (hetzner-vps module)
         working-directory: terraform/modules/hetzner-vps
         run: terraform init -backend=false
 
-      - name: Run Terraform Tests
+      - name: Run Terraform Tests (hetzner-vps)
         working-directory: terraform/modules/hetzner-vps
+        run: terraform test
+
+      - name: Terraform Init (tailscale module)
+        working-directory: terraform/modules/tailscale
+        run: terraform init -backend=false
+
+      - name: Run Terraform Tests (tailscale)
+        working-directory: terraform/modules/tailscale
         run: terraform test
 
   checkov:
