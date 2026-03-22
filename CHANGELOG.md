@@ -1,6 +1,20 @@
 # CHANGELOG
 
 
+## v0.6.2 (2026-03-22)
+
+### Bug Fixes
+
+- Inline plays in site.local.example.yml to allow pre-build insertions
+  ([`5a0b094`](https://github.com/tardigrde/openclaw-deploy/commit/5a0b094c0a155ffb3ab7e64e9c208954492597df))
+
+Importing site.yml as a block makes it impossible to insert local plays at specific points (e.g.
+  cloning a private repo before the Docker build). Inline all core plays so users can slot in their
+  own plays where needed.
+
+Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
+
+
 ## v0.6.1 (2026-03-22)
 
 ### Bug Fixes
