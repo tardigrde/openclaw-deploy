@@ -1,6 +1,27 @@
 # CHANGELOG
 
 
+## v0.6.0 (2026-03-22)
+
+### Chores
+
+- **deps**: Update terraform tailscale to ~> 0.28
+  ([`5b434a6`](https://github.com/tardigrde/openclaw-deploy/commit/5b434a639b5d7c5fc0db85d250f9dddd4463b6ba))
+
+### Features
+
+- Add Terraform-managed CI runner auth key (tag:ci-runner)
+  ([`1f3e1e1`](https://github.com/tardigrde/openclaw-deploy/commit/1f3e1e1af8991a675b452ac17d59da8404c89bfa))
+
+Adds tailscale_tailnet_key.ci_runner — a reusable ephemeral pre-auth key for GitHub Actions CI
+  nodes. The OAuth client must have tag:ci-runner in its allowed tags (alongside tag:openclaw-vps)
+  for Terraform to create it.
+
+Output tailscale_ci_runner_auth_key stores as GitHub Secret TAILSCALE_AUTH_KEY.
+
+Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
+
+
 ## v0.5.0 (2026-03-22)
 
 ### Bug Fixes
