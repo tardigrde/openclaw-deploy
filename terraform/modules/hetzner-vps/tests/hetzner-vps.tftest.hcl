@@ -56,8 +56,8 @@ run "default_config" {
   }
 
   assert {
-    condition     = var.enable_tailscale == false
-    error_message = "Tailscale should be disabled by default"
+    condition     = length(hcloud_firewall.main.rule) == 3
+    error_message = "Should have only 3 egress rules by default (tailscale off, no SSH CIDRs)"
   }
 
   assert {
@@ -306,11 +306,11 @@ run "ssh_key_lookup" {
   variables {
     project_name        = "openclaw"
     environment         = "prod"
-    ssh_key_fingerprint = "ff:ee:dd:cc:bb:aa"
+    ssh_key_fingerprint = "aa:bb:cc:dd:ee:ff"
   }
 
   assert {
-    condition     = data.hcloud_ssh_key.main.fingerprint == "ff:ee:dd:cc:bb:aa"
+    condition     = data.hcloud_ssh_key.main.fingerprint == "aa:bb:cc:dd:ee:ff"
     error_message = "SSH key data source should use provided fingerprint"
   }
 }
