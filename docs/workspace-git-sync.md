@@ -1,3 +1,7 @@
+---
+title: "Workspace Git Sync"
+weight: 80
+---
 # Workspace Git Sync
 
 Back up `~/.openclaw/workspace` to a private GitHub repo automatically. Runs as a native cron job on the VPS, pushing to a configurable branch (default: `auto`).

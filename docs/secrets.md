@@ -1,3 +1,7 @@
+---
+title: "Secrets Reference"
+weight: 20
+---
 # Secrets Reference
 
 Two secret files are required. Neither is ever committed to git.
@@ -78,4 +82,4 @@ SOPS encryption is **required** if you use the [GitOps auto-deploy workflow](git
 
 ## CI Secrets
 
-The GitOps auto-deploy workflow needs additional GitHub repository secrets beyond what Terraform CI uses. See [docs/gitops-auto-deploy.md](gitops-auto-deploy.md) for the full list.
+The GitOps auto-deploy workflow needs additional GitHub repository secrets beyond what Terraform CI uses. See [GitOps auto-deploy](gitops-auto-deploy.md) for the full list.

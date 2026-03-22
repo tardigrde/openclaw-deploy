@@ -1,3 +1,7 @@
+---
+title: "Agents & Sessions"
+weight: 40
+---
 # Agents
 
 OpenClaw supports multiple isolated agents, each with their own workspace and model. Define them in `openclaw.json` under `agents.list`.

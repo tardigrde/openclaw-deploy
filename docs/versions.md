@@ -1,3 +1,7 @@
+---
+title: "Version Management"
+weight: 30
+---
 # Version Management
 
 All dependencies are pinned in their respective config files. Renovate Bot opens

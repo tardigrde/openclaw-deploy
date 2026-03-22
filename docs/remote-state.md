@@ -1,3 +1,7 @@
+---
+title: "Remote State"
+weight: 110
+---
 # Remote State Backend
 
 By default Terraform uses a **local backend** (`terraform.tfstate` on disk). This requires zero setup and works fine for solo use. For team workflows or CI/CD, a remote backend gives you shared state, versioning, and locking.

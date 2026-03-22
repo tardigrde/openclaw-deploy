@@ -50,7 +50,7 @@ SECRET_PATTERNS=(
   'Bearer [A-Za-z0-9._-]{20,}'
 )
 
-FILES=$(cd "$REPO_ROOT" && git ls-files | grep -v '\.env\.example$' | grep -v '\.env\.enc$' | grep -v '\.md$' || true)
+FILES=$(cd "$REPO_ROOT" && git ls-files | grep -v '\.env\.example$' | grep -v '\.env\.enc$' | grep -v '\.md$' | grep -v '^go\.sum$' || true)
 
 if [[ -z "$FILES" ]]; then
   echo "✓ No secrets detected in tracked files"

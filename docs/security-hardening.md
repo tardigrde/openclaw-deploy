@@ -1,3 +1,7 @@
+---
+title: "Security Hardening"
+weight: 130
+---
 # Security Hardening
 
 Overview of all security controls applied to the OpenClaw VPS.

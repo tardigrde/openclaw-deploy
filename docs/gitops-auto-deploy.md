@@ -1,3 +1,7 @@
+---
+title: "GitOps Auto-Deploy"
+weight: 100
+---
 # GitOps Auto-Deploy
 
 A GitHub Actions pipeline can automatically deploy to the VPS on every push to `main`. This is **optional** — if you don't configure the secrets below, the workflow won't run and you can continue deploying manually with `make deploy`.

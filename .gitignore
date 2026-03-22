@@ -120,3 +120,12 @@ scripts/local/
 docs/local/
 .github/workflows/deploy.yml
 .github/workflows/rollback.yml
+
+# Hugo build output
+public/
+resources/
+.hugo_build.lock
+
+# Copied in CI — do not commit
+docs/index.md
+docs/security.md

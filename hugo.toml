@@ -1,0 +1,69 @@
+baseURL = "https://tardigrde.github.io/openclaw-deploy/"
+title = "OpenClaw Deploy"
+contentDir = "docs"
+
+[module]
+  [[module.imports]]
+    path = "github.com/adityatelange/hugo-PaperMod"
+
+enableRobotsTXT = true
+buildDrafts = false
+[params]
+  env = "production"
+  title = "OpenClaw Deploy"
+  description = "Self-hosted AI assistant infrastructure — one-command Hetzner VPS provisioning with Terraform, Ansible, and Docker"
+  keywords = ["openclaw", "self-hosted", "hetzner", "terraform", "ansible", "docker", "ai"]
+  author = "OpenClaw"
+  defaultTheme = "auto"
+  ShowReadingTime = false
+  ShowShareButtons = false
+  ShowPostNavLinks = true
+  ShowBreadCrumbs = true
+  ShowCodeCopyButtons = true
+  ShowWordCount = false
+  ShowToc = true
+  TocOpen = false
+  comments = false
+
+  [params.homeInfoParams]
+    Title = "OpenClaw Deploy"
+    Content = "Self-hosted AI assistant infrastructure — one-command Hetzner VPS provisioning with Terraform, Ansible, and Docker"
+
+  [[params.socialIcons]]
+    name = "github"
+    url = "https://github.com/tardigrde/openclaw-deploy"
+
+  [params.assets]
+    favicon = ""
+
+  [params.cover]
+    hidden = true
+    hiddenInList = true
+    hiddenInSingle = true
+
+  [params.label]
+    text = "OpenClaw Deploy"
+
+[markup]
+  [markup.highlight]
+    codeFences = true
+    guessSyntax = true
+    lineNos = true
+    style = "monokai"
+  [markup.goldmark.renderer]
+    unsafe = true
+
+[outputs]
+  home = ["HTML", "RSS", "JSON"]
+
+[[menu.main]]
+  identifier = "docs"
+  name = "Docs"
+  url = "/openclaw-config/"
+  weight = 10
+
+[[menu.main]]
+  identifier = "github"
+  name = "GitHub"
+  url = "https://github.com/tardigrde/openclaw-deploy"
+  weight = 20

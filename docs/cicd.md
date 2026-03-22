@@ -1,3 +1,7 @@
+---
+title: "CI/CD Setup"
+weight: 90
+---
 # CI/CD
 
 The built-in CI runs **Terraform only** (`plan` on PRs, `apply` on manual dispatch). Ansible is never run in CI — all `make bootstrap` / `make deploy` operations are local only.

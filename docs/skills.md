@@ -1,3 +1,7 @@
+---
+title: "Skills & Tools"
+weight: 60
+---
 # Skills
 
 OpenClaw is extended via skills — slash commands, hooks, templates, and tool definitions. `docker/skills-manifest.txt` lists which skills are auto-installed at container startup via `clawhub install`.
