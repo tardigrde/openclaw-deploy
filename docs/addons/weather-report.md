@@ -1,6 +1,6 @@
 ---
 title: "Weather Report"
-weight: 150
+weight: 10
 ---
 # Morning Weather Report
 

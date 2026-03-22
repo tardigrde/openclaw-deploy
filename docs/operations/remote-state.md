@@ -1,6 +1,7 @@
 ---
 title: "Remote State"
-weight: 110
+weight: 30
+aliases: ["/remote-state/"]
 ---
 # Remote State Backend
 

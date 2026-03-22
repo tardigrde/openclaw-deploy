@@ -1,6 +1,7 @@
 ---
 title: "GitOps Auto-Deploy"
-weight: 100
+weight: 20
+aliases: ["/gitops-auto-deploy/"]
 ---
 # GitOps Auto-Deploy
 

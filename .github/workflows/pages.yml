@@ -80,17 +80,11 @@ jobs:
         run: |
           [[ -f package-lock.json || -f npm-shrinkwrap.json ]] && npm ci || true
 
-      - name: Copy root docs into docs/
+      - name: Copy SECURITY.md into docs/
         run: |
-          # Add Hugo front matter and strip docs/ prefix from links
-          # README→docs/index.md (SECURITY.md → security.md for same-dir linking)
-          { echo '---'; echo 'title: "Home"'; echo '---'; \
-            sed 's|\](docs/|](|g; s|\[docs/|[|g; s|](SECURITY.md)|](security.md)|g' README.md; \
-          } > docs/index.md
-          # SECURITY→docs/security.md (../README.md → index.md for same-dir linking)
-          { echo '---'; echo 'title: "Security Policy"'; echo '---'; \
-            sed 's|\](docs/|](|g; s|\[docs/|[|g; s|\](\.\./README\.md|](index.md|g' SECURITY.md; \
-          } > docs/security.md
+          { echo '---'; echo 'title: "Security Policy"'; echo 'weight: 20'; echo '---'; \
+            cat SECURITY.md; \
+          } > docs/security/policy.md
 
       - name: Configure Git
         run: |

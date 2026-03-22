@@ -1,6 +1,7 @@
 ---
 title: "Skills & Tools"
-weight: 60
+weight: 30
+aliases: ["/skills/"]
 ---
 # Skills
 

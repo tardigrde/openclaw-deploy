@@ -1,6 +1,7 @@
 ---
 title: "CI/CD Setup"
-weight: 90
+weight: 10
+aliases: ["/cicd/"]
 ---
 # CI/CD
 
@@ -8,7 +9,7 @@ The built-in CI **validates and tests** Terraform (`terraform fmt`, `terraform v
 
 Example workflows for `terraform plan` (on PRs) and `terraform apply` (manual dispatch) are included as `.example.yml` files — copy them to enable (see [Required Secrets](#required-github-secrets) below).
 
-An optional GitOps deployment workflow is also included — copy `.github/workflows/deploy.yml.example` to `.github/workflows/deploy.yml` to enable automatic Ansible-based deployments on push. See [GitOps auto-deploy](gitops-auto-deploy.md) for setup instructions.
+An optional GitOps deployment workflow is also included — copy `.github/workflows/deploy.yml.example` to `.github/workflows/deploy.yml` to enable automatic Ansible-based deployments on push. See [GitOps auto-deploy](/operations/gitops-auto-deploy/) for setup instructions.
 
 ## Terraform Plan (example — copy to enable)
 
@@ -41,4 +42,4 @@ These are for the **Terraform CI workflows only**:
 | `HCLOUD_TOKEN` | Hetzner Cloud API token |
 | `SSH_KEY_FINGERPRINT` | SSH key fingerprint registered in Hetzner |
 
-> The optional GitOps deployment workflow requires additional secrets (`SSH_PRIVATE_KEY`, `SOPS_AGE_KEY`, and optionally Tailscale OAuth credentials). See [GitOps auto-deploy](gitops-auto-deploy.md).
+> The optional GitOps deployment workflow requires additional secrets (`SSH_PRIVATE_KEY`, `SOPS_AGE_KEY`, and optionally Tailscale OAuth credentials). See [GitOps auto-deploy](/operations/gitops-auto-deploy/).

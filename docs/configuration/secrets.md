@@ -1,6 +1,7 @@
 ---
 title: "Secrets Reference"
 weight: 20
+aliases: ["/secrets/"]
 ---
 # Secrets Reference
 
@@ -78,8 +79,8 @@ vim secrets/.env
 make secrets-encrypt         # → secrets/.env.enc
 ```
 
-SOPS encryption is **required** if you use the [GitOps auto-deploy workflow](gitops-auto-deploy.md) — the CI workflow only handles `.env.enc`, never a plaintext `.env`.
+SOPS encryption is **required** if you use the [GitOps auto-deploy workflow](/operations/gitops-auto-deploy/) — the CI workflow only handles `.env.enc`, never a plaintext `.env`.
 
 ## CI Secrets
 
-The GitOps auto-deploy workflow needs additional GitHub repository secrets beyond what Terraform CI uses. See [GitOps auto-deploy](gitops-auto-deploy.md) for the full list.
+The GitOps auto-deploy workflow needs additional GitHub repository secrets beyond what Terraform CI uses. See [GitOps auto-deploy](/operations/gitops-auto-deploy/) for the full list.

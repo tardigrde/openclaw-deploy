@@ -1,6 +1,7 @@
 ---
 title: "Headless Browser"
-weight: 70
+weight: 40
+aliases: ["/headless-browser/"]
 ---
 # Headless Browser
 

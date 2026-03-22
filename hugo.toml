@@ -34,7 +34,11 @@ buildDrafts = false
     url = "https://github.com/tardigrde/openclaw-deploy"
 
   [params.assets]
-    favicon = ""
+    favicon = "/favicon.svg"
+    favicon16x16 = "/favicon.svg"
+    favicon32x32 = "/favicon.svg"
+    apple_touch_icon = "/favicon.svg"
+    safari_pinned_tab = "/favicon.svg"
 
   [params.cover]
     hidden = true
@@ -57,13 +61,43 @@ buildDrafts = false
   home = ["HTML", "RSS", "JSON"]
 
 [[menu.main]]
-  identifier = "docs"
-  name = "Docs"
-  url = "/openclaw-config/"
+  identifier = "getting-started"
+  name = "Getting Started"
+  url = "/getting-started/"
   weight = 10
+
+[[menu.main]]
+  identifier = "configuration"
+  name = "Configuration"
+  url = "/configuration/"
+  weight = 20
+
+[[menu.main]]
+  identifier = "guides"
+  name = "Guides"
+  url = "/guides/"
+  weight = 30
+
+[[menu.main]]
+  identifier = "operations"
+  name = "Operations"
+  url = "/operations/"
+  weight = 40
+
+[[menu.main]]
+  identifier = "security"
+  name = "Security"
+  url = "/security/"
+  weight = 50
+
+[[menu.main]]
+  identifier = "addons"
+  name = "Add-ons"
+  url = "/addons/"
+  weight = 60
 
 [[menu.main]]
   identifier = "github"
   name = "GitHub"
   url = "https://github.com/tardigrde/openclaw-deploy"
-  weight = 20
+  weight = 70

@@ -1,6 +1,7 @@
 ---
 title: "Security Hardening"
-weight: 130
+weight: 10
+aliases: ["/security-hardening/"]
 ---
 # Security Hardening
 
@@ -319,7 +320,7 @@ Triggers on push to `main` when `docker/`, `docker-compose.yml`, `ansible/`, or 
 
 Required GitHub secrets: `TAILSCALE_OAUTH_CLIENT_ID`, `TAILSCALE_OAUTH_CLIENT_SECRET`, `SSH_PRIVATE_KEY`, `SERVER_IP`, `SOPS_AGE_KEY`.
 
-Template: `.github/workflows/deploy.yml.example` — copy to `deploy.yml` to enable. See [GitOps auto-deploy](gitops-auto-deploy.md) for full setup.
+Template: `.github/workflows/deploy.yml.example` — copy to `deploy.yml` to enable. See [GitOps auto-deploy](/operations/gitops-auto-deploy/) for full setup.
 
 ### Rollback (`rollback.yml`)
 
