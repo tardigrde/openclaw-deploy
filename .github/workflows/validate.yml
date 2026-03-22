@@ -38,7 +38,7 @@ jobs:
           terraform_version: "1.7.0"
 
       - name: Setup TFLint
-        uses: terraform-linters/setup-tflint@v5
+        uses: terraform-linters/setup-tflint@v6
 
       - name: Init TFLint
         working-directory: terraform/modules/hetzner-vps
