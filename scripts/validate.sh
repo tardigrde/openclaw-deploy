@@ -22,8 +22,8 @@ else
   PATTERNS='sk-ant-|sk-proj-|bot[0-9]|bsc_|xai-|gsk_'
   if grep -qE "$PATTERNS" "$CONFIG"; then
     echo "ERROR: Raw API key pattern detected in $CONFIG" >&2
-    echo "Use \${ENV_VAR} references instead of plaintext keys."
-    grep -nE "$PATTERNS" "$CONFIG"
+    echo "Use \${ENV_VAR} references instead of plaintext keys." >&2
+    grep -nE "$PATTERNS" "$CONFIG" >&2
     exit 1
   fi
 
