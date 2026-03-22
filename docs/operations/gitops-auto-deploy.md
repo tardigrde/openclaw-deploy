@@ -39,8 +39,9 @@ rm ci-deploy-key ci-deploy-key.pub
 Full reference: [Tailscale CI/CD guide](https://tailscale.com/docs/solutions/connect-github-CICD-workflows-to-private-infrastructure-without-public-exposure)
 
 1. Tailscale admin → **Settings → OAuth clients** → Create new client
-2. Required scopes: **Devices → Write** and **Auth keys → Write** (both required — Devices Write alone causes a 403)
-3. Assign tag: `tag:ci-runner`
+2. Required scopes: **Devices → Write** and **Auth keys → Write**
+3. Assign tag: `tag:ci-runner` (this must be the **only** tag — do not add other tags to this client)
+   > **Important:** Tailscale OAuth clients with 2+ tags require all tags simultaneously on every key request. Keep this client single-tag. The Terraform provider uses a separate OAuth client for `tag:openclaw-vps`.
 4. Save **Client ID** and **Client Secret**
 
 **3. Tag the VPS in Tailscale**

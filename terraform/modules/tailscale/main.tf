@@ -5,7 +5,6 @@
 #
 # What this manages:
 #   - tailscale_tailnet_key      : pre-auth key for bootstrapping the openclaw server
-#   - tailscale_tailnet_key      : reusable ephemeral key for GitHub Actions CI
 #   - tailscale_tailnet_settings : tailnet-wide settings (device approval, auto-updates)
 #   - tailscale_dns_preferences  : MagicDNS DNS resolution
 #   - tailscale_acl              : tailnet ACL policy (WARNING: replaces the entire ACL)
@@ -18,8 +17,14 @@
 #
 # Auth: provider uses OAuth client credentials, not an API key.
 # Create an OAuth client at: https://login.tailscale.com/admin/settings/oauth
-# Required scopes: auth_keys:write, acls:write, settings:write, dns:write
-# Required tags:   tag:openclaw-vps, tag:ci-runner
+# Required scopes: auth_keys, acls, settings, dns
+# Required tags:   tag:openclaw-vps (only — see note below)
+#
+# NOTE: The Terraform OAuth client must have exactly ONE tag (tag:openclaw-vps).
+# Tailscale OAuth clients with 2+ tags require ALL tags simultaneously on every
+# auth key request — so a multi-tag client cannot create single-tag keys.
+# The GitHub Actions CI client (tag:ci-runner) must be a separate OAuth client
+# with scope "Devices: Write" only. See docs/gitops-auto-deploy.md.
 # =============================================================================
 
 terraform {
@@ -48,24 +53,6 @@ resource "tailscale_tailnet_key" "openclaw" {
   expiry        = 7776000 # 90 days in seconds
   description   = "openclaw-${var.environment} bootstrap key"
   tags          = ["tag:openclaw-vps"]
-}
-
-# =============================================================================
-# CI Runner Auth Key
-# =============================================================================
-# Reusable ephemeral pre-auth key for GitHub Actions CI nodes.
-# Ephemeral: nodes are removed from the tailnet automatically when the runner exits.
-# Expiry: 90 days — rotate via `terraform apply` when it expires.
-# Rotate: store the tailscale_ci_runner_auth_key output as GitHub Secret TAILSCALE_AUTH_KEY.
-# =============================================================================
-
-resource "tailscale_tailnet_key" "ci_runner" {
-  reusable      = true
-  ephemeral     = true
-  preauthorized = true
-  expiry        = 7776000 # 90 days in seconds
-  description   = "openclaw-${var.environment} ci-runner key (GitHub Actions)"
-  tags          = ["tag:ci-runner"]
 }
 
 # =============================================================================

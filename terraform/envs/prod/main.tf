@@ -121,8 +121,3 @@ output "tailscale_auth_key" {
   sensitive   = true
 }
 
-output "tailscale_ci_runner_auth_key" {
-  description = "Tailscale pre-auth key for GitHub Actions CI (ephemeral, tag:ci-runner). Store as GitHub Secret TAILSCALE_AUTH_KEY."
-  value       = var.enable_tailscale ? module.tailscale[0].ci_runner_auth_key : null
-  sensitive   = true
-}
