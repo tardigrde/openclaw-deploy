@@ -1,6 +1,34 @@
 # CHANGELOG
 
 
+## v0.6.1 (2026-03-22)
+
+### Bug Fixes
+
+- Revert ci_runner key resource, document single-tag OAuth requirement
+  ([`1e046e4`](https://github.com/tardigrde/openclaw-deploy/commit/1e046e4ccccb2496e4ffc4c9110344c56ee63a73))
+
+Tailscale OAuth clients with 2+ allowed tags require ALL tags simultaneously on every auth key
+  request (tailscale/tailscale#12402). A client with both tag:openclaw-vps and tag:ci-runner cannot
+  create single-tag keys for either.
+
+Removes tailscale_tailnet_key.ci_runner — the Terraform OAuth client must stay single-tag
+  (tag:openclaw-vps only). The GitHub Actions CI client is a separate OAuth client with
+  Devices:Write scope and tag:ci-runner only.
+
+Updates docs to correct scope (Devices:Write only per official Tailscale docs) and warn about the
+  single-tag requirement.
+
+Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
+
+### Chores
+
+- Merge main into worktree-pages
+  ([`a7b19e9`](https://github.com/tardigrde/openclaw-deploy/commit/a7b19e91b05f84617a75c8f5aff8775a92412461))
+
+Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
+
+
 ## v0.6.0 (2026-03-22)
 
 ### Chores
@@ -87,8 +115,26 @@ docs/tailscale.md (new): - How serve config works (Terraform + Ansible + make) -
 
 Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
 
+- Restructure into sections with getting-started funnel
+  ([`b72936f`](https://github.com/tardigrde/openclaw-deploy/commit/b72936f94f67bac3b18874bb6269483e4f2ea861))
+
+Reorganize flat 13-page docs into 6 Hugo sections (getting-started, configuration, guides,
+  operations, security, addons) with proper navigation. Extract installation and bootstrap guides
+  from README. Add aliases on all moved pages to preserve old URLs.
+
+Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
+
 - Update cicd.md to reference renamed .yml.example workflow files
   ([`707c16d`](https://github.com/tardigrde/openclaw-deploy/commit/707c16d6dea4904689bbc5e6ed6a505089ba8202))
+
+Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
+
+- Update frontmatter, menus, CI workflow, and cross-references
+  ([`d8e6b61`](https://github.com/tardigrde/openclaw-deploy/commit/d8e6b615d46db90e8fb1e7e3a7f5b0d78ad09fe7))
+
+- Add aliases to all moved pages for URL backwards compatibility - Reset section-relative weights on
+  moved pages - Update hugo.toml menu to 6 section links - Fix CI workflow: SECURITY.md copies to
+  docs/security/policy.md - Update internal cross-references to canonical paths
 
 Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
 
