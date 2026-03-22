@@ -51,7 +51,7 @@ Playbook: `ansible/site.yml` — imports modular plays from `ansible/plays/`.
 Ansible tags: `bootstrap`, `tailscale`, `docker`, `config`, `start` (run by default on `make bootstrap`).
 Tags that never run by default: `setup_auth`, `patch_devices`, `backup_now`, `backup_pull`, `restore`, `addon-weather-report`.
 
-**CI validates and tests Terraform** (`terraform fmt`, `terraform validate`, `tflint`, `terraform test`). Example workflows for `terraform plan` and `terraform apply` are in `.github/workflows/*.example.yml` — copy them to enable (requires GCP WIF and Hetzner secrets). Ansible is never run in CI — all `make bootstrap` / `make deploy` / `make tailscale-setup` operations are local only.
+**CI runs Terraform only** (`terraform plan` on PRs, `terraform apply` on manual dispatch). Ansible is never run in CI — all `make bootstrap` / `make deploy` / `make tailscale-setup` operations are local only.
 Dry run: `ANSIBLE_CONFIG=ansible/ansible.cfg ansible-playbook -i "$SERVER_IP," --private-key $SSH_KEY ansible/site.yml --check --diff`
 
 **Update cycle** (bump OpenClaw version or MC source):
