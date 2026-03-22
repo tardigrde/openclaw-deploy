@@ -204,23 +204,26 @@
       ansible.builtin.stat:
         path: /etc/tailscale/serve.json
       register: tailscale_serve_config
-      become: true
       tags: [config]
 
-    - name: Update Tailscale serve config
+    - name: Render Tailscale serve config to temp file
       ansible.builtin.template:
         src: ../templates/tailscale-serve.json.j2
-        dest: /etc/tailscale/serve.json
-        owner: root
-        mode: "0644"
-      become: true
+        dest: /tmp/tailscale-serve.json
+        mode: "0600"
       when: tailscale_serve_config.stat.exists
+      register: tailscale_serve_rendered
+      tags: [config]
+
+    - name: Install Tailscale serve config
+      ansible.builtin.shell: sudo /usr/bin/tee /etc/tailscale/serve.json < /tmp/tailscale-serve.json > /dev/null
+      when: tailscale_serve_rendered is changed
       register: tailscale_serve_updated
+      changed_when: true
       tags: [config]
 
     - name: Re-apply Tailscale serve config
-      ansible.builtin.command: tailscale serve --config /etc/tailscale/serve.json
-      become: true
+      ansible.builtin.command: sudo /usr/bin/tailscale serve --config /etc/tailscale/serve.json
       when: tailscale_serve_updated is changed
       changed_when: true
       tags: [config]

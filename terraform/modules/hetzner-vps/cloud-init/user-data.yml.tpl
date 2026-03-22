@@ -80,6 +80,8 @@ runcmd:
     # OpenClaw user sudo permissions — scoped for security
     ${app_user} ALL=(root) NOPASSWD: /usr/bin/tailscale status
     ${app_user} ALL=(root) NOPASSWD: /usr/bin/tailscale up
+    ${app_user} ALL=(root) NOPASSWD: /usr/bin/tailscale serve *
+    ${app_user} ALL=(root) NOPASSWD: /usr/bin/tee /etc/tailscale/serve.json
     ${app_user} ALL=(root) NOPASSWD: /usr/sbin/ufw status
     ${app_user} ALL=(root) NOPASSWD: /usr/bin/journalctl *
     ${app_user} ALL=(root) NOPASSWD: /usr/bin/systemctl daemon-reload
