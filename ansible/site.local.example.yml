@@ -1,11 +1,24 @@
 ---
 # Copy to ansible/site.local.yml (gitignored).
-# Imports the core site.yml first, then adds optional/local plays.
-# Plays in this file use `never` tags and only run when explicitly requested.
+# Inlines all core plays so local plays can be inserted at specific points
+# in the sequence (e.g. clone a private repo before the Docker build).
 #
 # Usage: make deploy  (Makefile auto-detects site.local.yml if present)
 
-- ansible.builtin.import_playbook: site.yml
+- ansible.builtin.import_playbook: plays/bootstrap.yml
+- ansible.builtin.import_playbook: plays/tailscale.yml
+
+# -------------------------------------------------------------------------
+# Insert pre-build plays here (e.g. clone private repos before docker.yml)
+# -------------------------------------------------------------------------
+# - ansible.builtin.import_playbook: plays/docker.local.yml
+
+- ansible.builtin.import_playbook: plays/docker.yml
+- ansible.builtin.import_playbook: plays/config.yml
+- ansible.builtin.import_playbook: plays/start.yml
+- ansible.builtin.import_playbook: plays/setup_auth.yml
+- ansible.builtin.import_playbook: plays/backup.yml
+- ansible.builtin.import_playbook: plays/restore.yml
 
 # -------------------------------------------------------------------------
 # Optional plays — uncomment to enable, then use make targets to run them.
