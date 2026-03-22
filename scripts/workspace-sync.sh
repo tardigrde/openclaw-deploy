@@ -59,7 +59,17 @@ fi
 # Git setup
 # -----------------------------------------------------------------------------
 
-REMOTE_URL="https://${GIT_WORKSPACE_TOKEN}@github.com/${GIT_WORKSPACE_REPO}.git"
+REMOTE_URL="https://github.com/${GIT_WORKSPACE_REPO}.git"
+
+# Store credentials in a temp file (mode 600) rather than embedding in the URL.
+# This prevents the token from appearing in .git/config or ps aux.
+_CRED_FILE=$(mktemp)
+chmod 600 "$_CRED_FILE"
+printf 'https://token:%s@github.com\n' "$GIT_WORKSPACE_TOKEN" > "$_CRED_FILE"
+trap 'rm -f "$_CRED_FILE"' EXIT
+export GIT_CONFIG_COUNT=1
+export GIT_CONFIG_KEY_0="credential.helper"
+export GIT_CONFIG_VALUE_0="store --file $_CRED_FILE"
 
 echo "=== OpenClaw Workspace Sync ==="
 echo "Repo: $GIT_WORKSPACE_REPO"

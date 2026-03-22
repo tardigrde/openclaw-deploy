@@ -111,6 +111,14 @@
       when: execute | default('false') | bool
       tags: [never, restore]
 
+    - name: Validate backup filename format
+      ansible.builtin.assert:
+        that:
+          - backup_file | regex_search('^openclaw_backup_[0-9]{8}_[0-9]{6}\.tar\.gz$')
+        fail_msg: "Invalid backup filename. Expected: openclaw_backup_YYYYMMDD_HHMMSS.tar.gz"
+      when: execute | default('false') | bool
+      tags: [never, restore]
+
     - name: Extract backup archive
       ansible.builtin.command:
         cmd: tar -xzf ~/backups/{{ backup_file | default('') }} -C ~

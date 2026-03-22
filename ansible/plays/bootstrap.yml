@@ -62,7 +62,7 @@
         - { path: ~/openclaw,             mode: "0755" }
         - { path: ~/.openclaw,            mode: "0700" }
         - { path: ~/.openclaw/workspace,  mode: "0700" }
-        - { path: ~/backups,              mode: "0755" }
+        - { path: ~/backups,              mode: "0700" }
         - { path: ~/scripts,              mode: "0755" }
         - { path: ~/logs,                 mode: "0755" }
         - { path: ~/.config/systemd/user, mode: "0755" }
