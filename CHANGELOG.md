@@ -1,6 +1,29 @@
 # CHANGELOG
 
 
+## v0.6.3 (2026-03-22)
+
+### Bug Fixes
+
+- Scope Ansible sudo, fix Tailscale TF provider -var, add tee/serve sudoers
+  ([`a9fef07`](https://github.com/tardigrde/openclaw-deploy/commit/a9fef075fef4c7b1ca03d645e1d8a0172c1c4240))
+
+- ansible/plays/config.yml: replace become:true on Tailscale serve tasks with scoped sudo calls
+  (sudo tee + sudo tailscale serve). Avoids requiring broad python3 NOPASSWD in sudoers — Ansible's
+  become uses sudo /bin/sh under the hood which cannot be cleanly scoped.
+
+- terraform/modules/hetzner-vps/cloud-init/user-data.yml.tpl: add NOPASSWD entries for
+  /usr/bin/tailscale serve * and /usr/bin/tee /etc/tailscale/serve.json, required by the new Ansible
+  tasks.
+
+- Makefile: pass Tailscale OAuth credentials via explicit -var flags in plan and apply. The
+  Tailscale Terraform provider ignores TF_VAR_* env vars when TAILSCALE_OAUTH_CLIENT_ID/SECRET are
+  also set in the environment (e.g. a separate CI OAuth client), causing 401 errors on every
+  plan/apply.
+
+Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
+
+
 ## v0.6.2 (2026-03-22)
 
 ### Bug Fixes
