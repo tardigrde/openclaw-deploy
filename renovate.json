@@ -158,6 +158,55 @@
       "depNameTemplate": "ansible-core",
       "datasourceTemplate": "pypi",
       "versioningTemplate": "pep440"
+    },
+    {
+      "description": "Track Hugo version in docs workflow",
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^\\.github/workflows/pages\\.yml$/"
+      ],
+      "matchStrings": [
+        "HUGO_VERSION: (?<currentValue>[\\d]+\\.[\\d]+(?:\\.[\\d]+)?)"
+      ],
+      "depNameTemplate": "gohugoio/hugo",
+      "datasourceTemplate": "github-releases",
+      "extractVersionTemplate": "^v(?<version>.+)$"
+    },
+    {
+      "description": "Track Dart Sass version in docs workflow",
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^\\.github/workflows/pages\\.yml$/"
+      ],
+      "matchStrings": [
+        "DART_SASS_VERSION: (?<currentValue>[\\d]+\\.[\\d]+(?:\\.[\\d]+)?)"
+      ],
+      "depNameTemplate": "sass/dart-sass",
+      "datasourceTemplate": "github-releases"
+    },
+    {
+      "description": "Track Go version in docs workflow",
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^\\.github/workflows/pages\\.yml$/"
+      ],
+      "matchStrings": [
+        "GO_VERSION: (?<currentValue>[\\d]+\\.[\\d]+(?:\\.[\\d]+)?)"
+      ],
+      "depNameTemplate": "go",
+      "datasourceTemplate": "golang-version"
+    },
+    {
+      "description": "Track Node.js version in docs workflow",
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^\\.github/workflows/pages\\.yml$/"
+      ],
+      "matchStrings": [
+        "NODE_VERSION: (?<currentValue>[\\d]+\\.[\\d]+(?:\\.[\\d]+)?)"
+      ],
+      "depNameTemplate": "node",
+      "datasourceTemplate": "node-version"
     }
   ]
 }
