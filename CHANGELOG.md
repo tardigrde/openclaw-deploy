@@ -1,6 +1,46 @@
 # CHANGELOG
 
 
+## v0.4.2 (2026-03-22)
+
+### Bug Fixes
+
+- Add required_version to hetzner-vps module terraform block
+  ([`b07156a`](https://github.com/tardigrde/openclaw-deploy/commit/b07156ad66527c2dd6b2c0d7c2cab7a6b3ac5ca3))
+
+### Chores
+
+- **deps**: Update dependency @martian-engineering/lossless-claw to v0.4.0
+  ([`1e18910`](https://github.com/tardigrde/openclaw-deploy/commit/1e1891077c6def1558dba3c0105fd98c731d617c))
+
+- **deps**: Update dependency crshdn/mission-control to v2
+  ([`8164913`](https://github.com/tardigrde/openclaw-deploy/commit/816491329d0e454c1c1bdd23a06b1a4f8a6147b9))
+
+### Continuous Integration
+
+- Add tflint to validate workflow
+  ([`186a848`](https://github.com/tardigrde/openclaw-deploy/commit/186a8487955843ddc9a1c0d3130ae02482b2f4ae))
+
+- Rename plan/apply workflows to examples, update docs
+  ([`89a12a0`](https://github.com/tardigrde/openclaw-deploy/commit/89a12a0aa4f01498df1483cea64ecbebd8ac9669))
+
+### Testing
+
+- Address Gemini review feedback
+  ([`58272ce`](https://github.com/tardigrde/openclaw-deploy/commit/58272ce848e4dbadc6bba301531ca351e00b1bb6))
+
+- Remove override_during for Terraform 1.7 compat, split plan/apply tests
+  ([`6f782ba`](https://github.com/tardigrde/openclaw-deploy/commit/6f782ba5209dd960fe3e059a99f4ac41b7c1cf07))
+
+- **terraform**: Add native tests for hetzner-vps module
+  ([`473a3a0`](https://github.com/tardigrde/openclaw-deploy/commit/473a3a008afb9f79fd3de2e3bbc77a02c6863360))
+
+13 tests covering defaults, variable validation, firewall rules, Tailscale toggle, server labels,
+  firewall attachment, SSH key lookup, public networking, and environment naming.
+
+Adds terraform-test job to validate.yml CI workflow.
+
+
 ## v0.4.1 (2026-03-22)
 
 ### Bug Fixes
