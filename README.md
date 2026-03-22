@@ -468,7 +468,7 @@ ssh openclaw@VPS_IP "sudo chown -R openclaw:openclaw ~/.openclaw"
 
 ## CI/CD
 
-Built-in CI runs Terraform only — `plan` on PRs, `apply` on manual dispatch. An optional GitOps workflow enables automatic Ansible-based deployments on push.
+Built-in CI validates and tests Terraform (fmt, validate, tflint, native tests). Example workflows for `terraform plan` and `terraform apply` are in `.github/workflows/*.example.yml`. An optional GitOps workflow enables automatic Ansible-based deployments on push.
 
 See [docs/cicd.md](docs/cicd.md) for required GitHub Variables, Secrets, and approval gate setup.
 
