@@ -46,7 +46,7 @@ if [[ -z "$GIT_WORKSPACE_REPO" ]]; then
 fi
 
 if [[ -z "$GIT_WORKSPACE_TOKEN" ]]; then
-    echo "[ERROR] GIT_WORKSPACE_TOKEN not set"
+    echo "[ERROR] GIT_WORKSPACE_TOKEN not set" >&2
     exit 1
 fi
 
@@ -72,7 +72,7 @@ cd "$WORKSPACE_DIR"
 if [[ -d ".git" ]] && find .git -user root -print -quit | grep -q .; then
     echo "[...] Fixing .git ownership (was root, correcting to $(id -u):$(id -g))"
     chown -R "$(id -u):$(id -g)" .git 2>/dev/null || {
-        echo "[ERROR] Cannot fix .git ownership — run: sudo chown -R $(id -u):$(id -g) $WORKSPACE_DIR/.git"
+        echo "[ERROR] Cannot fix .git ownership — run: sudo chown -R $(id -u):$(id -g) $WORKSPACE_DIR/.git" >&2
         exit 1
     }
 fi

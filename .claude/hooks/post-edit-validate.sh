@@ -9,7 +9,7 @@ cd "$REPO_ROOT"
 
 file=$(jq -r '.tool_input.file_path // ""' 2>/dev/null) || exit 0
 
-[ -z "$file" ] && exit 0
+[[ -z "$file" ]] && exit 0
 
 # Normalize to repo-relative path
 rel="${file#"$REPO_ROOT"/}"
@@ -27,5 +27,7 @@ case "$rel" in
   openclaw.json)
     echo "[hook] Validating openclaw.json..."
     jq empty "$file" && echo "openclaw.json: valid JSON"
+    ;;
+  *)
     ;;
 esac
