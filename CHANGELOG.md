@@ -1,6 +1,23 @@
 # CHANGELOG
 
 
+## v0.6.4 (2026-03-22)
+
+### Bug Fixes
+
+- Address security review findings (VULN-001/007/008/009/002/003/010)
+  ([`13fbf71`](https://github.com/tardigrde/openclaw-deploy/commit/13fbf714ad97cf811856a5738e08463d2721a24c))
+
+- VULN-001: comment out Docker socket mount in override example; add warning comment so users can
+  re-enable consciously - VULN-007: tighten ~/backups directory mode from 0755 to 0700 - VULN-008:
+  add assert task in restore.yml to validate backup_file format before tar extraction - VULN-009:
+  replace token-in-URL with temp credential file (mode 600) in workspace-sync.sh so PAT is not
+  written to .git/config or visible in ps aux - VULN-002/003/010: document journalctl wildcard,
+  curl|sh Tailscale install, and unencrypted intra-container WebSocket risks in SECURITY.md
+
+Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
+
+
 ## v0.6.3 (2026-03-22)
 
 ### Bug Fixes
