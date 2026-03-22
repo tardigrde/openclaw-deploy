@@ -11,6 +11,10 @@ terraform {
       source  = "hetznercloud/hcloud"
       version = "~> 1.45"
     }
+    tailscale = {
+      source  = "tailscale/tailscale"
+      version = "~> 0.17"
+    }
   }
 
   # Backend is configured in backend.tf (gitignored).
@@ -23,6 +27,11 @@ terraform {
 
 provider "hcloud" {
   token = var.hcloud_token
+}
+
+provider "tailscale" {
+  oauth_client_id     = var.tailscale_oauth_client_id
+  oauth_client_secret = var.tailscale_oauth_client_secret
 }
 
 # ============================================
@@ -43,6 +52,18 @@ module "vps" {
 
   # Security configuration
   enable_tailscale = var.enable_tailscale
+}
+
+# ============================================
+# Tailscale Module (only when Tailscale is enabled)
+# ============================================
+
+module "tailscale" {
+  count  = var.enable_tailscale ? 1 : 0
+  source = "../../modules/tailscale"
+
+  environment = "prod"
+  enable_acl  = var.tailscale_enable_acl
 }
 
 # ============================================
@@ -92,4 +113,10 @@ output "firewall_id" {
 output "tailscale_enabled" {
   description = "Whether Tailscale VPN is enabled"
   value       = module.vps.tailscale_enabled
+}
+
+output "tailscale_auth_key" {
+  description = "Tailscale pre-auth key for bootstrapping. Consumed automatically by 'make bootstrap' and 'make tailscale-enable' when TAILSCALE_AUTH_KEY is not set in the environment."
+  value       = var.enable_tailscale ? module.tailscale[0].auth_key : null
+  sensitive   = true
 }

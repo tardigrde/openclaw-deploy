@@ -1,6 +1,6 @@
 ---
 # =============================================================================
-# Tailscale Play — install and register Tailscale VPN
+# Tailscale Play — install, register, and configure Tailscale VPN
 # =============================================================================
 # Tags: tailscale
 #
@@ -11,13 +11,17 @@
 # The auth key is never logged (no_log: true on the registration task).
 #
 # Variables (passed via --extra-vars from Makefile):
-#   tailscale_auth_key  — Tailscale pre-auth key.
-#                         Set TAILSCALE_AUTH_KEY in secrets/inputs.sh.
-#                         Use a reusable key so re-running bootstrap is safe.
+#   tailscale_auth_key        — Tailscale pre-auth key.
+#                               Auto-read from terraform output; set
+#                               TAILSCALE_AUTH_KEY in secrets/inputs.sh to override.
+#   openclaw_gateway_port     — Gateway port for tailscale serve (default: 18789).
 #
 # Runs as root (become: true) — package install and ufw require root.
 # The Hetzner firewall UDP 41641 rule is managed separately by Terraform
 # (enable_tailscale in terraform.tfvars). This play handles the in-guest layer.
+#
+# tailscale serve config is deployed here on first bootstrap and kept in sync
+# by config.yml on every `make deploy`.
 # =============================================================================
 
 - name: Configure Tailscale VPN
@@ -54,4 +58,24 @@
           ansible.builtin.command:
             cmd: tailscale up --auth-key="{{ tailscale_auth_key }}" --hostname="openclaw-prod" --accept-routes
           no_log: true
+          changed_when: true
+
+        - name: Ensure /etc/tailscale directory exists
+          ansible.builtin.file:
+            path: /etc/tailscale
+            state: directory
+            owner: root
+            mode: "0755"
+
+        - name: Deploy Tailscale serve config
+          ansible.builtin.template:
+            src: ../templates/tailscale-serve.json.j2
+            dest: /etc/tailscale/serve.json
+            owner: root
+            mode: "0644"
+          register: tailscale_serve_deployed
+
+        - name: Apply Tailscale serve config
+          ansible.builtin.command: tailscale serve --config /etc/tailscale/serve.json
+          when: tailscale_serve_deployed is changed
           changed_when: true

@@ -10,6 +10,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This is an infrastructure-as-code repository for deploying the [OpenClaw](https://openclaw.ai) AI coding assistant on a Hetzner Cloud VPS.
 
+**Private mirror:** Users typically maintain a private fork of this repo with their production credentials, prod-specific overrides, and private files. If `docs/local/CLAUDE.md` exists, it contains the mirror's workflow and what lives where. All shared infrastructure changes should be made here first and pulled into the private mirror — never the reverse.
+
+**Worktrees:** Claude Code may use git worktrees (`.claude/worktrees/<branch>/`) as isolated checkouts for feature branches. Run `git` commands from the worktree path when working inside one — `git log`, `git push origin HEAD:<branch>`, etc. all work normally there.
+
 ## Common Commands
 
 All operations go through `make`. The Makefile reads VPS IP from Terraform state automatically.
@@ -51,7 +55,7 @@ Playbook: `ansible/site.yml` — imports modular plays from `ansible/plays/`.
 Ansible tags: `bootstrap`, `tailscale`, `docker`, `config`, `start` (run by default on `make bootstrap`).
 Tags that never run by default: `setup_auth`, `patch_devices`, `backup_now`, `backup_pull`, `restore`, `addon-weather-report`.
 
-**CI runs Terraform only** (`terraform plan` on PRs, `terraform apply` on manual dispatch). Ansible is never run in CI — all `make bootstrap` / `make deploy` / `make tailscale-setup` operations are local only.
+**CI runs validation and tests only.** `terraform-plan.yml.example` and `terraform-apply.yml.example` are inactive templates — copy and rename to `.yml` in a private fork to enable Terraform CI against a real backend. Ansible is never run in CI — all `make bootstrap` / `make deploy` / `make tailscale-setup` operations are local only.
 Dry run: `ANSIBLE_CONFIG=ansible/ansible.cfg ansible-playbook -i "$SERVER_IP," --private-key $SSH_KEY ansible/site.yml --check --diff`
 
 **Update cycle** (bump OpenClaw version or MC source):
@@ -75,6 +79,7 @@ make exec CMD=""  # Run a command in the gateway container
 
 - **Never commit directly to `main`** — always create a feature/fix branch and open a PR.
 - **Use semantic commit messages**: `feat:`, `fix:`, `chore:`, `docs:`, `refactor:`, etc.
+- **Worktrees**: when Claude Code creates a worktree at `.claude/worktrees/<branch>/`, work inside that directory. Push with `git push origin HEAD:<branch>`.
 
 ## Security Notes
 

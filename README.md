@@ -207,27 +207,45 @@ source secrets/inputs.sh && make plan && make apply
 
 **Option B — Tailscale VPN (recommended):**
 
-Tailscale creates a private WireGuard mesh so SSH is reachable only from devices on your tailnet. You can set this up any time after bootstrap with a single command.
+Tailscale creates a private WireGuard mesh so SSH is reachable only from devices on your tailnet. The pre-auth key is generated automatically by Terraform — no need to create one manually in the Tailscale console.
 
-1. Get a **reusable** + pre-authorized auth key at [login.tailscale.com/admin/settings/keys](https://login.tailscale.com/admin/settings/keys).
+> **Tailscale is optional.** If you skip these steps, set `TF_VAR_enable_tailscale=false` (the default) and `make apply` ignores all Tailscale resources. You can add Tailscale at any time by setting the vars below and re-running `make apply`.
 
-   > Use a reusable key (not one-time) so re-running the setup doesn't fail. Keys expire after 90 days by default — rotate at the same URL.
+1. Create an OAuth client at [login.tailscale.com/admin/settings/oauth](https://login.tailscale.com/admin/settings/oauth).
 
-2. Add the auth key to `secrets/inputs.sh`:
+   Required scopes: `auth_keys:write`, `settings:write`, `dns:write` — and `acls:write` if you want Terraform to manage your tailnet ACL.
 
-   ```bash
-   export TAILSCALE_AUTH_KEY="tskey-auth-xxxxxxxxxxxxx"
-   ```
-
-3. Run:
+2. Add to `secrets/inputs.sh`:
 
    ```bash
-   source secrets/inputs.sh && make tailscale-enable
+   export TF_VAR_enable_tailscale=true
+   export TF_VAR_tailscale_oauth_client_id="tskey-client-..."
+   export TF_VAR_tailscale_oauth_client_secret="tskey-secret-..."
    ```
 
-   This installs and registers Tailscale, verifies the connection is working, then automatically removes public SSH access via Terraform — all in one step. If verification fails, it aborts and SSH stays open.
+3. Apply infrastructure (generates the auth key):
 
-4. Switch your make commands to use the Tailscale hostname:
+   ```bash
+   source secrets/inputs.sh && make apply
+   ```
+
+   This can be your initial `make apply` (Quick Start step 5) or a re-run on an existing VPS — both work. Without the OAuth vars, `make apply` skips all Tailscale resources.
+
+4. Bootstrap — installs and registers Tailscale, deploys serve config:
+
+   ```bash
+   make bootstrap
+   ```
+
+5. Lock SSH to Tailscale-only:
+
+   ```bash
+   make tailscale-enable
+   ```
+
+   This verifies the Tailscale connection is working, then automatically removes public SSH access via Terraform. If verification fails, it aborts and SSH stays open.
+
+6. Switch your make commands to use the Tailscale hostname:
 
    ```bash
    # secrets/inputs.sh
@@ -235,7 +253,9 @@ Tailscale creates a private WireGuard mesh so SSH is reachable only from devices
    source secrets/inputs.sh
    ```
 
-5. *(Optional)* Update `openclaw.json` to enable Tailscale-based gateway auth:
+   This is a one-time manual edit to your local `inputs.sh` — `make` doesn't write back to shell config files.
+
+7. *(Optional)* Update `openclaw.json` to enable Tailscale-based gateway auth — skip this if you only want SSH access and don't need the dashboard accessible via Tailscale HTTPS:
 
    ```json
    {
@@ -342,12 +362,16 @@ make exec CMD=""  # Run command in gateway container
 **Tailscale:**
 
 ```bash
-make tailscale-enable   # Install Tailscale, verify, and lock down public SSH (requires TAILSCALE_AUTH_KEY)
-make tailscale-setup    # Install and register Tailscale only, no SSH lockdown (requires TAILSCALE_AUTH_KEY)
+make tailscale-enable   # Install Tailscale, verify, and lock down public SSH
+make tailscale-setup    # Install and register Tailscale only, no SSH lockdown
 make tailscale-status   # Check Tailscale connection status
 make tailscale-ip       # Get Tailscale IP
 make tailscale-up       # Manually authenticate Tailscale
 ```
+
+> `TAILSCALE_AUTH_KEY` is read automatically from `terraform output` when `enable_tailscale=true` — no manual key needed. To override, set it explicitly in your shell before running make.
+>
+> **Security note:** The auth key is stored in Terraform state. Protect your state file (`terraform/envs/prod/terraform.tfstate`, gitignored) or GCS bucket with the same care as `secrets/inputs.sh`. Anyone with read access to state can extract the key.
 
 **Backup & Restore:**
 
@@ -421,13 +445,13 @@ Open `http://localhost:18789` and paste your `OPENCLAW_GATEWAY_TOKEN`.
 
 **Via Tailscale Serve** (if Tailscale is enabled):
 
-```bash
-ssh -i $SSH_KEY openclaw@<tailscale-ip>
-sudo tailscale serve --bg 18789
-sudo tailscale serve status  # prints your HTTPS URL
+`make bootstrap` deploys the serve config automatically — no manual SSH needed. The gateway is available at:
+
+```
+https://openclaw-prod.<tailnet>.ts.net
 ```
 
-Dashboard available at `https://openclaw-prod.<tailnet>.ts.net` from any tailnet device.
+from any tailnet device. To expose additional services (e.g. ports 4000, 3001), edit `ansible/templates/tailscale-serve.json.j2` and run `make deploy`. See [docs/tailscale.md](docs/tailscale.md) for the full serve config reference.
 
 > Use Serve, not Funnel. Funnel exposes the service to the public internet.
 
@@ -476,6 +500,7 @@ See [docs/cicd.md](docs/cicd.md) for required GitHub Variables, Secrets, and app
 
 | Topic | Doc |
 | ----- | --- |
+| Tailscale serve config | [docs/tailscale.md](docs/tailscale.md) |
 | Skills (ClawHub) | [docs/skills.md](docs/skills.md) |
 | Headless browser | [docs/headless-browser.md](docs/headless-browser.md) |
 | Multi-agent setup | [docs/agents.md](docs/agents.md) |
