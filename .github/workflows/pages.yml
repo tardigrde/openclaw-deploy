@@ -27,7 +27,10 @@ jobs:
       - run: pip install mkdocs-material
 
       - name: Copy root docs into docs/
-        run: cp README.md docs/index.md && cp SECURITY.md docs/security.md
+        run: |
+          # Strip docs/ prefix from links (files live at root, but MkDocs serves from docs/)
+          sed 's|\](docs/|](|g; s|\[docs/|[|g' README.md > docs/index.md
+          sed 's|\](docs/|](|g; s|\[docs/|[|g' SECURITY.md > docs/security.md
 
       - run: mkdocs build --strict
 
