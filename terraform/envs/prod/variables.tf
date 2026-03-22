@@ -78,3 +78,23 @@ variable "enable_tailscale" {
   type        = bool
   default     = false
 }
+
+variable "tailscale_oauth_client_id" {
+  description = "Tailscale OAuth client ID — required when enable_tailscale=true. Create at https://login.tailscale.com/admin/settings/oauth (scopes: auth_keys:write, settings:write, dns:write; add acls:write if tailscale_enable_acl=true)"
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+
+variable "tailscale_oauth_client_secret" {
+  description = "Tailscale OAuth client secret — required when enable_tailscale=true"
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+
+variable "tailscale_enable_acl" {
+  description = "Manage the tailnet ACL policy via Terraform. WARNING: replaces the entire tailnet ACL on apply. Only enable if you want Terraform to be the sole source of truth for your ACL."
+  type        = bool
+  default     = false
+}

@@ -13,11 +13,11 @@ An optional GitOps deployment workflow is also included — copy `.github/workfl
 
 ## Terraform Plan (example — copy to enable)
 
-Copy `.github/workflows/terraform-plan.example.yml` to `.github/workflows/terraform-plan.yml`. When a pull request touches `terraform/**`, the workflow runs automatically and posts the plan diff as a PR comment.
+Copy `.github/workflows/terraform-plan.yml.example` to `.github/workflows/terraform-plan.yml`. When a pull request touches `terraform/**`, the workflow runs automatically and posts the plan diff as a PR comment.
 
 ## Terraform Apply (example — copy to enable)
 
-Copy `.github/workflows/terraform-apply.example.yml` to `.github/workflows/terraform-apply.yml`. Then trigger manually after merging:
+Copy `.github/workflows/terraform-apply.yml.example` to `.github/workflows/terraform-apply.yml`. Then trigger manually after merging:
 
 1. Go to **Actions** → **Terraform Apply** → **Run workflow**
 2. Select the branch and click **Run workflow**

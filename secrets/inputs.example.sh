@@ -58,16 +58,27 @@ export CLAUDE_SETUP_TOKEN=""
 # OPTIONAL: Tailscale VPN
 # ============================================
 # Enable Tailscale for private networking. When enabled:
-# - Tailscale is installed on first boot via cloud-init
-# - UFW and Hetzner firewall open UDP 41641 for WireGuard
-# - Set ssh_allowed_cidrs='[]' to remove all public SSH exposure
-#   (SSH over Tailscale goes through WireGuard, not port 22)
+# - Hetzner firewall opens UDP 41641 for WireGuard
+# - Terraform generates a pre-auth key automatically (no manual console step)
+# - 'make bootstrap' and 'make tailscale-enable' read the key from Terraform output
+# - Set ssh_allowed_cidrs='[]' after confirming Tailscale works (make tailscale-enable does this atomically)
 export TF_VAR_enable_tailscale=false
 
-# Tailscale auth key (generate at https://login.tailscale.com/admin/settings/keys)
-# Leave empty to authenticate manually after deployment with: make tailscale-up
-# Recommended: reusable + pre-authorized key (not ephemeral)
-export TF_VAR_tailscale_auth_key=""
+# Tailscale OAuth client credentials (required when enable_tailscale=true)
+# Create at: https://login.tailscale.com/admin/settings/oauth
+# Required scopes: auth_keys:write (to generate pre-auth keys)
+# Optional scope:  acls:write (only needed if tailscale_enable_acl=true)
+export TF_VAR_tailscale_oauth_client_id="CHANGE_ME_tskey-client-..."
+export TF_VAR_tailscale_oauth_client_secret="CHANGE_ME_tskey-secret-..."
+
+# ACL management via Terraform (default: false — manage ACL in Tailscale console instead)
+# WARNING: setting this to true will REPLACE your entire tailnet ACL on next apply.
+# export TF_VAR_tailscale_enable_acl=false
+
+# TAILSCALE_AUTH_KEY is no longer set manually here.
+# When enable_tailscale=true, 'make bootstrap' reads it automatically from:
+#   terraform output -raw tailscale_auth_key
+# To override (e.g. use an existing key): set TAILSCALE_AUTH_KEY in your shell before running make.
 
 # ============================================
 # Server Configuration (Optional Overrides)

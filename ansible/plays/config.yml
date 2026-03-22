@@ -193,6 +193,38 @@
       when: not env_plaintext_file.stat.exists and not (env_enc_file.stat.exists and age_key_file.stat.exists)
       tags: [config]
 
+    # -----------------------------------------------------------------
+    # Tailscale serve config — keep in sync on every deploy
+    # Only runs when /etc/tailscale/serve.json already exists (i.e. after
+    # bootstrap has run tailscale-setup). Skipped silently on bare deploys
+    # before Tailscale is installed.
+    # -----------------------------------------------------------------
+
+    - name: Check if Tailscale serve config path exists
+      ansible.builtin.stat:
+        path: /etc/tailscale/serve.json
+      register: tailscale_serve_config
+      become: true
+      tags: [config]
+
+    - name: Update Tailscale serve config
+      ansible.builtin.template:
+        src: ../templates/tailscale-serve.json.j2
+        dest: /etc/tailscale/serve.json
+        owner: root
+        mode: "0644"
+      become: true
+      when: tailscale_serve_config.stat.exists
+      register: tailscale_serve_updated
+      tags: [config]
+
+    - name: Re-apply Tailscale serve config
+      ansible.builtin.command: tailscale serve --config /etc/tailscale/serve.json
+      become: true
+      when: tailscale_serve_updated is changed
+      changed_when: true
+      tags: [config]
+
     - name: Copy workspace sync script
       ansible.builtin.copy:
         src: ../../scripts/workspace-sync.sh
