@@ -1,6 +1,139 @@
 # CHANGELOG
 
 
+## v0.5.0 (2026-03-22)
+
+### Bug Fixes
+
+- Address review feedback on tailscale serve config and oauth variable
+  ([`bf55f67`](https://github.com/tardigrde/openclaw-deploy/commit/bf55f67dd09af797b64e907d7ec29bd0ac39b46a))
+
+- Make tailscale serve apply idempotent: only run `tailscale serve --config` when the template file
+  actually changed (register + when: changed) - Update tailscale_oauth_client_id description: add
+  dns:write scope, clarify acls:write is only needed when tailscale_enable_acl=true
+
+Note: did not change ACL grants format — `ip` field is correct for Tailscale grants syntax; Gemini
+  conflated grants with legacy acls format.
+
+Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
+
+- Rename terraform-plan/apply workflows to .yml.example to stop CI runs
+  ([`6c75c9f`](https://github.com/tardigrde/openclaw-deploy/commit/6c75c9fb1161feed2a9b123deed37115bd618fac))
+
+.example.yml still ends in .yml so GitHub Actions picks them up and runs them on every PR touching
+  terraform/. Renaming to .yml.example (matching the deploy.yml.example / rollback.yml.example
+  convention) makes GitHub ignore them entirely.
+
+Private forks that want live Terraform CI should copy the .yml.example files, rename to .yml, and
+  configure their own backend credentials.
+
+Closes #20
+
+Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
+
+- Simplify tailscale serve template — hardcode 18789, drop Jinja2 var
+  ([`469729f`](https://github.com/tardigrde/openclaw-deploy/commit/469729f97666301dcf84a988c0d19b760cd92b48))
+
+Gateway always listens on 18789 internally (docker-compose internal port is fixed;
+  OPENCLAW_GATEWAY_PORT only changes the host binding). The Jinja2 variable was unnecessary and
+  could cause confusion.
+
+Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
+
+### Chores
+
+- **deps**: Update terraform-linters/setup-tflint action to v6
+  ([#19](https://github.com/tardigrde/openclaw-deploy/pull/19),
+  [`b9f92c7`](https://github.com/tardigrde/openclaw-deploy/commit/b9f92c7e6dbd10b8055e1d8e8fa781590182fa3c))
+
+Co-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+
+### Documentation
+
+- Address README review comments + add tailscale.md
+  ([`69941fb`](https://github.com/tardigrde/openclaw-deploy/commit/69941fbce25784d9de25a431a373d60dc7fe0a4a))
+
+README: - Clarify Tailscale is optional (default: disabled, add anytime) - Fix misleading "no manual
+  console step" — key is auto-generated, but OAuth client still needs to be created once - Note make
+  apply can be initial or re-run; skips TS resources without creds - Explain SERVER_IP switch is a
+  one-time manual edit (can't automate shell config) - Clarify openclaw.json step is optional and
+  only needed for dashboard HTTPS access - Add security note: auth key lives in TF state — protect
+  like inputs.sh - Point to new docs/tailscale.md for serve config editing reference
+
+docs/tailscale.md (new): - How serve config works (Terraform + Ansible + make) - Default config and
+  how to add extra ports - TS_CERT_DOMAIN explanation - Private fork override guidance - ACL
+  management, key rotation, troubleshooting
+
+Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
+
+- Update cicd.md to reference renamed .yml.example workflow files
+  ([`707c16d`](https://github.com/tardigrde/openclaw-deploy/commit/707c16d6dea4904689bbc5e6ed6a505089ba8202))
+
+Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
+
+- **CLAUDE.md**: Add private mirror and worktree guidance
+  ([`7996bfa`](https://github.com/tardigrde/openclaw-deploy/commit/7996bfa56bd82475e1ba6f6829815bb5a5e56f94))
+
+- Note that users typically maintain a private fork; docs/local/CLAUDE.md is where fork-specific
+  workflow lives - Explain worktree usage (.claude/worktrees/<branch>/) and how to push - Fix CI
+  note: terraform-plan/apply are now .yml.example (inactive templates)
+
+Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
+
+- **README**: Update Tailscale setup for OAuth-based auth key generation
+  ([`30b3aef`](https://github.com/tardigrde/openclaw-deploy/commit/30b3aefd05bf7309c4a294b14222935ccebbf3bb))
+
+- Replace manual pre-auth key steps with OAuth client flow: set TF_VAR_enable_tailscale + OAuth
+  creds → make apply → make bootstrap → make tailscale-enable - Remove manual `tailscale serve --bg`
+  instructions — serve config is now deployed declaratively by `make bootstrap` and kept in sync by
+  `make deploy` - Note that TAILSCALE_AUTH_KEY is auto-read from terraform output
+
+Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
+
+### Features
+
+- Manage Tailscale config via Terraform provider
+  ([`7acfe68`](https://github.com/tardigrde/openclaw-deploy/commit/7acfe68c3f539675d6fda606db58cb7cd768bce3))
+
+- Add tailscale/tailscale provider (~> 0.17) - New terraform/modules/tailscale/:
+  tailscale_tailnet_key (reusable, pre-authorized, 90d, tag:openclaw-server) + optional
+  tailscale_acl - Wire tailscale_auth_key as Terraform output; Makefile reads it automatically — no
+  manual key generation after make apply - Add OAuth client vars (tailscale_oauth_client_id/secret)
+  - Replace stale TF_VAR_tailscale_auth_key in inputs.example.sh
+
+Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
+
+- Manage Tailscale via Terraform provider + declarative serve config
+  ([`27370c2`](https://github.com/tardigrde/openclaw-deploy/commit/27370c24828ddbc201074b98f09a1a16c3c9c4cb))
+
+- Add tailscale/tailscale provider (~> 0.17) to envs/prod - New terraform/modules/tailscale:
+  generates reusable pre-auth key via OAuth client credentials (no more manual key creation in
+  console), manages tailnet settings, MagicDNS, and optional ACL policy - Makefile: auto-read
+  TAILSCALE_AUTH_KEY from terraform output so `make bootstrap` and `make tailscale-enable` need no
+  extra steps - ansible/plays/tailscale.yml: deploy tailscale-serve.json.j2 and apply serve config
+  on bootstrap (declarative, no manual ssh needed) - ansible/plays/config.yml: re-apply serve config
+  on `make deploy` when changed (idempotent, silently skipped before Tailscale is installed) -
+  ansible/templates/tailscale-serve.json.j2: Jinja2 template for tailscale serve --config (proxies
+  gateway port 18789 over HTTPS)
+
+Onboarding is now: set OAuth creds -> make apply -> make bootstrap. No manual key generation step.
+
+Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
+
+### Testing
+
+- Add native Terraform tests for tailscale module + fix fmt + add to CI
+  ([`dc77120`](https://github.com/tardigrde/openclaw-deploy/commit/dc77120764a126f976a36dbc79a7abe76990d197))
+
+- terraform/modules/tailscale/tests/tailscale.tftest.hcl: 7 tests covering auth key properties
+  (reusable, preauthorized, expiry, tag, description), auth_key sensitive output, MagicDNS always
+  on, tailnet settings defaults, and ACL resource created/skipped based on enable_acl flag - Fix
+  terraform fmt on modules/tailscale/main.tf (was causing validate to fail) - validate.yml: add
+  tailscale module init + test steps to terraform-test job
+
+Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
+
+
 ## v0.4.2 (2026-03-22)
 
 ### Bug Fixes
