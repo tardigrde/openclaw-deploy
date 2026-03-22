@@ -1,6 +1,20 @@
 # CHANGELOG
 
 
+## v0.4.1 (2026-03-22)
+
+### Bug Fixes
+
+- **renovate**: Suppress false go detection and track Hugo version in pages.yml
+  ([`36cb4a1`](https://github.com/tardigrde/openclaw-deploy/commit/36cb4a110cf3079b36f8b8fee2b2a3976e5a93e8))
+
+HUGO_VERSION was being misidentified as a 'go' package dependency, causing a bogus major-version
+  update PR. Fix by: - Disabling go package detection in pages.yml via packageRules - Adding a
+  custom manager that correctly tracks HUGO_VERSION against gohugoio/hugo releases
+
+Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
+
+
 ## v0.4.0 (2026-03-22)
 
 ### Bug Fixes
