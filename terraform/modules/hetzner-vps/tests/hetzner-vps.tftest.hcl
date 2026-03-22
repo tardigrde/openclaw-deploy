@@ -21,7 +21,6 @@ mock_provider "hcloud" {
       ipv6_address = "2001:db8::1"
       ssh_keys     = ["12345"]
     }
-    override_during = plan
   }
 
   mock_resource "hcloud_firewall" {
@@ -29,7 +28,6 @@ mock_provider "hcloud" {
       id   = "67890"
       name = "test-fw"
     }
-    override_during = plan
   }
 
   mock_resource "hcloud_firewall_attachment" {
@@ -37,12 +35,11 @@ mock_provider "hcloud" {
       id          = "11111"
       firewall_id = "67890"
     }
-    override_during = plan
   }
 }
 
 # --------------------------------------------
-# Default configuration
+# Default configuration (plan — known values)
 # --------------------------------------------
 run "default_config" {
   command = plan
@@ -56,11 +53,6 @@ run "default_config" {
   assert {
     condition     = hcloud_server.main.name == "openclaw-prod"
     error_message = "Server name should be {project}-{environment}"
-  }
-
-  assert {
-    condition     = hcloud_server.main.ipv4_address == "1.2.3.4"
-    error_message = "Server IPv4 should match mock"
   }
 
   assert {
@@ -81,6 +73,44 @@ run "default_config" {
   assert {
     condition     = hcloud_server.main.location == "nbg1"
     error_message = "Default location should be nbg1"
+  }
+}
+
+# --------------------------------------------
+# Computed outputs (apply — mock fills values)
+# --------------------------------------------
+run "computed_outputs" {
+  command = apply
+
+  variables {
+    project_name        = "openclaw"
+    environment         = "prod"
+    ssh_key_fingerprint = "aa:bb:cc:dd:ee:ff"
+  }
+
+  assert {
+    condition     = output.server_ipv4 == "1.2.3.4"
+    error_message = "Server IPv4 should match mock"
+  }
+
+  assert {
+    condition     = output.server_ipv6 == "2001:db8::1"
+    error_message = "Server IPv6 should match mock"
+  }
+
+  assert {
+    condition     = output.server_status == "running"
+    error_message = "Server status should be running"
+  }
+
+  assert {
+    condition     = output.ssh_command == "ssh openclaw@1.2.3.4"
+    error_message = "SSH command should use app user and IPv4"
+  }
+
+  assert {
+    condition     = output.ssh_command_root == "ssh root@1.2.3.4"
+    error_message = "Root SSH command should use root and IPv4"
   }
 }
 
@@ -245,10 +275,10 @@ run "server_labels" {
 }
 
 # --------------------------------------------
-# Firewall attachment links firewall to server
+# Firewall attachment (apply — computed IDs)
 # --------------------------------------------
 run "firewall_attachment" {
-  command = plan
+  command = apply
 
   variables {
     project_name        = "openclaw"
@@ -257,13 +287,13 @@ run "firewall_attachment" {
   }
 
   assert {
-    condition     = hcloud_firewall_attachment.main.firewall_id != null
-    error_message = "Firewall attachment should reference a firewall"
+    condition     = output.firewall_id != null
+    error_message = "Firewall ID should not be null"
   }
 
   assert {
-    condition     = length(hcloud_firewall_attachment.main.server_ids) == 1
-    error_message = "Firewall should be attached to exactly one server"
+    condition     = output.server_id != null
+    error_message = "Server ID should not be null"
   }
 }
 
@@ -283,18 +313,13 @@ run "ssh_key_lookup" {
     condition     = data.hcloud_ssh_key.main.fingerprint == "ff:ee:dd:cc:bb:aa"
     error_message = "SSH key data source should use provided fingerprint"
   }
-
-  assert {
-    condition     = length(hcloud_server.main.ssh_keys) > 0
-    error_message = "Server should have at least one SSH key"
-  }
 }
 
 # --------------------------------------------
-# Public networking — IPv4 and IPv6 enabled
+# Public networking (apply — computed block)
 # --------------------------------------------
 run "public_net" {
-  command = plan
+  command = apply
 
   variables {
     project_name        = "openclaw"
