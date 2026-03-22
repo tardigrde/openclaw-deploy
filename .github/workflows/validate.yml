@@ -25,6 +25,26 @@ jobs:
       - name: Run make validate
         run: make validate
 
+  terraform-test:
+    name: Terraform Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v4
+        with:
+          terraform_version: "1.7.0"
+
+      - name: Terraform Init (module)
+        working-directory: terraform/modules/hetzner-vps
+        run: terraform init -backend=false
+
+      - name: Run Terraform Tests
+        working-directory: terraform/modules/hetzner-vps
+        run: terraform test
+
   checkov:
     name: Checkov IaC scan
     runs-on: ubuntu-latest
