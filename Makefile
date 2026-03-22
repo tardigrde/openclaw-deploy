@@ -290,12 +290,14 @@ secrets-edit: ## Edit encrypted secrets/.env.enc in-place (opens $EDITOR)
 
 tailscale-enable: ## Install Tailscale, verify it works, then lock down public SSH via Terraform
 	$(call check-server-ip)
-	@if [[ -z "$${TAILSCALE_AUTH_KEY:-}" ]]; then \
-		echo -e "$(RED)[ERROR]$(NC) TAILSCALE_AUTH_KEY is not set. Add it to secrets/inputs.sh and source it."; \
+	@if [[ -z "$(TAILSCALE_AUTH_KEY)" ]]; then \
+		echo -e "$(RED)[ERROR]$(NC) TAILSCALE_AUTH_KEY is not set and could not be read from Terraform output."; \
+		echo "  → Run 'make apply' first (with enable_tailscale=true and OAuth creds set), or"; \
+		echo "  → Set TAILSCALE_AUTH_KEY manually: export TAILSCALE_AUTH_KEY=tskey-..."; \
 		exit 1; \
 	fi
 	@echo -e "$(BLUE)[DEPLOY]$(NC) Installing and registering Tailscale..."
-	@$(ANSIBLE) $(PLAYBOOK) --tags tailscale --extra-vars "tailscale_auth_key=$${TAILSCALE_AUTH_KEY}"
+	@$(ANSIBLE) $(PLAYBOOK) --tags tailscale --extra-vars "tailscale_auth_key=$(TAILSCALE_AUTH_KEY)"
 	@echo -e "$(GREEN)[INFO]$(NC) Verifying Tailscale connection..."
 	@ssh -i $(SSH_KEY) openclaw@$(SERVER_IP) 'sudo tailscale status' || { \
 		echo -e "$(RED)[ERROR]$(NC) Tailscale not connected. Public SSH is still open. Fix the issue and retry."; \
@@ -308,14 +310,15 @@ tailscale-enable: ## Install Tailscale, verify it works, then lock down public S
 	@echo -e "$(GREEN)[OK]$(NC) Done! SSH is now Tailscale-only."
 	@echo -e "$(YELLOW)[TIP]$(NC) Set SERVER_IP=\"openclaw-prod\" in secrets/inputs.sh to use MagicDNS for all make commands."
 
-tailscale-setup: ## Install and register Tailscale on VPS (requires TAILSCALE_AUTH_KEY)
-	@if [ -z "$${TAILSCALE_AUTH_KEY:-}" ]; then \
-		echo -e "$(RED)[ERROR]$(NC) TAILSCALE_AUTH_KEY is not set"; \
-		echo "Usage: TAILSCALE_AUTH_KEY=tskey-... make tailscale-setup"; \
+tailscale-setup: ## Install and register Tailscale on VPS (TAILSCALE_AUTH_KEY auto-read from Terraform output)
+	@if [[ -z "$(TAILSCALE_AUTH_KEY)" ]]; then \
+		echo -e "$(RED)[ERROR]$(NC) TAILSCALE_AUTH_KEY is not set and could not be read from Terraform output."; \
+		echo "  → Run 'make apply' first (with enable_tailscale=true and OAuth creds set), or"; \
+		echo "  → Set TAILSCALE_AUTH_KEY manually: export TAILSCALE_AUTH_KEY=tskey-..."; \
 		exit 1; \
 	fi
 	@echo -e "$(BLUE)[DEPLOY]$(NC) Installing and registering Tailscale on VPS..."
-	@$(ANSIBLE) $(PLAYBOOK) --tags tailscale --extra-vars "tailscale_auth_key=$${TAILSCALE_AUTH_KEY}"
+	@$(ANSIBLE) $(PLAYBOOK) --tags tailscale --extra-vars "tailscale_auth_key=$(TAILSCALE_AUTH_KEY)"
 
 tailscale-status: ## Show detailed Tailscale status and peers
 	@echo -e "$(GREEN)[INFO]$(NC) Checking Tailscale status..."
