@@ -26,6 +26,14 @@ TERRAFORM_DIR := terraform/envs/$(ENV)
 export TF_VAR_hcloud_token        := $(shell bash -c 'source secrets/inputs.sh 2>/dev/null && echo "$$HCLOUD_TOKEN"')
 export TF_VAR_ssh_key_fingerprint := $(shell bash -c 'source secrets/inputs.sh 2>/dev/null && echo "$$SSH_KEY_FINGERPRINT"')
 
+# Tailscale OAuth credentials — the Tailscale Terraform provider ignores TF_VAR_* env vars and
+# reads TAILSCALE_OAUTH_CLIENT_ID/SECRET directly, which may conflict when a separate OAuth client
+# is set for other purposes (e.g. CI). Pass credentials explicitly via -var to bypass this.
+# Only added when the values are non-empty (i.e. Tailscale is configured in secrets/inputs.sh).
+_TAILSCALE_OAUTH_ID     := $(shell bash -c 'source secrets/inputs.sh 2>/dev/null && echo "$$TF_VAR_tailscale_oauth_client_id"')
+_TAILSCALE_OAUTH_SECRET := $(shell bash -c 'source secrets/inputs.sh 2>/dev/null && echo "$$TF_VAR_tailscale_oauth_client_secret"')
+TAILSCALE_TF_VARS       := $(if $(_TAILSCALE_OAUTH_ID),-var="tailscale_oauth_client_id=$(_TAILSCALE_OAUTH_ID)" -var="tailscale_oauth_client_secret=$(_TAILSCALE_OAUTH_SECRET)")
+
 # Auto-read Tailscale auth key from Terraform output when not set in the environment.
 # This means after `make apply`, bootstrap/tailscale-enable work with no extra steps.
 # To override (e.g. use an existing key): export TAILSCALE_AUTH_KEY=tskey-... before running make.
@@ -76,11 +84,11 @@ init: ## Initialize Terraform backend
 
 plan: ## Preview Terraform changes
 	@echo -e "$(GREEN)[INFO]$(NC) Planning Terraform changes for $(ENV)..."
-	@cd $(TERRAFORM_DIR) && terraform plan
+	@cd $(TERRAFORM_DIR) && terraform plan $(TAILSCALE_TF_VARS)
 
 apply: ## Apply Terraform changes
 	@echo -e "$(YELLOW)[WARN]$(NC) This will modify infrastructure for $(ENV)"
-	@cd $(TERRAFORM_DIR) && terraform apply
+	@cd $(TERRAFORM_DIR) && terraform apply $(TAILSCALE_TF_VARS)
 
 destroy: ## Destroy all managed infrastructure
 	@echo -e "$(RED)[DANGER]$(NC) This will DESTROY all infrastructure for $(ENV)!"
