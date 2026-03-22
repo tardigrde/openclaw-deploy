@@ -1,6 +1,7 @@
 ---
 title: "Workspace Git Sync"
-weight: 80
+weight: 50
+aliases: ["/workspace-git-sync/"]
 ---
 # Workspace Git Sync
 

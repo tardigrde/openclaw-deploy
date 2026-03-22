@@ -1,6 +1,7 @@
 ---
 title: "OpenClaw Configuration"
 weight: 10
+aliases: ["/openclaw-config/"]
 ---
 # OpenClaw Configuration
 

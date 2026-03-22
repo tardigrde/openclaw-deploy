@@ -1,6 +1,7 @@
 ---
 title: "Version Management"
 weight: 30
+aliases: ["/versions/"]
 ---
 # Version Management
 

@@ -1,6 +1,7 @@
 ---
 title: "Agents & Sessions"
-weight: 40
+weight: 10
+aliases: ["/agents/"]
 ---
 # Agents
 

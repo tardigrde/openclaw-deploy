@@ -1,6 +1,7 @@
 ---
 title: "Lossless Context"
-weight: 50
+weight: 20
+aliases: ["/lossless-claw/"]
 ---
 # lossless-claw — Lossless Context Management
 
