@@ -33,6 +33,16 @@
       ]
     },
     {
+      "description": "Suppress false go detection in pages.yml (HUGO_VERSION misidentified as go)",
+      "matchFileNames": [
+        ".github/workflows/pages.yml"
+      ],
+      "matchPackageNames": [
+        "go"
+      ],
+      "enabled": false
+    },
+    {
       "description": "Group Docker base image updates for manual review",
       "matchManagers": [
         "dockerfile",
@@ -129,6 +139,19 @@
         "ARG SOPS_VERSION=(?<currentValue>[\\d]+\\.[\\d]+(?:\\.[\\d]+)?)"
       ],
       "depNameTemplate": "getsops/sops",
+      "datasourceTemplate": "github-releases",
+      "extractVersionTemplate": "^v(?<version>.+)$"
+    },
+    {
+      "description": "Track Hugo version pinned as env var in pages.yml",
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^\\.github/workflows/pages\\.yml$/"
+      ],
+      "matchStrings": [
+        "HUGO_VERSION: (?<currentValue>[\\d]+\\.[\\d]+\\.[\\d]+)"
+      ],
+      "depNameTemplate": "gohugoio/hugo",
       "datasourceTemplate": "github-releases",
       "extractVersionTemplate": "^v(?<version>.+)$"
     },
