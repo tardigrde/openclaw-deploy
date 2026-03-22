@@ -29,8 +29,10 @@ jobs:
       - name: Copy root docs into docs/
         run: |
           # Strip docs/ prefix from links (files live at root, but MkDocs serves from docs/)
-          sed 's|\](docs/|](|g; s|\[docs/|[|g' README.md > docs/index.md
-          sed 's|\](docs/|](|g; s|\[docs/|[|g' SECURITY.md > docs/security.md
+          # README→SECURITY.md becomes security.md (same dir in docs/)
+          sed 's|\](docs/|](|g; s|\[docs/|[|g; s|](SECURITY.md)|](security.md)|g' README.md > docs/index.md
+          # SECURITY→../README.md becomes index.md (MkDocs nav target)
+          sed 's|\](docs/|](|g; s|\[docs/|[|g; s|\](\.\./README\.md|](index.md|g' SECURITY.md > docs/security.md
 
       - run: mkdocs build --strict
 
