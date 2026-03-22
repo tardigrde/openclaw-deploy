@@ -71,6 +71,11 @@ make logs         # Stream Docker logs
 make exec CMD=""  # Run a command in the gateway container
 ```
 
+## Git Workflow
+
+- **Never commit directly to `main`** — always create a feature/fix branch and open a PR.
+- **Use semantic commit messages**: `feat:`, `fix:`, `chore:`, `docs:`, `refactor:`, etc.
+
 ## Security Notes
 
 - **fail2ban is active** with `maxretry=3` and `bantime=1h`. Avoid repeated failed SSH attempts (e.g. trying to connect as root, using wrong keys) or you will get banned. To unban: use the Hetzner web console → Console tab, then run `sudo fail2ban-client unban --all`.

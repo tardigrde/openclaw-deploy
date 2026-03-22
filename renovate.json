@@ -133,6 +133,18 @@
       "extractVersionTemplate": "^v(?<version>.+)$"
     },
     {
+      "description": "Track lossless-claw npm plugin pinned in entrypoint.sh",
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^docker/entrypoint\\.sh$/"
+      ],
+      "matchStrings": [
+        "@martian-engineering/lossless-claw@(?<currentValue>[\\d]+\\.[\\d]+\\.[\\d]+)"
+      ],
+      "depNameTemplate": "@martian-engineering/lossless-claw",
+      "datasourceTemplate": "npm"
+    },
+    {
       "description": "Track SOPS binary release in CI workflows and Ansible config play (SHA256 must be updated manually)",
       "customType": "regex",
       "managerFilePatterns": [
