@@ -4,17 +4,19 @@ weight: 90
 ---
 # CI/CD
 
-The built-in CI runs **Terraform only** (`plan` on PRs, `apply` on manual dispatch). Ansible is never run in CI — all `make bootstrap` / `make deploy` operations are local only.
+The built-in CI **validates and tests** Terraform (`terraform fmt`, `terraform validate`, `tflint`, `terraform test`). Ansible is never run in CI — all `make bootstrap` / `make deploy` operations are local only.
+
+Example workflows for `terraform plan` (on PRs) and `terraform apply` (manual dispatch) are included as `.example.yml` files — copy them to enable (see [Required Secrets](#required-github-secrets) below).
 
 An optional GitOps deployment workflow is also included — copy `.github/workflows/deploy.yml.example` to `.github/workflows/deploy.yml` to enable automatic Ansible-based deployments on push. See [GitOps auto-deploy](gitops-auto-deploy.md) for setup instructions.
 
-## Terraform Plan (automatic on PRs)
+## Terraform Plan (example — copy to enable)
 
-When a pull request touches `terraform/**`, the `Terraform Plan` workflow runs automatically and posts the plan diff as a PR comment.
+Copy `.github/workflows/terraform-plan.example.yml` to `.github/workflows/terraform-plan.yml`. When a pull request touches `terraform/**`, the workflow runs automatically and posts the plan diff as a PR comment.
 
-## Terraform Apply (manual)
+## Terraform Apply (example — copy to enable)
 
-`terraform apply` is triggered manually after merging:
+Copy `.github/workflows/terraform-apply.example.yml` to `.github/workflows/terraform-apply.yml`. Then trigger manually after merging:
 
 1. Go to **Actions** → **Terraform Apply** → **Run workflow**
 2. Select the branch and click **Run workflow**
