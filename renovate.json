@@ -242,6 +242,58 @@
       ],
       "depNameTemplate": "node",
       "datasourceTemplate": "node-version"
+    },
+    {
+      "description": "Track uv (Python package manager) version pinned via Dockerfile ARG",
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^docker/Dockerfile$/"
+      ],
+      "matchStrings": [
+        "ARG UV_VERSION=(?<currentValue>[\\d]+\\.[\\d]+(?:\\.[\\d]+)?)"
+      ],
+      "depNameTemplate": "astral-sh/uv",
+      "datasourceTemplate": "github-releases",
+      "extractVersionTemplate": "^v?(?<version>.+)$"
+    },
+    {
+      "description": "Track cosign sidecar image version in Dockerfile COPY --from (same depName as Ansible cosign, so PRs batch together)",
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^docker/Dockerfile$/"
+      ],
+      "matchStrings": [
+        "gcr\\.io/projectsigstore/cosign:v(?<currentValue>[\\d]+\\.[\\d]+(?:\\.[\\d]+)?)"
+      ],
+      "depNameTemplate": "sigstore/cosign",
+      "datasourceTemplate": "github-releases",
+      "extractVersionTemplate": "^v(?<version>.+)$"
+    },
+    {
+      "description": "Track python-semantic-release lower bound in release workflow",
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^\\.github/workflows/release\\.yml$/"
+      ],
+      "matchStrings": [
+        "pip install 'python-semantic-release>=(?<currentValue>[\\d]+(?:\\.[\\d]+)?),<[\\d]+'"
+      ],
+      "depNameTemplate": "python-semantic-release",
+      "datasourceTemplate": "pypi",
+      "versioningTemplate": "pep440"
+    },
+    {
+      "description": "Track Terraform CLI version pinned in CI workflows (setup-terraform action input)",
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^\\.github/workflows/[^/]+\\.yml$/"
+      ],
+      "matchStrings": [
+        "terraform_version: \"(?<currentValue>[\\d]+\\.[\\d]+(?:\\.[\\d]+)?)\""
+      ],
+      "depNameTemplate": "hashicorp/terraform",
+      "datasourceTemplate": "github-releases",
+      "extractVersionTemplate": "^v?(?<version>.+)$"
     }
   ]
 }
