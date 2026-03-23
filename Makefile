@@ -210,6 +210,11 @@ logs: ## Stream Docker logs from the VPS
 	@ssh -i $(SSH_KEY) -o StrictHostKeyChecking=accept-new openclaw@$(SERVER_IP) \
 		'docker logs -f --tail 100 $$(docker ps -q -f label=com.docker.compose.service=openclaw-gateway)'
 
+logs-tail: ## Print last 100 lines of Docker logs from the VPS (no follow)
+	$(call check-server-ip)
+	@ssh -i $(SSH_KEY) -o StrictHostKeyChecking=accept-new openclaw@$(SERVER_IP) \
+		'docker logs --tail 100 $$(docker ps -q -f label=com.docker.compose.service=openclaw-gateway)'
+
 status: ## Check OpenClaw status on the VPS (includes Tailscale if enabled)
 	$(call check-server-ip)
 	@echo -e "$(GREEN)[INFO]$(NC) Checking VPS status..."
