@@ -36,7 +36,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 ARG SOPS_VERSION=3.9.4
 COPY --from=gcr.io/projectsigstore/cosign:v2.4.0 /ko-app/cosign /usr/local/bin/cosign
 COPY scripts/install-sops.sh /usr/local/bin/install-sops.sh
-RUN install-sops.sh "${SOPS_VERSION}"
+RUN bash /usr/local/bin/install-sops.sh "${SOPS_VERSION}"
 
 # Install uv (Python package manager) — manages Python versions and project deps
 ARG UV_VERSION=0.6.6
