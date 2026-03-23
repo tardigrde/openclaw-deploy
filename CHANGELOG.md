@@ -1,6 +1,37 @@
 # CHANGELOG
 
 
+## v0.8.0 (2026-03-23)
+
+### Bug Fixes
+
+- Add logs-tail to .PHONY and help output
+  ([`5018193`](https://github.com/tardigrde/openclaw-deploy/commit/5018193f99512dfd18feb8cf7a33612717dbceb8))
+
+Address CodeRabbit review feedback.
+
+### Chores
+
+- **renovate**: Track clawhub, summarize, and ws version ARGs
+  ([`eb59e40`](https://github.com/tardigrde/openclaw-deploy/commit/eb59e403770e29e376d5e4e54c6930577877e4a7))
+
+Add custom managers so Renovate detects and opens PRs when new versions of clawhub,
+  @steipete/summarize, and ws are released on npm.
+
+### Features
+
+- Add logs-tail target for non-following log snapshots
+  ([`b16c4c1`](https://github.com/tardigrde/openclaw-deploy/commit/b16c4c13560cd12aedbdfe5e163faa4e6cad9fb7))
+
+### Refactoring
+
+- Combine clawhub/ws Renovate managers per code review
+  ([`f3dc6ca`](https://github.com/tardigrde/openclaw-deploy/commit/f3dc6cacfb2b0930c7d442979e57f42769de7be7))
+
+Use a single regex manager with alternation for clawhub and ws instead of two separate entries.
+  Summarize stays separate due to its scoped npm name not deriving from the ARG name.
+
+
 ## v0.7.1 (2026-03-23)
 
 ### Bug Fixes
