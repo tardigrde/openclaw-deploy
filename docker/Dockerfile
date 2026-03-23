@@ -46,7 +46,7 @@ RUN curl -LsSf https://astral.sh/uv/${UV_VERSION}/install.sh | sh \
   && rm -rf /root/.local
 
 # Pin OpenClaw version for reproducible builds — bump explicitly when upgrading
-ARG OPENCLAW_VERSION=2026.3.13
+ARG OPENCLAW_VERSION=2026.3.22
 RUN npm install -g \
     openclaw@${OPENCLAW_VERSION} \
     clawhub \
