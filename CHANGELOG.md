@@ -1,6 +1,25 @@
 # CHANGELOG
 
 
+## v0.6.5 (2026-03-23)
+
+### Bug Fixes
+
+- Suppress Renovate lookup error for tflint-ruleset-hcloud
+  ([#30](https://github.com/tardigrde/openclaw-deploy/pull/30),
+  [`7b01b95`](https://github.com/tardigrde/openclaw-deploy/commit/7b01b959a1f3181964523ae3f5cd6af4c9064527))
+
+Renovate fails to resolve github-releases for terraform-linters/tflint-ruleset-hcloud referenced in
+  .tflint.hcl. Disable the package rule to stop the recurring lookup error.
+
+Co-authored-by: Claude Sonnet 4.6 <noreply@anthropic.com>
+
+### Chores
+
+- **deps**: Update dependency @martian-engineering/lossless-claw to v0.5.0
+  ([`649991e`](https://github.com/tardigrde/openclaw-deploy/commit/649991e264d6148bd825d8dafcdf2695e1264606))
+
+
 ## v0.6.4 (2026-03-22)
 
 ### Bug Fixes
