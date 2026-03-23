@@ -32,12 +32,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
   && rm -rf /var/lib/apt/lists/*
 
 # Install SOPS (for native secrets decryption via exec provider)
+# cosign is used at build time to verify the SOPS release signature — no hardcoded hash needed.
 ARG SOPS_VERSION=3.9.4
-ARG SOPS_SHA256=5488e32bc471de7982ad895dd054bbab3ab91c417a118426134551e9626e4e85  # amd64 only
-RUN curl -fsSL "https://github.com/getsops/sops/releases/download/v${SOPS_VERSION}/sops-v${SOPS_VERSION}.linux.amd64" \
-      -o /usr/local/bin/sops \
-  && echo "${SOPS_SHA256}  /usr/local/bin/sops" | sha256sum --check \
-  && chmod +x /usr/local/bin/sops
+COPY --from=gcr.io/projectsigstore/cosign:v2.4.0 /ko-app/cosign /usr/local/bin/cosign
+COPY scripts/install-sops.sh /usr/local/bin/install-sops.sh
+RUN install-sops.sh "${SOPS_VERSION}"
 
 # Install uv (Python package manager) — manages Python versions and project deps
 ARG UV_VERSION=0.6.6
