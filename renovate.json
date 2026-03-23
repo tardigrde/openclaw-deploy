@@ -274,6 +274,45 @@
       "extractVersionTemplate": "^v?(?<version>.+)$"
     },
     {
+      "description": "Track clawhub version pinned via Dockerfile ARG",
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^docker/Dockerfile$/"
+      ],
+      "matchStrings": [
+        "ARG CLAWHUB_VERSION=(?<currentValue>[\\d]+\\.[\\d]+(?:\\.[\\d]+)?)"
+      ],
+      "depNameTemplate": "clawhub",
+      "datasourceTemplate": "npm",
+      "versioningTemplate": "npm"
+    },
+    {
+      "description": "Track @steipete/summarize version pinned via Dockerfile ARG",
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^docker/Dockerfile$/"
+      ],
+      "matchStrings": [
+        "ARG SUMMARIZE_VERSION=(?<currentValue>[\\d]+\\.[\\d]+(?:\\.[\\d]+)?)"
+      ],
+      "depNameTemplate": "@steipete/summarize",
+      "datasourceTemplate": "npm",
+      "versioningTemplate": "npm"
+    },
+    {
+      "description": "Track ws version pinned via Dockerfile ARG",
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^docker/Dockerfile$/"
+      ],
+      "matchStrings": [
+        "ARG WS_VERSION=(?<currentValue>[\\d]+\\.[\\d]+(?:\\.[\\d]+)?)"
+      ],
+      "depNameTemplate": "ws",
+      "datasourceTemplate": "npm",
+      "versioningTemplate": "npm"
+    },
+    {
       "description": "Track cosign sidecar image version in Dockerfile COPY --from (same depName as Ansible cosign, so PRs batch together)",
       "customType": "regex",
       "managerFilePatterns": [
