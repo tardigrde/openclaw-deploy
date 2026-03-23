@@ -46,14 +46,14 @@ jobs:
       - name: Install Ansible
         run: pip install "ansible-core>=2.20.3,<3"
 
+      - name: Install cosign
+        uses: sigstore/cosign-installer@v3
+
       - name: Install SOPS
         # NOTE: SOPS version must match ARG in docker/Dockerfile
         run: |
           SOPS_VERSION=3.9.4
-          SOPS_SHA256=5488e32bc471de7982ad895dd054bbab3ab91c417a118426134551e9626e4e85
-          curl -fsSL "https://github.com/getsops/sops/releases/download/v${SOPS_VERSION}/sops-v${SOPS_VERSION}.linux.amd64" -o /usr/local/bin/sops
-          echo "${SOPS_SHA256}  /usr/local/bin/sops" | sha256sum --check
-          chmod +x /usr/local/bin/sops
+          sudo bash scripts/install-sops.sh "${SOPS_VERSION}"
 
       - name: Decrypt secrets
         env:
