@@ -53,7 +53,7 @@ jobs:
         # NOTE: SOPS version must match ARG in docker/Dockerfile
         run: |
           SOPS_VERSION=3.9.4
-          sudo bash scripts/install-sops.sh "${SOPS_VERSION}"
+          bash scripts/install-sops.sh "${SOPS_VERSION}"
 
       - name: Decrypt secrets
         env:
