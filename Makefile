@@ -5,7 +5,7 @@
 
 SHELL := /bin/bash
 .PHONY: init plan apply destroy ssh ssh-root tunnel output ip fmt validate clean help \
-        bootstrap bootstrap-check deploy deploy-check setup-auth backup-now backup-pull restore logs status shell exec \
+        bootstrap bootstrap-check deploy deploy-check setup-auth backup-now backup-pull restore logs logs-tail status shell exec \
         tailscale-enable tailscale-setup tailscale-status tailscale-ip tailscale-up \
         workspace-sync \
         secrets-generate-key secrets-encrypt secrets-decrypt secrets-edit
@@ -373,6 +373,7 @@ help: ## Show this help message
 	@echo -e "  $(GREEN)tunnel$(NC)          SSH tunnel to gateway (localhost:18789)"
 	@echo -e "  $(GREEN)status$(NC)          Check VPS status"
 	@echo -e "  $(GREEN)logs$(NC)            Stream Docker logs"
+	@echo -e "  $(GREEN)logs-tail$(NC)       Print last 100 lines (no follow)"
 	@echo -e "  $(GREEN)backup-now$(NC)      Run backup now on VPS"
 	@echo -e "  $(GREEN)backup-pull$(NC)     Download latest VPS backup to ./backups/ locally"
 	@echo -e "  $(GREEN)restore$(NC)         List available backups (dry-run)"
