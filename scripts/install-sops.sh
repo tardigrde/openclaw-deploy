@@ -26,6 +26,7 @@ cosign verify-blob \
   --certificate-oidc-issuer "https://token.actions.githubusercontent.com" \
   "${tmpdir}/checksums.txt"
 
-grep "sops-v${SOPS_VERSION}.linux.amd64$" "${tmpdir}/checksums.txt" | sha256sum --check
+expected=$(grep "sops-v${SOPS_VERSION}.linux.amd64$" "${tmpdir}/checksums.txt" | awk '{print $1}')
+echo "${expected}  ${tmpdir}/sops" | sha256sum --check
 
 install -m 0755 "${tmpdir}/sops" "${INSTALL_PATH}"
