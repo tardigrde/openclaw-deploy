@@ -167,6 +167,12 @@
         dest: ~/openclaw/docker/
       tags: [docker]
 
+    - name: Copy scripts/ directory
+      ansible.builtin.copy:
+        src: ../../scripts/
+        dest: ~/openclaw/scripts/
+      tags: [docker]
+
     - name: Clone or update Mission Control
       ansible.builtin.git:
         repo: https://github.com/crshdn/mission-control.git
