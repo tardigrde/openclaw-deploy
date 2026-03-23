@@ -1,6 +1,36 @@
 # CHANGELOG
 
 
+## v0.7.0 (2026-03-23)
+
+### Chores
+
+- Complete Renovate version coverage ([#32](https://github.com/tardigrde/openclaw-deploy/pull/32),
+  [`798a2d4`](https://github.com/tardigrde/openclaw-deploy/commit/798a2d4259afc24258161fcc0fbe803e6cb49e5d))
+
+- Add regex manager for uv (astral-sh/uv, Dockerfile ARG) - Add regex manager for cosign sidecar
+  COPY --from in Dockerfile (same depName as Ansible cosign so PRs batch together) - Add regex
+  manager for python-semantic-release lower bound in release.yml - Add regex manager for Terraform
+  CLI version in CI workflows (setup-terraform input) - Pin chromedp/headless-shell from :latest to
+  147.0.7727.15 so Renovate can track it
+
+Co-authored-by: Claude Sonnet 4.6 <noreply@anthropic.com>
+
+- **deps**: Update dependency getsops/sops to v3.12.2
+  ([#1](https://github.com/tardigrde/openclaw-deploy/pull/1),
+  [`f949ac1`](https://github.com/tardigrde/openclaw-deploy/commit/f949ac1864742a5c6748acc4be4a56d76583aa07))
+
+Co-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+
+### Features
+
+- **deps**: Update openclaw to 2026.3.22
+  ([#33](https://github.com/tardigrde/openclaw-deploy/pull/33),
+  [`da57a26`](https://github.com/tardigrde/openclaw-deploy/commit/da57a26b76243c8b92e96c255dec588f3e62ffd6))
+
+Co-authored-by: Claude Sonnet 4.6 <noreply@anthropic.com>
+
+
 ## v0.6.6 (2026-03-23)
 
 ### Bug Fixes
