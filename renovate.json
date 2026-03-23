@@ -276,7 +276,7 @@
         "/^\\.github/workflows/release\\.yml$/"
       ],
       "matchStrings": [
-        "pip install 'python-semantic-release>=(?<currentValue>[\\d]+(?:\\.[\\d]+)?),<[\\d]+'"
+        "pip install 'python-semantic-release>=(?<currentValue>[\\d]+(?:\\.[\\d]+(?:\\.[\\d]+)?)?),<[\\d]+'"
       ],
       "depNameTemplate": "python-semantic-release",
       "datasourceTemplate": "pypi",
