@@ -163,12 +163,38 @@
       when: env_enc_file.stat.exists and age_key_file.stat.exists
       tags: [config]
 
+    - name: Check if cosign is installed on VPS
+      ansible.builtin.stat:
+        path: /home/openclaw/.local/bin/cosign
+      register: cosign_binary
+      when: env_enc_file.stat.exists and age_key_file.stat.exists
+      tags: [config]
+
+    - name: Install cosign on VPS
+      ansible.builtin.shell: |
+        COSIGN_VERSION=2.4.0
+        mkdir -p ~/.local/bin
+        curl -fsSL "https://github.com/sigstore/cosign/releases/download/v${COSIGN_VERSION}/cosign-linux-amd64" \
+          -o ~/.local/bin/cosign
+        chmod +x ~/.local/bin/cosign
+      args:
+        executable: /bin/bash
+      when: env_enc_file.stat.exists and age_key_file.stat.exists and not cosign_binary.stat.exists
+      tags: [config]
+
+    - name: Copy SOPS install script to VPS
+      ansible.builtin.copy:
+        src: ../../scripts/install-sops.sh
+        dest: /home/openclaw/.local/bin/install-sops.sh
+        mode: "0755"
+      when: env_enc_file.stat.exists and age_key_file.stat.exists
+      tags: [config]
+
     - name: Install SOPS on VPS
       ansible.builtin.shell: |
-        mkdir -p ~/.local/bin
-        curl -fsSL "https://github.com/getsops/sops/releases/download/v3.9.4/sops-v3.9.4.linux.amd64" -o ~/.local/bin/sops
-        echo "5488e32bc471de7982ad895dd054bbab3ab91c417a118426134551e9626e4e85  ~/.local/bin/sops" | sha256sum --check
-        chmod +x ~/.local/bin/sops
+        export PATH="$HOME/.local/bin:$PATH"
+        SOPS_VERSION=3.9.4
+        install-sops.sh "${SOPS_VERSION}" ~/.local/bin/sops
       args:
         executable: /bin/bash
       when: env_enc_file.stat.exists and age_key_file.stat.exists and sops_check.rc != 0

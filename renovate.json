@@ -172,7 +172,7 @@
       "datasourceTemplate": "npm"
     },
     {
-      "description": "Track SOPS binary release in CI workflows and Ansible config play (SHA256 must be updated manually)",
+      "description": "Track SOPS binary release in CI workflows and Ansible config play (verified via cosign)",
       "customType": "regex",
       "managerFilePatterns": [
         "/^\\.github/workflows/[^/]+\\.yml$/",
@@ -182,6 +182,19 @@
         "SOPS_VERSION=(?<currentValue>[\\d]+\\.[\\d]+(?:\\.[\\d]+)?)"
       ],
       "depNameTemplate": "getsops/sops",
+      "datasourceTemplate": "github-releases",
+      "extractVersionTemplate": "^v(?<version>.+)$"
+    },
+    {
+      "description": "Track cosign binary release in Ansible config play",
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^ansible/plays/config\\.yml$/"
+      ],
+      "matchStrings": [
+        "COSIGN_VERSION=(?<currentValue>[\\d]+\\.[\\d]+(?:\\.[\\d]+)?)"
+      ],
+      "depNameTemplate": "sigstore/cosign",
       "datasourceTemplate": "github-releases",
       "extractVersionTemplate": "^v(?<version>.+)$"
     },
