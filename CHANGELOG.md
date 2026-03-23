@@ -1,6 +1,59 @@
 # CHANGELOG
 
 
+## v0.6.6 (2026-03-23)
+
+### Bug Fixes
+
+- Replace hardcoded SOPS SHA256 with cosign signature verification
+  ([#31](https://github.com/tardigrde/openclaw-deploy/pull/31),
+  [`e897438`](https://github.com/tardigrde/openclaw-deploy/commit/e897438c980414851211b1a1c279a10a366aecd6))
+
+* fix: suppress Renovate lookup error for tflint-ruleset-hcloud
+
+Renovate fails to resolve github-releases for terraform-linters/tflint-ruleset-hcloud referenced in
+  .tflint.hcl. Disable the package rule to stop the recurring lookup error.
+
+Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
+
+* fix: replace hardcoded SOPS SHA256 with cosign signature verification
+
+Removes SOPS_SHA256 from Dockerfile and CI workflow examples. Renovate could bump SOPS_VERSION but
+  had no way to update the hash, causing broken PRs. cosign verifies the SOPS release signature
+  against the Sigstore transparency log instead — no hardcoded value to maintain.
+
+- Dockerfile: COPY cosign from gcr.io/projectsigstore/cosign (tracked by Renovate's Docker manager)
+  and use it to verify the checksums file before installing the binary - deploy.yml.example /
+  rollback.yml.example: use sigstore/cosign-installer action + same verification flow -
+  renovate.json: drop the prBodyNotes manual SHA256 reminder (no longer needed) and simplify the
+  SOPS package rule description
+
+* fix: call install-sops.sh via bash (COPY strips executable bit)
+
+* fix: check sha256 against actual file path, not checksums filename
+
+* fix: address Gemini review — arch comment, Ansible cosign+script, Renovate tracking
+
+- install-sops.sh: remove arm64 support (amd64 only, add comment); sha256 check already uses correct
+  tmpdir path (no-op fix) - renovate.json: remove stale "SHA256 must be updated manually" from
+  description; add custom manager to track COSIGN_VERSION in Ansible play - CI workflow examples:
+  restore SOPS_VERSION= variable so Renovate's regex manager still matches after script refactor -
+  ansible/plays/config.yml: replace hardcoded SHA256 install with cosign install + script copy +
+  script invocation; add COSIGN_VERSION= var
+
+---------
+
+Co-authored-by: Claude Sonnet 4.6 <noreply@anthropic.com>
+
+### Chores
+
+- **deps**: Update dependency crshdn/mission-control to v2.4.0
+  ([#21](https://github.com/tardigrde/openclaw-deploy/pull/21),
+  [`7ec707b`](https://github.com/tardigrde/openclaw-deploy/commit/7ec707bafa8ae59bf8b746da8534415c57ed8922))
+
+Co-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+
+
 ## v0.6.5 (2026-03-23)
 
 ### Bug Fixes
