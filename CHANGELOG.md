@@ -1,6 +1,33 @@
 # CHANGELOG
 
 
+## v0.7.1 (2026-03-23)
+
+### Bug Fixes
+
+- **ansible**: Add missing scripts/ copy task in docker playbook
+  ([`5e33ffa`](https://github.com/tardigrde/openclaw-deploy/commit/5e33ffa907b80f62ec4326e9475098d0e8a5c924))
+
+The scripts/ directory (including install-sops.sh, backup.sh, etc.) was never copied to the VPS by
+  the Ansible docker play. It worked previously because make bootstrap handles it on first run, but
+  make deploy alone would miss these files.
+
+### Chores
+
+- **deps**: Pin clawhub, summarize, and ws versions in Dockerfile
+  ([`90b5686`](https://github.com/tardigrde/openclaw-deploy/commit/90b56866de3489a3d29111e4674bfbc234b98cd1))
+
+Pin npm package versions alongside openclaw for reproducible builds. Previously only openclaw was
+  pinned; clawhub, @steipete/summarize, and ws floated to latest on every rebuild.
+
+- clawhub@0.9.0 - @steipete/summarize@0.12.0 - ws@8.20.0
+
+### Continuous Integration
+
+- Remove unnecessary sudo from SOPS install in example workflows
+  ([`676f177`](https://github.com/tardigrde/openclaw-deploy/commit/676f177a0c348cb86918e9295dfd2fc392f20702))
+
+
 ## v0.7.0 (2026-03-23)
 
 ### Chores
