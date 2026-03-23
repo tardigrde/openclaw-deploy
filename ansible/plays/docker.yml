@@ -172,7 +172,7 @@
         repo: https://github.com/crshdn/mission-control.git
         dest: ~/openclaw/mission-control
         update: true
-        version: v2.2.0
+        version: v2.4.0
       when: override_has_mc
       tags: [docker]
 
