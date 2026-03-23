@@ -33,6 +33,13 @@
       ]
     },
     {
+      "description": "Suppress tflint-ruleset-hcloud lookup — Renovate cannot resolve github-releases for this package",
+      "matchPackageNames": [
+        "terraform-linters/tflint-ruleset-hcloud"
+      ],
+      "enabled": false
+    },
+    {
       "description": "Suppress false go detection in pages.yml (HUGO_VERSION misidentified as go)",
       "matchFileNames": [
         ".github/workflows/pages.yml"
