@@ -34,6 +34,12 @@ write_files:
       net.ipv6.conf.lo.disable_ipv6 = 1
     permissions: '0644'
 
+  # Swappiness — swap only under real memory pressure (default 60 is too aggressive)
+  - path: /etc/sysctl.d/99-swappiness.conf
+    content: |
+      vm.swappiness = 10
+    permissions: '0644'
+
   # fail2ban — brute-force SSH protection
   - path: /etc/fail2ban/jail.local
     content: |
@@ -98,6 +104,18 @@ runcmd:
   - chown -R ${app_user}:${app_user} /home/${app_user}/.ssh
   - chmod 700 /home/${app_user}/.ssh
   - chmod 600 /home/${app_user}/.ssh/authorized_keys
+
+  # -----------------------------------------------------------------------------
+  # Swap — 2GB swapfile prevents hard OOM freeze under heavy workloads
+  # Without swap, the kernel freezes instead of killing processes.
+  # Swappiness is set to 10 via write_files above (only swap under real pressure).
+  # -----------------------------------------------------------------------------
+  - fallocate -l 2G /swapfile
+  - chmod 600 /swapfile
+  - mkswap /swapfile
+  - swapon /swapfile
+  - echo '/swapfile none swap sw 0 0' >> /etc/fstab
+  - sysctl --system
 
   # -----------------------------------------------------------------------------
   # Configure UFW Firewall
