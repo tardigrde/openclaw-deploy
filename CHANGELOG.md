@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v0.10.0 (2026-03-24)
+
+### Features
+
+- Add swappiness configuration and swapfile setup for improved memory management
+  ([`d1883e7`](https://github.com/tardigrde/openclaw-deploy/commit/d1883e711978503559350e9c34b7f5232b825d18))
+
+
 ## v0.9.2 (2026-03-24)
 
 ### Bug Fixes
