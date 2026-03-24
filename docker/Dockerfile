@@ -50,15 +50,15 @@ ARG OPENCLAW_VERSION=2026.3.22
 ARG CLAWHUB_VERSION=0.9.0
 ARG SUMMARIZE_VERSION=0.12.0
 ARG WS_VERSION=8.20.0
-ARG ACPX_VERSION=0.3.1
-ARG CLAUDE_CODE_VERSION=2.1.81
+# Optional packages (e.g. acpx, claude-code) go in docker/install-optional.sh
+COPY docker/install-optional.sh /tmp/install-optional.sh
 RUN npm install -g \
     openclaw@${OPENCLAW_VERSION} \
     clawhub@${CLAWHUB_VERSION} \
     @steipete/summarize@${SUMMARIZE_VERSION} \
     ws@${WS_VERSION} \
-    acpx@${ACPX_VERSION} \
-    @anthropic-ai/claude-code@${CLAUDE_CODE_VERSION} \
+  && bash /tmp/install-optional.sh \
+  && npm cache clean --force \
   && mkdir -p /home/node/.openclaw/workspace /.clawhub \
   && chown -R node:node /home/node/.openclaw /.clawhub
 

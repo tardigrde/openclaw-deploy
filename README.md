@@ -386,7 +386,6 @@ make restore EXECUTE=1 BACKUP=<file>  # Restore from backup
 
 ```bash
 make addon-weather    # Install morning weather cron
-make addon-acp        # Set up ACP + Claude Code
 make patch-devices    # Fix device pairing issues
 ```
 
