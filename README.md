@@ -14,6 +14,14 @@ For information about OpenClaw itself, see the [OpenClaw documentation](https://
 - Docker Compose runs OpenClaw gateway + headless Chromium on the VPS
 - All day-to-day operations go through `make`
 
+## Opinionated by Design
+
+This repo makes concrete choices: **Hetzner Cloud** for the VPS, **Terraform** for provisioning, **Ansible** for deployment, **Docker Compose** for containers, and a specific set of default skills and plugins. These work well together but aren't the only options.
+
+Every layer exposes an override file for local customization without forking. For a long-lived production setup, the recommended pattern is a **private fork** — tracking this repo as `upstream` and keeping credentials, personal config, and extensions in your fork.
+
+See **[docs/configuration/private-fork.md](docs/configuration/private-fork.md)** for the private fork workflow, including a `.gitattributes` template for nearly-zero-conflict upstream merges.
+
 ## Prerequisites
 
 1. **Terraform** >= 1.5 ([install](https://developer.hashicorp.com/terraform/install))
@@ -490,6 +498,7 @@ See [docs/cicd.md](docs/cicd.md) for required GitHub Variables, Secrets, and app
 
 | Topic | Doc |
 | ----- | --- |
+| Private fork workflow | [docs/configuration/private-fork.md](docs/configuration/private-fork.md) |
 | Backup & restore | [docs/operations/backup-restore.md](docs/operations/backup-restore.md) |
 | Tailscale serve config | [docs/tailscale.md](docs/tailscale.md) |
 | Skills (ClawHub) | [docs/skills.md](docs/skills.md) |
