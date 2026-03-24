@@ -1,6 +1,38 @@
 # CHANGELOG
 
 
+## v0.8.1 (2026-03-24)
+
+### Bug Fixes
+
+- Enhance backup and restore scripts for improved safety and validation
+  ([`15723e3`](https://github.com/tardigrde/openclaw-deploy/commit/15723e33bbc34fed3659fc7083e49fcea9bd05ff))
+
+- Harden restore play and backup script
+  ([`55f8a1c`](https://github.com/tardigrde/openclaw-deploy/commit/55f8a1cc1e06e342d3171d7346480fcabd0709f2))
+
+Backup script: - Include SOPS age key (~/.config/sops) in backup archives Without this, restored
+  .env.enc can't be decrypted after restore
+
+Restore play: - Validate compose directory exists before stopping containers - Add set -euo pipefail
+  to shell tasks (prevents silent failures) - Validate restored files after extraction (checks
+  critical files exist) - Pull latest container images before docker compose up - Wait for gateway
+  health endpoint after restart (30s timeout) - Log restore summary with undo instructions
+
+### Chores
+
+- Bump OpenClaw to 2026.3.23
+  ([`d7190ba`](https://github.com/tardigrde/openclaw-deploy/commit/d7190ba9fbeeb43d13141e98b0a373cbf6fe2b5b))
+
+### Documentation
+
+- Enhance backup and restore documentation with detailed procedures and safety measures
+  ([`ac75a5c`](https://github.com/tardigrde/openclaw-deploy/commit/ac75a5c7bfd82aae840019ec9efe738efb669f10))
+
+- Expand restore section in README with safety features
+  ([`450af7e`](https://github.com/tardigrde/openclaw-deploy/commit/450af7eb13d8170ddd559b74fc21ae5a0587dba9))
+
+
 ## v0.8.0 (2026-03-23)
 
 ### Bug Fixes
