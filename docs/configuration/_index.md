@@ -21,3 +21,7 @@ OpenClaw Deploy uses native override files at every layer — all gitignored so 
 **Makefile:** `Makefile.local` is loaded via `-include`. All variables from the main Makefile are available.
 
 **Ansible:** `ansible/site.local.yml` is used instead of `site.yml` when it exists. It should import `site.yml` first, then add your local plays.
+
+## Private Fork
+
+For a production setup, the recommended approach is to keep your credentials, personal config, and extensions in a **private fork** that tracks this repo as `upstream`. See [private-fork.md](private-fork.md) for the full workflow, `.gitattributes` template, and merge driver setup.
