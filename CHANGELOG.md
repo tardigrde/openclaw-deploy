@@ -1,6 +1,53 @@
 # CHANGELOG
 
 
+## v0.9.0 (2026-03-24)
+
+### Documentation
+
+- Add opinionated-by-design note and private fork guide
+  ([`b36e5f4`](https://github.com/tardigrde/openclaw-deploy/commit/b36e5f4a185ffff776f4623ee458ed5b12c403c5))
+
+### Features
+
+- Add ACP + Claude Code addon
+  ([`ae66ae9`](https://github.com/tardigrde/openclaw-deploy/commit/ae66ae99ea9a7448d86777924144db41fbea2bd3))
+
+Install and configure ACP runtime with Claude Code as the default coding harness. Enables coding
+  from Telegram/Discord without SSH.
+
+Changes: - addons.yml: addon-acp tag (idempotent — skips if installed) -
+  docs/addons/acp-claude-code.md: full setup & usage guide - Makefile.local.example: addon-acp
+  target - README.md: link to addon doc + mention in addons section
+
+Usage: make addon-acp
+
+Then: /acp spawn claude --mode persistent --thread auto
+
+- Add acpx + claude-code to Dockerfile
+  ([`ace1598`](https://github.com/tardigrde/openclaw-deploy/commit/ace15982bf8b6499c89cf11b47d81239a613e53f))
+
+Baked into container for permanent ACP support across rebuilds. Addon-acp Ansible tasks handle
+  config patching (separate concern).
+
+### Refactoring
+
+- Rework ACP addon — drop Ansible play, add install-optional.sh pattern
+  ([`82c58e6`](https://github.com/tardigrde/openclaw-deploy/commit/82c58e6c13d9f6571e5ec94eb9f4817ecc937d9c))
+
+- Remove addon-acp Ansible play: installing into a running container is ephemeral (lost on restart)
+  and patching openclaw.json VPS-side conflicts with make deploy overwriting it from local - Add
+  docker/install-optional.sh: no-op script in core, overridden in private forks to bake optional
+  packages (acpx, claude-code, etc.) into the image - Wire install-optional.sh into the Dockerfile
+  npm install layer with npm cache clean --force after - Remove ARG ACPX_VERSION /
+  CLAUDE_CODE_VERSION from core Dockerfile - Remove addon-acp from Makefile.local.example and README
+  optional add-ons - Rewrite docs/addons/acp-claude-code.md: setup now follows the correct model
+  (install-optional.sh + openclaw.json edit + make deploy REBUILD=1), fix all "Clawdy" → "OpenClaw",
+  add language specifiers to code blocks
+
+Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
+
+
 ## v0.8.1 (2026-03-24)
 
 ### Bug Fixes
