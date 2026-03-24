@@ -1,6 +1,20 @@
 # CHANGELOG
 
 
+## v0.9.1 (2026-03-24)
+
+### Bug Fixes
+
+- Remove openclaw-dashboard service
+  ([`c12d3fd`](https://github.com/tardigrde/openclaw-deploy/commit/c12d3fd3d0d577789267a0d22257acdfb655b0a0))
+
+Dashboard has been a recurring source of port conflicts and deployment failures. Removes the service
+  from the example override, cleans up the Ansible clone/migration tasks, and drops the Renovate
+  tracking rule.
+
+Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
+
+
 ## v0.9.0 (2026-03-24)
 
 ### Documentation
