@@ -1,6 +1,20 @@
 # CHANGELOG
 
 
+## v0.9.2 (2026-03-24)
+
+### Bug Fixes
+
+- Remove DOCKER_SOCKET_GID now that dashboard is gone
+  ([`474f6de`](https://github.com/tardigrde/openclaw-deploy/commit/474f6de8dd5756c4799e919112e5f43349477287))
+
+The variable was only consumed by openclaw-dashboard's group_add directive. With the dashboard
+  removed there are no remaining references in any compose file, so the stat task, lineinfile write,
+  and environment injection are all dead code.
+
+Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
+
+
 ## v0.9.1 (2026-03-24)
 
 ### Bug Fixes
