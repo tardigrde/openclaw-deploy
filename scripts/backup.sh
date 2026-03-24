@@ -6,9 +6,10 @@
 # Usage: Run on the VPS directly, or called by systemd timer.
 #
 # This script:
-#   1. Creates a timestamped tar.gz of ~/.openclaw
+#   1. Creates a timestamped tar.gz of ~/.openclaw + SOPS age key (~/.config/sops)
 #   2. Stores it in ~/backups/
-#   3. Removes backups older than 7 days
+#   3. Backs up Mission Control database from Docker volume (if present)
+#   4. Removes backups older than 7 days
 #
 # Note: This script is meant to run ON the VPS, not from your laptop.
 #       For remote backup, use: ssh openclaw@VPS ./scripts/backup.sh
@@ -54,8 +55,14 @@ echo ""
 
 echo "[...] Creating backup..."
 
-# Create tar.gz archive
-tar -czf "$BACKUP_FILE" -C "$HOME" ".openclaw"
+# Create tar.gz archive — includes .openclaw and SOPS age key (if present)
+# The age key is critical: without it, encrypted secrets (.env.enc) can't
+# be decrypted after restore. Including it makes backups self-contained.
+BACKUP_PATHS=(".openclaw")
+if [[ -d "$HOME/.config/sops" ]]; then
+    BACKUP_PATHS+=(".config/sops")
+fi
+tar -czf "$BACKUP_FILE" -C "$HOME" "${BACKUP_PATHS[@]}"
 
 # Get backup size
 BACKUP_SIZE=$(du -h "$BACKUP_FILE" | cut -f1)

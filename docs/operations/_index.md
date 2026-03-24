@@ -52,7 +52,7 @@ make tailscale-ip       # Get Tailscale IP
 make tailscale-up       # Manually authenticate Tailscale
 ```
 
-**Backup & Restore:**
+**Backup & Restore:** see [backup-restore.md](backup-restore.md)
 
 ```bash
 make backup-now   # Trigger backup immediately
@@ -98,17 +98,7 @@ make deploy
 
 ### Backup and Restore
 
-Backups run daily at 03:00 UTC via systemd timer.
-
-```bash
-make backup-now     # trigger immediately
-make backup-pull    # download latest archive locally
-
-make restore        # list available backups (safe, no changes)
-make restore EXECUTE=1 BACKUP=openclaw_backup_20260101_030000.tar.gz
-```
-
-`make restore` without `EXECUTE=1` is always safe. With `EXECUTE=1` it stops containers, creates a safety backup of current state, extracts the archive, and restarts.
+See **[backup-restore.md](backup-restore.md)** for the full workflow, backup contents, and undo instructions.
 
 ### Access the Gateway
 

@@ -7,11 +7,12 @@
 # Behavior:
 #   Default (no extra-vars): lists available backups on VPS — no changes made.
 #   With --extra-vars "execute=true backup_file=<filename>":
-#     1. Stops containers
-#     2. Creates a safety backup of current state
-#     3. Replaces ~/.openclaw with the backup contents
-#     4. Restores Mission Control database (if matching backup exists)
-#     5. Restarts containers
+#     1. Validates environment (compose dir, backup file)
+#     2. Stops containers
+#     3. Creates a safety backup of current state (including SOPS age key)
+#     4. Replaces ~/.openclaw with the backup contents
+#     5. Restores Mission Control database (if matching backup exists)
+#     6. Restarts containers and verifies health
 #
 # Usage:
 #   make restore                    # dry-run: list available backups
@@ -62,6 +63,14 @@
         - backup_file | default('') == ''
       tags: [never, restore]
 
+    - name: Validate backup filename format
+      ansible.builtin.assert:
+        that:
+          - backup_file | regex_search('^openclaw_(backup|pre_restore)_[0-9]{8}_[0-9]{6}\.tar\.gz$')
+        fail_msg: "Invalid backup filename. Expected: openclaw_backup_YYYYMMDD_HHMMSS.tar.gz or openclaw_pre_restore_YYYYMMDD_HHMMSS.tar.gz"
+      when: execute | default('false') | bool
+      tags: [never, restore]
+
     - name: Verify backup file exists on VPS
       ansible.builtin.stat:
         path: ~/backups/{{ backup_file | default('') }}
@@ -77,6 +86,24 @@
         - not backup_stat.stat.exists
       tags: [never, restore]
 
+    - name: Verify compose directory exists on VPS
+      ansible.builtin.stat:
+        path: ~/openclaw/docker-compose.yml
+      register: compose_stat
+      when: execute | default('false') | bool
+      tags: [never, restore]
+
+    - name: Fail if docker-compose.yml not found
+      ansible.builtin.fail:
+        msg: |
+          docker-compose.yml not found at ~/openclaw/.
+          Cannot restart containers after restore.
+          Fix: ensure the IaC repo is cloned at ~/openclaw/ on the VPS.
+      when:
+        - execute | default('false') | bool
+        - not compose_stat.stat.exists
+      tags: [never, restore]
+
     - name: Stop containers before restore
       ansible.builtin.command:
         cmd: docker compose stop
@@ -87,16 +114,27 @@
 
     - name: Create safety backup of current state
       ansible.builtin.shell: |
+        set -euo pipefail
         TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
-        tar -czf ~/backups/openclaw_pre_restore_${TIMESTAMP}.tar.gz -C ~ .openclaw
-        echo "Safety backup created: ~/backups/openclaw_pre_restore_${TIMESTAMP}.tar.gz"
+
+        echo "[...] Creating safety backup of ~/.openclaw..."
+        SAFETY_PATHS=".openclaw"
+        if [[ -d ~/.config/sops ]]; then
+          SAFETY_PATHS="$SAFETY_PATHS .config/sops"
+        fi
+        tar -czf ~/backups/openclaw_pre_restore_${TIMESTAMP}.tar.gz -C ~ $SAFETY_PATHS
+        echo "[OK] Safety backup created: ~/backups/openclaw_pre_restore_${TIMESTAMP}.tar.gz"
+
         if docker volume inspect openclaw_mission-control-data > /dev/null 2>&1; then
+          echo "[...] Creating MC DB safety backup..."
           docker run --rm \
             -v openclaw_mission-control-data:/data \
             -v ~/backups:/backup \
             alpine sh -c "apk add -q sqlite > /dev/null 2>&1 && sqlite3 /data/mission-control.db '.backup /backup/mc_pre_restore_'${TIMESTAMP}'.db'"
-          echo "MC DB safety backup created: ~/backups/mc_pre_restore_${TIMESTAMP}.db"
+          echo "[OK] MC DB safety backup created: ~/backups/mc_pre_restore_${TIMESTAMP}.db"
         fi
+
+        echo "[OK] Safety backup complete — you can restore from this if the restore fails"
       args:
         executable: /bin/bash
       when:
@@ -111,18 +149,78 @@
       when: execute | default('false') | bool
       tags: [never, restore]
 
-    - name: Validate backup filename format
-      ansible.builtin.assert:
-        that:
-          - backup_file | regex_search('^openclaw_backup_[0-9]{8}_[0-9]{6}\.tar\.gz$')
-        fail_msg: "Invalid backup filename. Expected: openclaw_backup_YYYYMMDD_HHMMSS.tar.gz"
+    - name: Extract backup archive
+      ansible.builtin.shell: |
+        set -euo pipefail
+        tar -xzf ~/backups/{{ backup_file | default('') }} -C ~
+        echo "[OK] Backup extracted to ~/"
+      args:
+        executable: /bin/bash
+      changed_when: true
       when: execute | default('false') | bool
       tags: [never, restore]
 
-    - name: Extract backup archive
+    - name: Validate restored files
+      ansible.builtin.shell: |
+        set -euo pipefail
+        ERRORS=0
+
+        echo "=== Validating restored files ==="
+
+        # Check critical files
+        if [[ -f ~/.openclaw/openclaw.json ]]; then
+          echo "[OK] ~/.openclaw/openclaw.json"
+        else
+          echo "[FAIL] ~/.openclaw/openclaw.json missing"
+          ERRORS=$((ERRORS + 1))
+        fi
+
+        if [[ -d ~/.openclaw/workspace ]]; then
+          echo "[OK] ~/.openclaw/workspace/"
+        else
+          echo "[FAIL] ~/.openclaw/workspace/ missing"
+          ERRORS=$((ERRORS + 1))
+        fi
+
+        if [[ -f ~/.openclaw/lcm.db ]]; then
+          echo "[OK] ~/.openclaw/lcm.db ($(du -h ~/.openclaw/lcm.db | cut -f1))"
+        else
+          echo "[WARN] ~/.openclaw/lcm.db missing (will be created on startup)"
+        fi
+
+        if [[ -f ~/.config/sops/age/keys.txt ]]; then
+          echo "[OK] ~/.config/sops/age/keys.txt (SOPS age key)"
+        else
+          echo "[WARN] ~/.config/sops/age/keys.txt missing — secrets decryption may fail"
+        fi
+
+        if [[ $ERRORS -gt 0 ]]; then
+          echo ""
+          echo "[FAIL] $ERRORS critical file(s) missing from backup"
+          echo "Safety backup is available at ~/backups/openclaw_pre_restore_*.tar.gz"
+          exit 1
+        fi
+
+        echo "[OK] All critical files present"
+      args:
+        executable: /bin/bash
+      register: validate_result
+      when: execute | default('false') | bool
+      tags: [never, restore]
+
+    - name: Show validation result
+      ansible.builtin.debug:
+        msg: "{{ validate_result.stdout_lines }}"
+      when:
+        - execute | default('false') | bool
+        - validate_result is defined
+      tags: [never, restore]
+
+    - name: Pull latest container images
       ansible.builtin.command:
-        cmd: tar -xzf ~/backups/{{ backup_file | default('') }} -C ~
-      changed_when: true
+        cmd: docker compose pull --quiet
+        chdir: ~/openclaw
+      changed_when: false
       when: execute | default('false') | bool
       tags: [never, restore]
 
@@ -155,11 +253,79 @@
       tags: [never, restore]
 
     - name: Restart containers after restore
+      ansible.builtin.command:
+        cmd: docker compose up -d
+        chdir: ~/openclaw
+      changed_when: true
+      when: execute | default('false') | bool
+      tags: [never, restore]
+
+    - name: Wait for gateway health endpoint
       ansible.builtin.shell: |
-        docker compose up -d
+        set -euo pipefail
+        MAX_ATTEMPTS=30
+        ATTEMPT=0
+
+        echo "[...] Waiting for gateway to become healthy..."
+
+        while [[ $ATTEMPT -lt $MAX_ATTEMPTS ]]; do
+          ATTEMPT=$((ATTEMPT + 1))
+          if curl -sf http://127.0.0.1:18789/health > /dev/null 2>&1; then
+            echo "[OK] Gateway healthy after ${ATTEMPT}s"
+            exit 0
+          fi
+          sleep 1
+        done
+
+        echo "[FAIL] Gateway did not become healthy after ${MAX_ATTEMPTS}s"
+        echo "Check logs: docker compose logs openclaw-gateway --tail 50"
+        exit 1
+      args:
+        executable: /bin/bash
+      register: healthcheck_result
+      when: execute | default('false') | bool
+      tags: [never, restore]
+
+    - name: Show healthcheck result
+      ansible.builtin.debug:
+        msg: "{{ healthcheck_result.stdout_lines }}"
+      when:
+        - execute | default('false') | bool
+        - healthcheck_result is defined
+      tags: [never, restore]
+
+    - name: Log restore summary
+      ansible.builtin.shell: |
+        set -euo pipefail
+
+        echo "=== Restore Summary ==="
+        echo "Restored from: ~/backups/{{ backup_file | default('unknown') }}"
+        echo "Backup size:   $(du -h ~/backups/{{ backup_file | default('') }} | cut -f1)"
+        echo "Restored at:   $(date -u +"%Y-%m-%d %H:%M:%S UTC")"
+        echo ""
+
+        echo "Containers:"
+        docker compose ps --format "table {{ '{{' }}.Name{{ '}}' }}\t{{ '{{' }}.Status{{ '}}' }}" 2>/dev/null \
+          || docker compose ps
+
+        SAFETY=$(ls -t ~/backups/openclaw_pre_restore_*.tar.gz 2>/dev/null | head -1)
+        if [[ -n "$SAFETY" ]]; then
+          echo ""
+          echo "Safety backup available at: $SAFETY"
+          echo "To undo: make restore EXECUTE=1 BACKUP=$(basename "$SAFETY")"
+        fi
       args:
         chdir: ~/openclaw
         executable: /bin/bash
-      changed_when: true
+      register: restore_summary
       when: execute | default('false') | bool
+      changed_when: false
+      tags: [never, restore]
+
+    - name: Show restore summary
+      ansible.builtin.debug:
+        msg: "{{ restore_summary.stdout_lines }}"
+      when:
+        - execute | default('false') | bool
+        - restore_summary is defined
       tags: [never, restore]

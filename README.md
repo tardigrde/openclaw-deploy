@@ -419,17 +419,7 @@ make deploy
 
 ### Backup and Restore
 
-Backups run daily at 03:00 UTC via systemd timer.
-
-```bash
-make backup-now     # trigger immediately
-make backup-pull    # download latest archive locally
-
-make restore        # list available backups (safe, no changes)
-make restore EXECUTE=1 BACKUP=openclaw_backup_20260101_030000.tar.gz
-```
-
-`make restore` without `EXECUTE=1` is always safe. With `EXECUTE=1` it stops containers, creates a safety backup of current state, extracts the archive, and restarts.
+See **[docs/operations/backup-restore.md](docs/operations/backup-restore.md)** for the full backup and restore workflow, backup contents, and undo instructions.
 
 ### Access the Gateway
 
@@ -500,6 +490,7 @@ See [docs/cicd.md](docs/cicd.md) for required GitHub Variables, Secrets, and app
 
 | Topic | Doc |
 | ----- | --- |
+| Backup & restore | [docs/operations/backup-restore.md](docs/operations/backup-restore.md) |
 | Tailscale serve config | [docs/tailscale.md](docs/tailscale.md) |
 | Skills (ClawHub) | [docs/skills.md](docs/skills.md) |
 | Headless browser | [docs/headless-browser.md](docs/headless-browser.md) |
@@ -527,6 +518,10 @@ Key points:
 ## Infrastructure Costs
 
 This setup uses a small shared VPS (default: CX23) plus minimal object storage for Terraform state. See [Hetzner Cloud pricing](https://www.hetzner.com/cloud#pricing). API costs (Anthropic, OpenAI, etc.) are separate.
+
+## Acknowledgments
+
+Inspired by [andreesg/openclaw-terraform-hetzner](https://github.com/andreesg/openclaw-terraform-hetzner), which provided early ideas for deploying OpenClaw on Hetzner with Terraform.
 
 ## License
 
