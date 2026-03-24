@@ -75,6 +75,26 @@ make logs         # Stream Docker logs
 make exec CMD=""  # Run a command in the gateway container
 ```
 
+### Workspace
+
+The OpenClaw agent workspace (`~/.openclaw/workspace/`) contains shared repos used by the agent and the user:
+
+| Repo | Purpose |
+|------|---------|
+| `openclaw-deploy` | Upstream IaC (this repo) |
+| `openclaw-prod` | Private deployment fork |
+| `family-finance` | Household finance tool (Python) |
+| `ingatlan-scraper` | House hunting scraper |
+| `openclaw-dropbox-plugin` | Dropbox integration plugin |
+
+Clone them all at once:
+
+```bash
+make workspace-repos
+```
+
+This is idempotent — skips repos that already exist. Requires `gh auth` for private repo access.
+
 ## Git Workflow
 
 - **Never commit directly to `main`** — always create a feature/fix branch and open a PR.
