@@ -148,11 +148,6 @@
         override_has_mc: "{{ docker_compose_override.stat.exists and 'mission-control' in (override_content | default('')) }}"
       tags: [docker]
 
-    - name: Check if override references openclaw-dashboard
-      ansible.builtin.set_fact:
-        override_has_dashboard: "{{ docker_compose_override.stat.exists and 'openclaw-dashboard' in (override_content | default('')) }}"
-      tags: [docker]
-
     - name: Copy docker-compose.override.yml
       ansible.builtin.copy:
         src: "{{ docker_override_path }}"
@@ -180,27 +175,6 @@
         update: true
         version: v2.4.0
       when: override_has_mc
-      tags: [docker]
-
-    # Pinned to commit SHA until a release tag is cut that includes the upstream Dockerfile (post-v3.0.0).
-    # Once a real tag is available, update `version` to it — Renovate will track future releases from there.
-    - name: Clone or update OpenClaw Dashboard
-      ansible.builtin.git:
-        repo: https://github.com/tugcantopaloglu/openclaw-dashboard.git
-        dest: ~/openclaw/openclaw-dashboard
-        update: true
-        version: d6198d021886712bf9c508f1799893994bf9dfa4
-      when: override_has_dashboard
-      tags: [docker]
-
-    - name: Migrate dashboard-data volume ownership (UID 1001 → 1000)
-      ansible.builtin.shell: |
-        if docker volume inspect openclaw_dashboard-data >/dev/null 2>&1; then
-          docker run --rm -v openclaw_dashboard-data:/data alpine sh -c \
-            'find /data -uid 1001 -exec chown 1000:1000 {} \; 2>/dev/null; true'
-        fi
-      changed_when: false
-      when: override_has_dashboard
       tags: [docker]
 
     - name: Stat Docker socket
