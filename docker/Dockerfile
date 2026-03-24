@@ -50,11 +50,15 @@ ARG OPENCLAW_VERSION=2026.3.23
 ARG CLAWHUB_VERSION=0.9.0
 ARG SUMMARIZE_VERSION=0.12.0
 ARG WS_VERSION=8.20.0
+# Optional packages (e.g. acpx, claude-code) go in docker/install-optional.sh
+COPY docker/install-optional.sh /tmp/install-optional.sh
 RUN npm install -g \
     openclaw@${OPENCLAW_VERSION} \
     clawhub@${CLAWHUB_VERSION} \
     @steipete/summarize@${SUMMARIZE_VERSION} \
     ws@${WS_VERSION} \
+  && bash /tmp/install-optional.sh \
+  && npm cache clean --force \
   && mkdir -p /home/node/.openclaw/workspace /.clawhub \
   && chown -R node:node /home/node/.openclaw /.clawhub
 

@@ -506,6 +506,7 @@ See [docs/cicd.md](docs/cicd.md) for required GitHub Variables, Secrets, and app
 | Multi-agent setup | [docs/agents.md](docs/agents.md) |
 | Workspace Git sync | [docs/workspace-git-sync.md](docs/workspace-git-sync.md) |
 | Morning weather report | [docs/addons/weather-report.md](docs/addons/weather-report.md) |
+| ACP + Claude Code | [docs/addons/acp-claude-code.md](docs/addons/acp-claude-code.md) |
 | CI/CD setup | [docs/cicd.md](docs/cicd.md) |
 | GitOps auto-deploy | [docs/gitops-auto-deploy.md](docs/gitops-auto-deploy.md) |
 | Security hardening | [docs/security-hardening.md](docs/security-hardening.md) |

@@ -59,3 +59,4 @@
         hour: "5"
         job: "~/run-morning-weather.sh >> ~/logs/morning-weather.log 2>&1"
       tags: [never, addon-weather-report]
+
