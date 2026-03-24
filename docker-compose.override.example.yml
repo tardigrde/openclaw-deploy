@@ -33,36 +33,6 @@ services:
     depends_on:
       - openclaw-gateway
 
-  openclaw-dashboard:
-    build:
-      context: ./openclaw-dashboard
-    restart: unless-stopped
-    # group_add:
-    #   - "${DOCKER_SOCKET_GID:-988}"
-    environment:
-      NODE_ENV: production
-      DASHBOARD_PORT: "3001"
-      DASHBOARD_ALLOW_HTTP: "true"
-      WORKSPACE_DIR: /app/workspace
-      # DOCKER_HOST: unix:///var/run/docker.sock
-    volumes:
-      - ${OPENCLAW_WORKSPACE_DIR:-/home/openclaw/.openclaw/workspace}:/app/workspace
-      - ${OPENCLAW_CONFIG_DIR:-/home/openclaw/.openclaw}:/home/node/.openclaw:ro
-      # Docker socket mount — allows the dashboard to list running containers.
-      # Security risk: despite the :ro flag, the Docker API is fully writable,
-      # granting any process in this container the ability to create/exec containers
-      # or mount the host filesystem (full host compromise). Only uncomment if you
-      # accept this risk and trust all code running in openclaw-dashboard.
-      # - /var/run/docker.sock:/var/run/docker.sock:ro
-    ports:
-      - "127.0.0.1:3001:3001"  # localhost only — change to 0.0.0.0 if you need Tailscale access (ensure firewall blocks port 3001 externally)
-    healthcheck:
-      test: ["CMD", "curl", "-sf", "http://127.0.0.1:3001/"]
-      interval: 30s
-      timeout: 5s
-      start_period: 30s
-      retries: 3
-
   # --- Add your own services here ---
   # Example: a custom web app that connects to the gateway
   # my-service:

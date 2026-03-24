@@ -121,19 +121,6 @@
       "extractVersionTemplate": "^v(?<version>.+)$"
     },
     {
-      "description": "Track OpenClaw Dashboard version pinned in Ansible plays",
-      "customType": "regex",
-      "managerFilePatterns": [
-        "/^ansible/plays/docker\\.yml$/"
-      ],
-      "matchStrings": [
-        "tugcantopaloglu/openclaw-dashboard\\.git[\\s\\S]*?version: v?(?<currentValue>[\\d]+\\.[\\d]+\\.[\\d]+)"
-      ],
-      "depNameTemplate": "tugcantopaloglu/openclaw-dashboard",
-      "datasourceTemplate": "github-releases",
-      "extractVersionTemplate": "^v(?<version>.+)$"
-    },
-    {
       "description": "Track SOPS binary release referenced in Dockerfile",
       "customType": "regex",
       "managerFilePatterns": [
