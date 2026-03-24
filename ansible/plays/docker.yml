@@ -177,17 +177,9 @@
       when: override_has_mc
       tags: [docker]
 
-    - name: Stat Docker socket
-      ansible.builtin.stat:
-        path: /var/run/docker.sock
-      register: docker_socket
-      tags: [docker]
-
     - name: Build Docker images
       ansible.builtin.command:
         cmd: docker compose build
         chdir: ~/openclaw
-      environment:
-        DOCKER_SOCKET_GID: "{{ docker_socket.stat.gid }}"
       changed_when: true
       tags: [docker]

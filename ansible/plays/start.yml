@@ -13,29 +13,12 @@
 
   tasks:
 
-    - name: Stat Docker socket
-      ansible.builtin.stat:
-        path: /var/run/docker.sock
-      register: docker_socket
-      tags: [start]
-
-    - name: Write DOCKER_SOCKET_GID to .env for compose variable substitution
-      ansible.builtin.lineinfile:
-        path: ~/openclaw/.env
-        regexp: '^DOCKER_SOCKET_GID='
-        line: "DOCKER_SOCKET_GID={{ docker_socket.stat.gid }}"
-        create: true
-        mode: "0600"
-      tags: [start]
-
     - name: Start containers
       ansible.builtin.shell: |
         docker compose up -d --remove-orphans
       args:
         chdir: ~/openclaw
         executable: /bin/bash
-      environment:
-        DOCKER_SOCKET_GID: "{{ docker_socket.stat.gid }}"
       changed_when: true
       tags: [start]
 
