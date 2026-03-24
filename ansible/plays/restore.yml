@@ -66,8 +66,8 @@
     - name: Validate backup filename format
       ansible.builtin.assert:
         that:
-          - backup_file | regex_search('^openclaw_backup_[0-9]{8}_[0-9]{6}\.tar\.gz$')
-        fail_msg: "Invalid backup filename. Expected: openclaw_backup_YYYYMMDD_HHMMSS.tar.gz"
+          - backup_file | regex_search('^openclaw_(backup|pre_restore)_[0-9]{8}_[0-9]{6}\.tar\.gz$')
+        fail_msg: "Invalid backup filename. Expected: openclaw_backup_YYYYMMDD_HHMMSS.tar.gz or openclaw_pre_restore_YYYYMMDD_HHMMSS.tar.gz"
       when: execute | default('false') | bool
       tags: [never, restore]
 
@@ -118,10 +118,11 @@
         TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
 
         echo "[...] Creating safety backup of ~/.openclaw..."
-        tar -czf ~/backups/openclaw_pre_restore_${TIMESTAMP}.tar.gz \
-          -C ~ .openclaw .config/sops 2>/dev/null \
-          || tar -czf ~/backups/openclaw_pre_restore_${TIMESTAMP}.tar.gz \
-          -C ~ .openclaw
+        SAFETY_PATHS=".openclaw"
+        if [[ -d ~/.config/sops ]]; then
+          SAFETY_PATHS="$SAFETY_PATHS .config/sops"
+        fi
+        tar -czf ~/backups/openclaw_pre_restore_${TIMESTAMP}.tar.gz -C ~ $SAFETY_PATHS
         echo "[OK] Safety backup created: ~/backups/openclaw_pre_restore_${TIMESTAMP}.tar.gz"
 
         if docker volume inspect openclaw_mission-control-data > /dev/null 2>&1; then
@@ -307,8 +308,8 @@
         docker compose ps --format "table {{ '{{' }}.Name{{ '}}' }}\t{{ '{{' }}.Status{{ '}}' }}" 2>/dev/null \
           || docker compose ps
 
-        if [[ -f ~/backups/openclaw_pre_restore_*.tar.gz ]]; then
-          SAFETY=$(ls -t ~/backups/openclaw_pre_restore_*.tar.gz | head -1)
+        SAFETY=$(ls -t ~/backups/openclaw_pre_restore_*.tar.gz 2>/dev/null | head -1)
+        if [[ -n "$SAFETY" ]]; then
           echo ""
           echo "Safety backup available at: $SAFETY"
           echo "To undo: make restore EXECUTE=1 BACKUP=$(basename "$SAFETY")"

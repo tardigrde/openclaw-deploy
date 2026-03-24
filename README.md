@@ -519,6 +519,10 @@ Key points:
 
 This setup uses a small shared VPS (default: CX23) plus minimal object storage for Terraform state. See [Hetzner Cloud pricing](https://www.hetzner.com/cloud#pricing). API costs (Anthropic, OpenAI, etc.) are separate.
 
+## Acknowledgments
+
+Inspired by [andreesg/openclaw-terraform-hetzner](https://github.com/andreesg/openclaw-terraform-hetzner), which provided early ideas for deploying OpenClaw on Hetzner with Terraform.
+
 ## License
 
 MIT — see [LICENSE](LICENSE).
