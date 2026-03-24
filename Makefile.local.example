@@ -1,7 +1,7 @@
 # Copy to Makefile.local (gitignored, auto-loaded by Makefile).
 # All variables from the main Makefile are available (SERVER_IP, SSH_KEY, etc.).
 
-.PHONY: patch-devices addon-weather
+.PHONY: patch-devices addon-weather addon-acp
 
 patch-devices: ## Fix all device pairing issues (CLI scopes + UI pairing)
 	@echo -e "$(BLUE)[AUTH]$(NC) Patching all device settings on VPS..."
@@ -10,3 +10,7 @@ patch-devices: ## Fix all device pairing issues (CLI scopes + UI pairing)
 addon-weather: ## Install morning-weather cron on VPS
 	@echo -e "$(BLUE)[ADDON]$(NC) Installing morning-weather cron..."
 	@$(ANSIBLE) $(PLAYBOOK) --tags addon-weather-report
+
+addon-acp: ## Set up ACP runtime with Claude Code in Gateway container
+	@echo -e "$(BLUE)[ADDON]$(NC) Setting up ACP + Claude Code..."
+	@$(ANSIBLE) $(PLAYBOOK) --tags addon-acp
