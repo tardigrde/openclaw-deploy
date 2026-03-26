@@ -14,6 +14,11 @@ commit_message = "chore(release): {version}"
 
 [tool.semantic_release.changelog]
 changelog_file = "CHANGELOG.md"
+mode = "init"
+
+[tool.semantic_release.commit_parser_options]
+parse_squash_commits = false
+ignore_merge_commits = false
 
 [tool.semantic_release.branches.main]
 match = "main"
