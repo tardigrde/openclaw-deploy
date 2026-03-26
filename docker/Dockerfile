@@ -73,6 +73,11 @@ RUN apt-get update \
   && rm -rf /var/lib/apt/lists/* \
   && chown -R node:node /home/node/.agent-browser
 
+# Pre-create .config dir owned by node so Docker volume mounts (e.g. SOPS
+# age key at .config/sops/age/keys.txt) don't create it as root.
+# Chrome needs to write crash reports to .config/google-chrome-for-testing/.
+RUN mkdir -p /home/node/.config && chown node:node /home/node/.config
+
 # Copy skills manifest, workspace templates, agent templates, and entrypoint
 COPY docker/skills-manifest.txt /opt/config/skills-manifest.txt
 COPY docker/workspace-templates/ /opt/workspace-templates/
