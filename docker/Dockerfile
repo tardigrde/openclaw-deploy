@@ -64,11 +64,31 @@ RUN npm install -g \
   && mkdir -p /home/node/.openclaw/workspace /.clawhub \
   && chown -R node:node /home/node/.openclaw /.clawhub
 
-# Install browser binaries and system deps.
-# Explicit PATH ensures agent-browser's subprocess spawner finds apt-get.
+# Install browser binaries and Chromium system deps.
+# agent-browser install --with-deps calls `sudo apt-get` internally, which
+# doesn't exist in the slim image — install the required libs explicitly instead.
 RUN apt-get update \
-  && PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin" \
-     HOME=/home/node agent-browser install --with-deps \
+  && apt-get install -y --no-install-recommends \
+    libglib2.0-0 \
+    libnss3 \
+    libatk1.0-0 \
+    libatk-bridge2.0-0 \
+    libcups2 \
+    libgbm1 \
+    libasound2 \
+    libdbus-1-3 \
+    libxkbcommon0 \
+    libxcomposite1 \
+    libxdamage1 \
+    libxrandr2 \
+    libpango-1.0-0 \
+    libcairo2 \
+    libatspi2.0-0 \
+    libx11-6 \
+    libxcb1 \
+    libxext6 \
+    libxfixes3 \
+  && HOME=/home/node agent-browser install \
   && rm -rf /var/lib/apt/lists/* \
   && chown -R node:node /home/node/.agent-browser
 
