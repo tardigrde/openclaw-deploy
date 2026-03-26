@@ -1,6 +1,17 @@
 # CHANGELOG
 
 
+## v0.13.1 (2026-03-26)
+
+### Bug Fixes
+
+- Explicitly install Chromium system libs instead of relying on --with-deps
+  ([`12bc276`](https://github.com/tardigrde/openclaw-deploy/commit/12bc2764461b4173e919c2b1c272e7017c4f97d2))
+
+- Install sudo so agent-browser install --with-deps works in slim image
+  ([`ca4c73d`](https://github.com/tardigrde/openclaw-deploy/commit/ca4c73dd6246232da88af5c48cb4dfd3121e2f23))
+
+
 ## v0.13.0 (2026-03-26)
 
 ### Features
