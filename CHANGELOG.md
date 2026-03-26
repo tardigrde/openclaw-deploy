@@ -1,6 +1,22 @@
 # CHANGELOG
 
 
+## v0.11.0 (2026-03-26)
+
+### Features
+
+- Bump OpenClaw to 2026.3.24
+  ([`7e3dd35`](https://github.com/tardigrde/openclaw-deploy/commit/7e3dd359c52eaa9590017f9a934c236641f2e996))
+
+No breaking changes. Key improvements for this deployment: - Gateway/restart sentinel: fixes session
+  wake + Telegram topic routing after restart - Docker/setup: fixes fresh install pre-start loop -
+  Gateway/channels: isolates per-channel boot failures - Telegram: photo dimension fix, better 403
+  error handling, forum topic recovery - ACP: delivery fix when TTS yields no audio (relevant for
+  acpx plugin)
+
+Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
+
+
 ## v0.10.0 (2026-03-24)
 
 ### Features
