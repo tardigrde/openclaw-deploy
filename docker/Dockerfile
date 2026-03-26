@@ -5,8 +5,8 @@
 # needed by skills MUST be installed here at build time. If you add a skill
 # that needs a new binary, update this Dockerfile and rebuild.
 #
-# NOTE: Chromium is installed via `agent-browser install --with-deps` below.
-# The chromedp/headless-shell sidecar has been removed.
+# NOTE: Chromium is NOT installed here — the separate chromedp/headless-shell
+# container provides browser automation via the agent-browser skill.
 ###############################################################################
 
 # checkov:skip=CKV_DOCKER_2:No suitable health endpoint available in this container
@@ -50,8 +50,6 @@ ARG OPENCLAW_VERSION=2026.3.24
 ARG CLAWHUB_VERSION=0.9.0
 ARG SUMMARIZE_VERSION=0.12.0
 ARG WS_VERSION=8.20.0
-ARG AGENT_BROWSER_VERSION=0.22.3
-ARG AGENTMAIL_VERSION=0.4.12
 # Optional packages (e.g. acpx, claude-code) go in docker/install-optional.sh
 COPY docker/install-optional.sh /tmp/install-optional.sh
 RUN npm install -g \
@@ -59,19 +57,10 @@ RUN npm install -g \
     clawhub@${CLAWHUB_VERSION} \
     @steipete/summarize@${SUMMARIZE_VERSION} \
     ws@${WS_VERSION} \
-    agent-browser@${AGENT_BROWSER_VERSION} \
-    agentmail@${AGENTMAIL_VERSION} \
   && bash /tmp/install-optional.sh \
   && npm cache clean --force \
   && mkdir -p /home/node/.openclaw/workspace /.clawhub \
   && chown -R node:node /home/node/.openclaw /.clawhub
-
-# Install browser binaries and system deps.
-# Needs a fresh apt-get update — the earlier apt layer clears /var/lib/apt/lists/*.
-RUN apt-get update \
-  && HOME=/home/node agent-browser install --with-deps \
-  && rm -rf /var/lib/apt/lists/* \
-  && chown -R node:node /home/node/.cache
 
 # Copy skills manifest, workspace templates, agent templates, and entrypoint
 COPY docker/skills-manifest.txt /opt/config/skills-manifest.txt

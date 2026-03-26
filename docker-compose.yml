@@ -20,7 +20,6 @@ services:
       TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
       BRAVE_API_KEY: ${BRAVE_API_KEY}
       GH_TOKEN: ${GH_TOKEN:-}
-      AGENTMAIL_API_KEY: ${AGENTMAIL_API_KEY:-}
       # Allow private-network ws:// connections from mission-control (Docker bridge)
       # Required since v2026.3.2 which restricts plaintext WS to loopback by default
       OPENCLAW_ALLOW_INSECURE_PRIVATE_WS: "1"
@@ -46,3 +45,19 @@ services:
       timeout: 5s
       start_period: 60s
       retries: 3
+
+  chromium:
+    image: chromedp/headless-shell:148.0.7743.0
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:9222:9222"
+    command: "--remote-allow-origins=*"
+    networks:
+      default:
+        ipv4_address: 172.20.0.10
+
+networks:
+  default:
+    ipam:
+      config:
+        - subnet: 172.20.0.0/24
