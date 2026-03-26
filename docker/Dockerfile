@@ -22,6 +22,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     openssh-client \
     python3 \
     age \
+    sudo \
   && curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
       | dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg \
   && chmod 644 /usr/share/keyrings/githubcli-archive-keyring.gpg \
@@ -64,31 +65,11 @@ RUN npm install -g \
   && mkdir -p /home/node/.openclaw/workspace /.clawhub \
   && chown -R node:node /home/node/.openclaw /.clawhub
 
-# Install browser binaries and Chromium system deps.
-# agent-browser install --with-deps calls `sudo apt-get` internally, which
-# doesn't exist in the slim image — install the required libs explicitly instead.
+# Install browser binaries and system deps.
+# sudo is present (installed above) so agent-browser install --with-deps can
+# call sudo apt-get to install Chromium's shared libs automatically.
 RUN apt-get update \
-  && apt-get install -y --no-install-recommends \
-    libglib2.0-0 \
-    libnss3 \
-    libatk1.0-0 \
-    libatk-bridge2.0-0 \
-    libcups2 \
-    libgbm1 \
-    libasound2 \
-    libdbus-1-3 \
-    libxkbcommon0 \
-    libxcomposite1 \
-    libxdamage1 \
-    libxrandr2 \
-    libpango-1.0-0 \
-    libcairo2 \
-    libatspi2.0-0 \
-    libx11-6 \
-    libxcb1 \
-    libxext6 \
-    libxfixes3 \
-  && HOME=/home/node agent-browser install \
+  && HOME=/home/node agent-browser install --with-deps \
   && rm -rf /var/lib/apt/lists/* \
   && chown -R node:node /home/node/.agent-browser
 
