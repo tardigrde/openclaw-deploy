@@ -14,7 +14,6 @@ weekly PRs when updates are available (see `renovate.json`).
 |---|---|---|
 | OpenClaw | `docker/Dockerfile` (`ARG OPENCLAW_VERSION`) | Never auto-merged — check release notes + run `make backup-now` first |
 | Node.js base image | `docker/Dockerfile` (`FROM node:...`) | |
-| chromedp/headless-shell | `docker-compose.yml` (`image:`) | |
 | Terraform CLI | `terraform/envs/prod/main.tf` (`required_version`) | Also enforced in CI via `hashicorp/setup-terraform` input |
 | hcloud provider | `terraform/envs/prod/main.tf` (`version =`) | |
 | ansible-core | `.github/workflows/*.yml` (`pip install`) | Range constraint — bump minor manually |

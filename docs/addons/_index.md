@@ -12,3 +12,4 @@ Add-on scripts live in `scripts/local/` (gitignored, copy from `scripts/local.ex
 | Add-on | Make target | Doc |
 |--------|-------------|-----|
 | Morning weather report | `make addon-weather` | [Weather Report](/addons/weather-report/) |
+| ACP + Claude Code | `make deploy REBUILD=1` | [ACP + Claude Code](/addons/acp-claude-code/) |

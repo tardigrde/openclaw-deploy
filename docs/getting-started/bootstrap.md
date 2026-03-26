@@ -84,10 +84,10 @@ Open `http://localhost:18789` and paste your `OPENCLAW_GATEWAY_TOKEN`.
 
 **Via Tailscale Serve** (if Tailscale is enabled):
 
-```bash
-ssh -i $SSH_KEY openclaw@<tailscale-ip>
-sudo tailscale serve --bg 18789
-sudo tailscale serve status  # prints your HTTPS URL
+`make bootstrap` deploys the Tailscale serve config automatically — no manual steps needed. The gateway is available at:
+
+```
+https://openclaw-prod.<tailnet>.ts.net
 ```
 
-Dashboard available at `https://openclaw-prod.<tailnet>.ts.net` from any tailnet device.
+from any tailnet device. See [Tailscale](/tailscale/) for serve config details and troubleshooting.

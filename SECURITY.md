@@ -29,7 +29,7 @@ This project deploys cloud infrastructure. Please be aware of:
 
 1. **API Credentials**
    - Never commit `secrets/inputs.sh` or `secrets/.env` — both are gitignored
-   - See [docs/secrets.md](docs/secrets.md) for the full secrets model (two-file layout, SOPS encryption, how secrets reach the VPS)
+   - See [docs/configuration/secrets.md](docs/configuration/secrets.md) for the full secrets model (two-file layout, SOPS encryption, how secrets reach the VPS)
    - Rotate API tokens regularly
    - Use separate tokens for different environments
 
@@ -54,7 +54,7 @@ This project deploys cloud infrastructure. Please be aware of:
    - A stolen or leaked Tailscale auth key (mitigate with expiring keys and MFA)
    - Vulnerabilities in OpenClaw or its dependencies
 
-   Tailscale is installed automatically on first boot when `TF_VAR_enable_tailscale=true` is set. See [Firewall / Network Access](../README.md#firewall--network-access) in the README for the step-by-step setup.
+   Tailscale is installed automatically on first boot when `TF_VAR_enable_tailscale=true` is set. See [Firewall / Network Access](README.md#firewall--network-access) in the README for the step-by-step setup.
 
 4. **Firewall Rules**
    - Inbound by default: SSH (22/tcp) only — no HTTP/HTTPS exposed at the Hetzner level
