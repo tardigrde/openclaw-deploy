@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v0.13.2 (2026-03-26)
+
+### Bug Fixes
+
+- Pre-create .config dir so Chrome crash reports work with volume mounts
+  ([`6124901`](https://github.com/tardigrde/openclaw-deploy/commit/61249012e34ed8832d3d4d4572ef35ce135bd06e))
+
+
 ## v0.13.1 (2026-03-26)
 
 ### Bug Fixes
