@@ -20,7 +20,7 @@ jobs:
           terraform_version: "1.7.0"
 
       - name: Install Ansible
-        run: pip install "ansible-core>=2.20.3,<3" --quiet
+        run: pip install "ansible-core>=2.20.4,<3" --quiet
 
       - name: Run make validate
         run: make validate
