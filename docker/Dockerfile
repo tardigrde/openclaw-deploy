@@ -22,6 +22,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     openssh-client \
     python3 \
     age \
+    sudo \
   && curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
       | dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg \
   && chmod 644 /usr/share/keyrings/githubcli-archive-keyring.gpg \
@@ -65,10 +66,10 @@ RUN npm install -g \
   && chown -R node:node /home/node/.openclaw /.clawhub
 
 # Install browser binaries and system deps.
-# Explicit PATH ensures agent-browser's subprocess spawner finds apt-get.
+# sudo is present (installed above) so agent-browser install --with-deps can
+# call sudo apt-get to install Chromium's shared libs automatically.
 RUN apt-get update \
-  && PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin" \
-     HOME=/home/node agent-browser install --with-deps \
+  && HOME=/home/node agent-browser install --with-deps \
   && rm -rf /var/lib/apt/lists/* \
   && chown -R node:node /home/node/.agent-browser
 
