@@ -34,7 +34,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Install SOPS (for native secrets decryption via exec provider)
 # cosign is used at build time to verify the SOPS release signature — no hardcoded hash needed.
 ARG SOPS_VERSION=3.12.2
-COPY --from=gcr.io/projectsigstore/cosign:v2.6.2 /ko-app/cosign /usr/local/bin/cosign
+COPY --from=gcr.io/projectsigstore/cosign:v3.0.5 /ko-app/cosign /usr/local/bin/cosign
 COPY scripts/install-sops.sh /usr/local/bin/install-sops.sh
 RUN bash /usr/local/bin/install-sops.sh "${SOPS_VERSION}"
 
