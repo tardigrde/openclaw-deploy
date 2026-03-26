@@ -45,19 +45,3 @@ services:
       timeout: 5s
       start_period: 60s
       retries: 3
-
-  chromium:
-    image: chromedp/headless-shell:148.0.7743.0
-    restart: unless-stopped
-    ports:
-      - "127.0.0.1:9222:9222"
-    command: "--remote-allow-origins=*"
-    networks:
-      default:
-        ipv4_address: 172.20.0.10
-
-networks:
-  default:
-    ipam:
-      config:
-        - subnet: 172.20.0.0/24
