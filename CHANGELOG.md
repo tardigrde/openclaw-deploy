@@ -1,6 +1,19 @@
 # CHANGELOG
 
 
+## v0.14.0 (2026-03-27)
+
+### Bug Fixes
+
+- Harden setup wizard, doctor, and monitoring scripts
+  ([`f58b68d`](https://github.com/tardigrde/openclaw-deploy/commit/f58b68dee2ee1ce57c42ff40b551e66f5b556087))
+
+### Features
+
+- Add setup wizard, doctor check, and health monitoring
+  ([`fe045c2`](https://github.com/tardigrde/openclaw-deploy/commit/fe045c2167457c507733cc06033595b1ebd2710b))
+
+
 ## v0.13.3 (2026-03-27)
 
 ### Bug Fixes

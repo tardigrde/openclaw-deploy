@@ -178,6 +178,41 @@ check_dotenv_var() {
   fi
 }
 
+# check_encrypted_dotenv_var verifies a KEY=VALUE in a SOPS-encrypted dotenv file.
+# Falls back to plaintext .env if the encrypted file is missing or decryption fails.
+check_encrypted_dotenv_var() {
+  local var_name="$1"
+  local label="${2:-$var_name}" required="${3:-true}"
+  local enc_file="$REPO_ROOT/secrets/.env.enc"
+  local plain_file="$REPO_ROOT/secrets/.env"
+  local age_key="$REPO_ROOT/secrets/age-key.txt"
+
+  local val="" source=""
+
+  # Try decrypting from .env.enc (requires age key)
+  if [[ -f "$enc_file" ]] && [[ -f "$age_key" ]] && command -v sops &>/dev/null; then
+    val="$(SOPS_AGE_KEY_FILE="$age_key" sops --decrypt --input-type dotenv --output-type dotenv "$enc_file" 2>/dev/null \
+      | grep -E "^${var_name}=" | head -1 | cut -d= -f2-)" || true
+    [[ -n "$val" ]] && source="secrets/.env.enc"
+  fi
+
+  # Fallback to plaintext .env
+  if [[ -z "$val" && -f "$plain_file" ]]; then
+    val="$(grep -E "^${var_name}=" "$plain_file" 2>/dev/null | head -1 | cut -d= -f2-)" || true
+    [[ -n "$val" ]] && source="secrets/.env"
+  fi
+
+  if [[ -z "$val" ]]; then
+    if [[ "$required" == "true" ]]; then
+      fail "$label — not set in secrets/.env.enc"
+    else
+      pass "$label ${DIM}(optional, not set)${NC}"
+    fi
+  else
+    pass "$label ${DIM}(set in $source)${NC}"
+  fi
+}
+
 # =============================================================================
 # Main
 # =============================================================================
@@ -206,7 +241,7 @@ check_tool "sops" "3.7" "sops --version" \
 check_tool "jq" "" "jq --version" \
   "https://jqlang.github.io/jq/download/"
 
-check_tool "shellcheck" "0.7" "shellcheck --version" \
+check_tool "shellcheck" "0.7" "shellcheck --version | grep 'version:'" \
   "https://github.com/koalaman/shellcheck#installing"
 
 check_tool "ssh" "" "ssh -V 2>&1" ""
@@ -288,9 +323,9 @@ echo ""
 check_env_var "secrets/inputs.sh" "HCLOUD_TOKEN" "HCLOUD_TOKEN"
 check_env_var "secrets/inputs.sh" "TF_VAR_ssh_key_fingerprint" "SSH_KEY_FINGERPRINT"
 
-check_dotenv_var "secrets/.env" "TELEGRAM_BOT_TOKEN" "TELEGRAM_BOT_TOKEN"
-check_dotenv_var "secrets/.env" "OPENCLAW_GATEWAY_TOKEN" "OPENCLAW_GATEWAY_TOKEN"
-check_dotenv_var "secrets/.env" "ANTHROPIC_API_KEY" "ANTHROPIC_API_KEY" "false"
+check_encrypted_dotenv_var "TELEGRAM_BOT_TOKEN" "TELEGRAM_BOT_TOKEN"
+check_encrypted_dotenv_var "OPENCLAW_GATEWAY_TOKEN" "OPENCLAW_GATEWAY_TOKEN"
+check_encrypted_dotenv_var "ANTHROPIC_API_KEY" "ANTHROPIC_API_KEY" "false"
 
 echo ""
 
