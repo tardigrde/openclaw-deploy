@@ -86,8 +86,8 @@ Open `http://localhost:18789` and paste your `OPENCLAW_GATEWAY_TOKEN`.
 
 `make bootstrap` deploys the Tailscale serve config automatically — no manual steps needed. The gateway is available at:
 
-```
+```text
 https://openclaw-prod.<tailnet>.ts.net
 ```
 
-from any tailnet device. See [Tailscale](/tailscale/) for serve config details and troubleshooting.
+from any tailnet device. See [Tailscale](/docs/tailscale.md) for serve config details and troubleshooting.

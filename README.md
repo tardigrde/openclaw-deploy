@@ -152,7 +152,6 @@ Open `http://localhost:18789` and paste your `OPENCLAW_GATEWAY_TOKEN` to authent
 │  │                        │  │
 │  │  openclaw-gateway      │  │
 │  │  chromium (headless)   │  │
-│  │  workspace-sync        │  │
 │  └────────────────────────┘  │
 │                              │
 │  UFW + Hetzner Firewall      │
