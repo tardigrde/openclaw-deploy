@@ -1,6 +1,19 @@
 # CHANGELOG
 
 
+## v0.13.3 (2026-03-27)
+
+### Bug Fixes
+
+- Address PR review comments
+  ([`eb80f26`](https://github.com/tardigrde/openclaw-deploy/commit/eb80f2640fcbf079270413fc6a0ff2dfb5147736))
+
+### Documentation
+
+- Fix broken links, stale content, and documentation inconsistencies
+  ([`b54f389`](https://github.com/tardigrde/openclaw-deploy/commit/b54f389eb35d668f12c5bf761f16972e3d8de6d4))
+
+
 ## v0.13.2 (2026-03-26)
 
 ### Bug Fixes
