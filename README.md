@@ -30,7 +30,7 @@ See **[docs/configuration/private-fork.md](docs/configuration/private-fork.md)**
 4. **jq** — required for `make validate`. Install via your package manager.
 5. **Hetzner Cloud account** with API token ([console](https://console.hetzner.cloud/))
 6. **SSH key** uploaded to Hetzner Cloud. Default path: `~/.ssh/id_rsa`. Override with `SSH_KEY` env var.
-7. *(Optional)* **Remote Terraform state** — the default is local (no setup needed). For GCS or other remote backends, see [docs/remote-state.md](docs/remote-state.md).
+7. *(Optional)* **Remote Terraform state** — the default is local (no setup needed). For GCS or other remote backends, see [docs/operations/remote-state.md](docs/operations/remote-state.md).
 
 ## Quick Start
 
@@ -48,7 +48,7 @@ cp secrets/inputs.example.sh secrets/inputs.sh
 vim secrets/inputs.sh
 ```
 
-Required: `HCLOUD_TOKEN`, `TF_VAR_ssh_key_fingerprint` (from [Hetzner Console](https://console.hetzner.cloud/) → Security → SSH Keys). See [docs/secrets.md](docs/secrets.md) for the full variable reference and Tailscale-specific notes.
+Required: `HCLOUD_TOKEN`, `TF_VAR_ssh_key_fingerprint` (from [Hetzner Console](https://console.hetzner.cloud/) → Security → SSH Keys). See [docs/configuration/secrets.md](docs/configuration/secrets.md) for the full variable reference and Tailscale-specific notes.
 
 ### 3. Configure OpenClaw
 
@@ -85,7 +85,7 @@ cp secrets/.env.example secrets/.env
 vim secrets/.env
 ```
 
-Required: `OPENCLAW_GATEWAY_TOKEN`, `ANTHROPIC_API_KEY` (or leave empty for subscription auth), `TELEGRAM_BOT_TOKEN`. See [docs/secrets.md](docs/secrets.md) for the full variable reference.
+Required: `OPENCLAW_GATEWAY_TOKEN`, `ANTHROPIC_API_KEY` (or leave empty for subscription auth), `TELEGRAM_BOT_TOKEN`. See [docs/configuration/secrets.md](docs/configuration/secrets.md) for the full variable reference.
 
 ### 7. (Optional) Encrypt secrets at rest with SOPS
 
@@ -97,7 +97,7 @@ make secrets-generate-key   # generates secrets/age-key.txt and prints the publi
 make secrets-encrypt        # encrypts secrets/.env → secrets/.env.enc
 ```
 
-Plain `.env` works for local use. SOPS is **required** for the [GitOps auto-deploy workflow](docs/gitops-auto-deploy.md). See [docs/secrets.md § SOPS](docs/secrets.md#sops-encryption-optional-for-local-required-for-ci) for the full workflow.
+Plain `.env` works for local use. SOPS is **required** for the [GitOps auto-deploy workflow](docs/operations/gitops-auto-deploy.md). See [docs/configuration/secrets.md § SOPS](docs/configuration/secrets.md#sops-encryption-optional-for-local-required-for-ci) for the full workflow.
 
 > **Adding extra services?** If you plan to run additional services (e.g. Mission Control), copy `docker-compose.override.example.yml → docker-compose.override.yml` before the next step — it cannot be merged in after bootstrap without re-running it. See [Override System](#override-system).
 >
@@ -152,7 +152,6 @@ Open `http://localhost:18789` and paste your `OPENCLAW_GATEWAY_TOKEN` to authent
 │  │                        │  │
 │  │  openclaw-gateway      │  │
 │  │  chromium (headless)   │  │
-│  │  workspace-sync        │  │
 │  └────────────────────────┘  │
 │                              │
 │  UFW + Hetzner Firewall      │
@@ -294,7 +293,7 @@ Tailscale creates a private WireGuard mesh so SSH is reachable only from devices
 
 ### Remote State Backend
 
-Default backend is local (no setup needed). See [docs/remote-state.md](docs/remote-state.md) for GCS setup, migration from local state, and CI authentication.
+Default backend is local (no setup needed). See [docs/operations/remote-state.md](docs/operations/remote-state.md) for GCS setup, migration from local state, and CI authentication.
 
 ### AI Providers
 
@@ -321,7 +320,7 @@ Supported providers: Anthropic, OpenAI, DeepSeek, and local models via Ollama/LM
 
 ### Agent & Channel Configuration
 
-See **[docs/openclaw-config.md](docs/openclaw-config.md)** for:
+See **[docs/configuration/openclaw-config.md](docs/configuration/openclaw-config.md)** for:
 
 - Telegram channel settings (retry, access control, groups, mention patterns)
 - Session architecture (DM vs group chats)
@@ -492,7 +491,7 @@ ssh openclaw@VPS_IP "sudo chown -R openclaw:openclaw ~/.openclaw"
 
 Built-in CI validates and tests Terraform (fmt, validate, tflint, native tests). Example workflows for `terraform plan` and `terraform apply` are in `.github/workflows/*.example.yml`. An optional GitOps workflow enables automatic Ansible-based deployments on push.
 
-See [docs/cicd.md](docs/cicd.md) for required GitHub Variables, Secrets, and approval gate setup.
+See [docs/operations/cicd.md](docs/operations/cicd.md) for required GitHub Variables, Secrets, and approval gate setup.
 
 ## Advanced Topics
 
@@ -501,18 +500,18 @@ See [docs/cicd.md](docs/cicd.md) for required GitHub Variables, Secrets, and app
 | Private fork workflow | [docs/configuration/private-fork.md](docs/configuration/private-fork.md) |
 | Backup & restore | [docs/operations/backup-restore.md](docs/operations/backup-restore.md) |
 | Tailscale serve config | [docs/tailscale.md](docs/tailscale.md) |
-| Skills (ClawHub) | [docs/skills.md](docs/skills.md) |
-| Headless browser | [docs/headless-browser.md](docs/headless-browser.md) |
-| Multi-agent setup | [docs/agents.md](docs/agents.md) |
-| Workspace Git sync | [docs/workspace-git-sync.md](docs/workspace-git-sync.md) |
+| Skills (ClawHub) | [docs/guides/skills.md](docs/guides/skills.md) |
+| Headless browser | [docs/guides/headless-browser.md](docs/guides/headless-browser.md) |
+| Multi-agent setup | [docs/guides/agents.md](docs/guides/agents.md) |
+| Workspace Git sync | [docs/guides/workspace-git-sync.md](docs/guides/workspace-git-sync.md) |
 | Morning weather report | [docs/addons/weather-report.md](docs/addons/weather-report.md) |
 | ACP + Claude Code | [docs/addons/acp-claude-code.md](docs/addons/acp-claude-code.md) |
-| CI/CD setup | [docs/cicd.md](docs/cicd.md) |
-| GitOps auto-deploy | [docs/gitops-auto-deploy.md](docs/gitops-auto-deploy.md) |
-| Security hardening | [docs/security-hardening.md](docs/security-hardening.md) |
-| Version management | [docs/versions.md](docs/versions.md) |
-| Remote state backend | [docs/remote-state.md](docs/remote-state.md) |
-| Secrets reference | [docs/secrets.md](docs/secrets.md) |
+| CI/CD setup | [docs/operations/cicd.md](docs/operations/cicd.md) |
+| GitOps auto-deploy | [docs/operations/gitops-auto-deploy.md](docs/operations/gitops-auto-deploy.md) |
+| Security hardening | [docs/security/hardening.md](docs/security/hardening.md) |
+| Version management | [docs/configuration/versions.md](docs/configuration/versions.md) |
+| Remote state backend | [docs/operations/remote-state.md](docs/operations/remote-state.md) |
+| Secrets reference | [docs/configuration/secrets.md](docs/configuration/secrets.md) |
 
 ## Security
 

@@ -28,7 +28,6 @@ Infrastructure-as-code for deploying [OpenClaw](https://openclaw.ai) on a Hetzne
 │  │                        │  │
 │  │  openclaw-gateway      │  │
 │  │  chromium (headless)   │  │
-│  │  workspace-sync        │  │
 │  └────────────────────────┘  │
 │                              │
 │  UFW + Hetzner Firewall      │
