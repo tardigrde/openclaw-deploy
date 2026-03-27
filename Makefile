@@ -8,7 +8,9 @@ SHELL := /bin/bash
         bootstrap bootstrap-check deploy deploy-check setup-auth backup-now backup-pull restore logs logs-tail status shell exec \
         tailscale-enable tailscale-setup tailscale-status tailscale-ip tailscale-up \
         workspace-sync \
-        secrets-generate-key secrets-encrypt secrets-decrypt secrets-edit
+        secrets-generate-key secrets-encrypt secrets-decrypt secrets-edit \
+        doctor setup \
+        monitor-enable monitor-disable monitor-status monitor-test
 
 -include Makefile.local
 
@@ -73,6 +75,16 @@ RED    := \033[0;31m
 BLUE   := \033[0;34m
 BOLD   := \033[1m
 NC     := \033[0m
+
+# =============================================================================
+# Getting Started
+# =============================================================================
+
+doctor: ## Check prerequisites and configuration health
+	@bash scripts/doctor.sh
+
+setup: ## Interactive first-time setup wizard (copies configs, prompts for values, generates keys)
+	@bash scripts/setup.sh
 
 # =============================================================================
 # Terraform Commands
@@ -345,6 +357,34 @@ tailscale-up: ## Manually authenticate Tailscale
 	@ssh -i $(SSH_KEY) -t openclaw@$(SERVER_IP) 'sudo tailscale up'
 
 # =============================================================================
+# Monitoring
+# =============================================================================
+
+monitor-enable: ## Enable health monitoring with Telegram alerts (5-min interval)
+	$(call check-server-ip)
+	@echo -e "$(BLUE)[MONITOR]$(NC) Enabling health monitoring on $(SERVER_IP)..."
+	@$(ANSIBLE) $(PLAYBOOK) --tags monitor_enable
+
+monitor-disable: ## Disable health monitoring
+	$(call check-server-ip)
+	@echo -e "$(YELLOW)[MONITOR]$(NC) Disabling health monitoring on $(SERVER_IP)..."
+	@$(ANSIBLE) $(PLAYBOOK) --tags monitor_disable
+
+monitor-status: ## Show monitoring timer status and recent state
+	$(call check-server-ip)
+	@echo -e "$(GREEN)[INFO]$(NC) Monitoring status on $(SERVER_IP)..."
+	@ssh -i $(SSH_KEY) -o StrictHostKeyChecking=accept-new openclaw@$(SERVER_IP) \
+		'echo "=== Timer ===" && systemctl --user status openclaw-monitor.timer 2>/dev/null || echo "Timer not installed"; \
+		 echo "" && echo "=== Last check ===" && journalctl --user -u openclaw-monitor.service --no-pager -n 20 2>/dev/null || echo "No logs"; \
+		 echo "" && echo "=== State ===" && cat ~/.openclaw/monitor-state.json 2>/dev/null | jq . || echo "No state file"'
+
+monitor-test: ## Trigger one health check cycle manually (sends alert if checks fail)
+	$(call check-server-ip)
+	@echo -e "$(GREEN)[INFO]$(NC) Running health check on $(SERVER_IP)..."
+	@ssh -i $(SSH_KEY) -o StrictHostKeyChecking=accept-new openclaw@$(SERVER_IP) \
+		'bash ~/scripts/monitor.sh'
+
+# =============================================================================
 # Help
 # =============================================================================
 
@@ -352,6 +392,10 @@ help: ## Show this help message
 	@echo -e "$(BOLD)OpenClaw Infrastructure$(NC)"
 	@echo ""
 	@echo -e "Usage: make <target> [ENV=prod]"
+	@echo ""
+	@echo -e "$(BOLD)Getting Started:$(NC)"
+	@echo -e "  $(GREEN)doctor$(NC)          Check prerequisites and configuration health"
+	@echo -e "  $(GREEN)setup$(NC)           Interactive first-time setup wizard"
 	@echo ""
 	@echo -e "$(BOLD)Terraform:$(NC)"
 	@echo -e "  $(GREEN)init$(NC)            Initialize Terraform backend"
@@ -391,6 +435,12 @@ help: ## Show this help message
 	@echo -e "  $(GREEN)tailscale-ip$(NC)      Get Tailscale IP address"
 	@echo -e "  $(GREEN)tailscale-up$(NC)      Manually authenticate Tailscale"
 	@echo ""
+	@echo -e "$(BOLD)Monitoring:$(NC)"
+	@echo -e "  $(BLUE)monitor-enable$(NC)   Enable health monitoring with Telegram alerts"
+	@echo -e "  $(BLUE)monitor-disable$(NC)  Disable health monitoring"
+	@echo -e "  $(GREEN)monitor-status$(NC)  Show monitoring status and recent alerts"
+	@echo -e "  $(GREEN)monitor-test$(NC)    Trigger one health check cycle manually"
+	@echo ""
 	@echo -e "$(BOLD)Secrets (SOPS):$(NC)"
 	@echo -e "  $(GREEN)secrets-generate-key$(NC)  Generate age key (first-time setup)"
 	@echo -e "  $(GREEN)secrets-encrypt$(NC)       Encrypt secrets/.env → secrets/.env.enc"
@@ -398,6 +448,7 @@ help: ## Show this help message
 	@echo -e "  $(GREEN)secrets-edit$(NC)          Edit encrypted secrets in-place"
 	@echo ""
 	@echo -e "$(BOLD)Quick Start:$(NC)"
+	@echo "  make setup               # interactive first-time wizard"
 	@echo "  source secrets/inputs.sh"
 	@echo "  make init && make plan && make apply"
 	@echo "  make bootstrap"

@@ -42,6 +42,8 @@
 #   backup_now           — trigger backup systemd service [never by default]
 #   backup_pull          — fetch latest backup archives locally [never by default]
 #   restore              — list backups (dry-run) or execute restore [never by default]
+#   monitor_enable       — deploy health monitoring with Telegram alerts [never by default]
+#   monitor_disable      — remove health monitoring [never by default]
 #   addon-weather-report — install morning-weather cron [never; opt-in via site.local.yml]
 #   patch_devices        — fix device pairing [never; local-only play, see site.local.yml]
 # =============================================================================
@@ -54,3 +56,4 @@
 - ansible.builtin.import_playbook: plays/setup_auth.yml
 - ansible.builtin.import_playbook: plays/backup.yml
 - ansible.builtin.import_playbook: plays/restore.yml
+- ansible.builtin.import_playbook: plays/monitor.yml

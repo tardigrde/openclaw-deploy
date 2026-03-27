@@ -1,0 +1,144 @@
+---
+# =============================================================================
+# Monitor Play — Health monitoring with Telegram alerts
+# =============================================================================
+# Tags: monitor_enable, monitor_disable (both tagged `never` — opt-in only)
+#
+# Deploys a systemd timer that checks gateway health every 5 minutes and
+# sends Telegram alerts when checks fail. Reuses the existing Telegram
+# bot token and the first allowFrom user ID from openclaw.json.
+#
+# Usage:
+#   make monitor-enable   # Deploy and start the monitoring timer
+#   make monitor-disable  # Stop and remove the monitoring timer
+#   make monitor-status   # Show timer status
+#   make monitor-test     # Trigger one check cycle manually
+# =============================================================================
+
+- name: Health Monitoring
+  hosts: all
+  gather_facts: false
+
+  tasks:
+
+    # ----- monitor_enable -----
+
+    - name: Copy monitor script to VPS
+      ansible.builtin.copy:
+        src: ../../scripts/monitor.sh
+        dest: ~/scripts/monitor.sh
+        mode: "0755"
+      tags: [never, monitor_enable]
+
+    - name: Read Telegram bot token from deployed .env
+      ansible.builtin.shell:
+        cmd: >
+          grep -E '^TELEGRAM_BOT_TOKEN=' ~/.openclaw/.env 2>/dev/null
+          | head -1 | cut -d= -f2-
+      register: telegram_token_result
+      changed_when: false
+      failed_when: telegram_token_result.stdout | length == 0
+      tags: [never, monitor_enable]
+
+    - name: Read Telegram chat ID from openclaw.json
+      ansible.builtin.shell:
+        cmd: >
+          jq -r '.channels.telegram.allowFrom[0] // empty' ~/.openclaw/openclaw.json 2>/dev/null
+      register: chat_id_result
+      changed_when: false
+      failed_when: chat_id_result.stdout | length == 0
+      tags: [never, monitor_enable]
+
+    - name: Write monitor environment file
+      ansible.builtin.copy:
+        content: |
+          TELEGRAM_BOT_TOKEN={{ telegram_token_result.stdout }}
+          MONITOR_CHAT_ID={{ chat_id_result.stdout }}
+        dest: ~/scripts/monitor.env
+        mode: "0600"
+      tags: [never, monitor_enable]
+
+    - name: Write monitor systemd service
+      ansible.builtin.copy:
+        content: |
+          [Unit]
+          Description=OpenClaw Health Monitor
+
+          [Service]
+          Type=oneshot
+          ExecStart=/home/openclaw/scripts/monitor.sh
+          Environment=HOME=/home/openclaw
+        dest: ~/.config/systemd/user/openclaw-monitor.service
+        mode: "0644"
+      tags: [never, monitor_enable]
+
+    - name: Write monitor systemd timer
+      ansible.builtin.copy:
+        content: |
+          [Unit]
+          Description=OpenClaw Health Monitor Timer
+
+          [Timer]
+          OnBootSec=2min
+          OnUnitActiveSec=5min
+          Persistent=true
+
+          [Install]
+          WantedBy=timers.target
+        dest: ~/.config/systemd/user/openclaw-monitor.timer
+        mode: "0644"
+      tags: [never, monitor_enable]
+
+    - name: Enable and start monitor timer
+      ansible.builtin.systemd:
+        name: openclaw-monitor.timer
+        scope: user
+        enabled: true
+        state: started
+        daemon_reload: true
+      tags: [never, monitor_enable]
+
+    - name: Send test alert to confirm monitoring works
+      ansible.builtin.shell:
+        cmd: >
+          curl -sf --max-time 10
+          "https://api.telegram.org/bot{{ telegram_token_result.stdout }}/sendMessage"
+          -d "chat_id={{ chat_id_result.stdout }}"
+          -d "text=OpenClaw health monitoring enabled on $(hostname). You will receive alerts if the gateway goes down."
+          -d "parse_mode=HTML"
+      changed_when: false
+      failed_when: false
+      tags: [never, monitor_enable]
+
+    # ----- monitor_disable -----
+
+    - name: Stop and disable monitor timer
+      ansible.builtin.systemd:
+        name: openclaw-monitor.timer
+        scope: user
+        enabled: false
+        state: stopped
+        daemon_reload: true
+      failed_when: false
+      tags: [never, monitor_disable]
+
+    - name: Remove monitor systemd files
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - ~/.config/systemd/user/openclaw-monitor.service
+        - ~/.config/systemd/user/openclaw-monitor.timer
+      tags: [never, monitor_disable]
+
+    - name: Remove monitor environment file
+      ansible.builtin.file:
+        path: ~/scripts/monitor.env
+        state: absent
+      tags: [never, monitor_disable]
+
+    - name: Remove monitor state file
+      ansible.builtin.file:
+        path: ~/.openclaw/monitor-state.json
+        state: absent
+      tags: [never, monitor_disable]

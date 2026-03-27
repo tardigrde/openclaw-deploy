@@ -18,6 +18,12 @@ This is an infrastructure-as-code repository for deploying the [OpenClaw](https:
 
 All operations go through `make`. The Makefile reads VPS IP from Terraform state automatically.
 
+### Getting Started
+```bash
+make doctor   # Check prerequisites and configuration health
+make setup    # Interactive first-time setup wizard
+```
+
 Prerequisite to all operating make targets:
 
 ```bash
@@ -53,7 +59,7 @@ make addon-weather    # Install morning-weather cron (optional)
 
 Playbook: `ansible/site.yml` — imports modular plays from `ansible/plays/`.
 Ansible tags: `bootstrap`, `tailscale`, `docker`, `config`, `start` (run by default on `make bootstrap`).
-Tags that never run by default: `setup_auth`, `patch_devices`, `backup_now`, `backup_pull`, `restore`, `addon-weather-report`.
+Tags that never run by default: `setup_auth`, `patch_devices`, `backup_now`, `backup_pull`, `restore`, `monitor_enable`, `monitor_disable`, `addon-weather-report`.
 
 **CI runs validation and tests only.** `terraform-plan.yml.example` and `terraform-apply.yml.example` are inactive templates — copy and rename to `.yml` in a private fork to enable Terraform CI against a real backend. Ansible is never run in CI — all `make bootstrap` / `make deploy` / `make tailscale-setup` operations are local only.
 Dry run: `ANSIBLE_CONFIG=ansible/ansible.cfg ansible-playbook -i "$SERVER_IP," --private-key $SSH_KEY ansible/site.yml --check --diff`
@@ -70,9 +76,13 @@ Dry run: `ANSIBLE_CONFIG=ansible/ansible.cfg ansible-playbook -i "$SERVER_IP," -
 
 ### Operations
 ```bash
-make status       # Check container status, Tailscale, etc.
-make logs         # Stream Docker logs
-make exec CMD=""  # Run a command in the gateway container
+make status          # Check container status, Tailscale, etc.
+make logs            # Stream Docker logs
+make exec CMD=""     # Run a command in the gateway container
+make monitor-enable  # Enable health monitoring with Telegram alerts (5-min interval)
+make monitor-disable # Disable health monitoring
+make monitor-status  # Show monitoring timer status
+make monitor-test    # Trigger one health check cycle manually
 ```
 
 ## Git Workflow
