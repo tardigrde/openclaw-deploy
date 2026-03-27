@@ -51,27 +51,11 @@
       when: latest_oc_backup.stdout == ''
       tags: [never, backup_pull]
 
-    - name: Find latest Mission Control backup on VPS
-      ansible.builtin.shell: ls -t ~/backups/mc_backup_*.db 2>/dev/null | head -1
-      args:
-        executable: /bin/bash
-      register: latest_mc_backup
-      changed_when: false
-      tags: [never, backup_pull]
-
     - name: Fetch openclaw backup archive
       ansible.builtin.fetch:
         src: "{{ latest_oc_backup.stdout }}"
         dest: "{{ playbook_dir }}/../../backups/"
         flat: true
-      tags: [never, backup_pull]
-
-    - name: Fetch Mission Control backup
-      ansible.builtin.fetch:
-        src: "{{ latest_mc_backup.stdout }}"
-        dest: "{{ playbook_dir }}/../../backups/"
-        flat: true
-      when: latest_mc_backup.stdout != ''
       tags: [never, backup_pull]
 
     - name: Show downloaded backup files

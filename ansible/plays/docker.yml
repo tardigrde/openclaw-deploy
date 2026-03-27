@@ -5,8 +5,7 @@
 # Tags: docker
 #
 # Installs Docker Engine + Compose plugin (if not present), copies
-# docker-compose.yml and docker/ directory to the VPS, clones/updates
-# Mission Control, then builds images. Run with REBUILD=1.
+# docker-compose.yml and docker/ directory to the VPS, then builds images. Run with REBUILD=1.
 # =============================================================================
 
 - name: Install and configure Docker on VPS
@@ -143,11 +142,6 @@
       when: docker_compose_override.stat.exists
       tags: [docker]
 
-    - name: Check if override references mission-control
-      ansible.builtin.set_fact:
-        override_has_mc: "{{ docker_compose_override.stat.exists and 'mission-control' in (override_content | default('')) }}"
-      tags: [docker]
-
     - name: Copy docker-compose.override.yml
       ansible.builtin.copy:
         src: "{{ docker_override_path }}"
@@ -166,15 +160,6 @@
       ansible.builtin.copy:
         src: ../../scripts/
         dest: ~/openclaw/scripts/
-      tags: [docker]
-
-    - name: Clone or update Mission Control
-      ansible.builtin.git:
-        repo: https://github.com/crshdn/mission-control.git
-        dest: ~/openclaw/mission-control
-        update: true
-        version: v2.4.0
-      when: override_has_mc
       tags: [docker]
 
     - name: Build Docker images

@@ -64,15 +64,14 @@ Tags that never run by default: `setup_auth`, `patch_devices`, `backup_now`, `ba
 **CI runs validation and tests only.** `terraform-plan.yml.example` and `terraform-apply.yml.example` are inactive templates — copy and rename to `.yml` in a private fork to enable Terraform CI against a real backend. Ansible is never run in CI — all `make bootstrap` / `make deploy` / `make tailscale-setup` operations are local only.
 Dry run: `ANSIBLE_CONFIG=ansible/ansible.cfg ansible-playbook -i "$SERVER_IP," --private-key $SSH_KEY ansible/site.yml --check --diff`
 
-**Update cycle** (bump OpenClaw version or MC source):
-1. Check changelogs for breaking changes or data migrations:
+**Update cycle** (bump OpenClaw version):
+1. Check changelogs for breaking changes:
    ```bash
    gh release list --repo openclaw/openclaw --limit 10
-   gh release list --repo crshdn/mission-control --limit 10
    ```
-2. `make backup-now` — backs up gateway data AND Mission Control database (do this before every upgrade)
+2. `make backup-now` — backs up gateway data (do this before every upgrade)
 3. Edit `docker/Dockerfile` ARG to change OpenClaw version
-4. `make deploy REBUILD=1` — re-clones/pulls MC from GitHub, rebuilds all images, restarts containers
+4. `make deploy REBUILD=1` — rebuilds all images, restarts containers
 
 ### Operations
 ```bash
