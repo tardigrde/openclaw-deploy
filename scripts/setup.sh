@@ -151,7 +151,12 @@ step "2/9  Copying example configuration files..."
 echo ""
 
 copy_example "secrets/inputs.example.sh" "secrets/inputs.sh" "secrets/inputs.sh" && STEPS_DONE=$((STEPS_DONE + 1)) || true
-copy_example "secrets/.env.example" "secrets/.env" "secrets/.env" && STEPS_DONE=$((STEPS_DONE + 1)) || true
+if [[ -f "$REPO_ROOT/secrets/.env.enc" ]]; then
+  skip "secrets/.env.enc"
+  STEPS_DONE=$((STEPS_DONE + 1))
+else
+  copy_example "secrets/.env.example" "secrets/.env" "secrets/.env" && STEPS_DONE=$((STEPS_DONE + 1)) || true
+fi
 copy_example "openclaw.example.json" "openclaw.json" "openclaw.json" && STEPS_DONE=$((STEPS_DONE + 1)) || true
 copy_example "terraform/envs/prod/terraform.tfvars.example" \
   "terraform/envs/prod/terraform.tfvars" "terraform.tfvars" && STEPS_DONE=$((STEPS_DONE + 1)) || true
@@ -250,6 +255,16 @@ if [[ -n "${SSH_FP:-}" ]]; then
 fi
 
 echo ""
+
+# ---- Decrypt existing .env.enc if .env is missing ----
+if [[ ! -f "$DOTENV_FILE" && -f "$REPO_ROOT/secrets/.env.enc" && -f "$REPO_ROOT/secrets/age-key.txt" ]]; then
+  if command -v sops &>/dev/null; then
+    info "Decrypting secrets/.env.enc -> secrets/.env ..."
+    SOPS_AGE_KEY_FILE="$REPO_ROOT/secrets/age-key.txt" sops --decrypt \
+      --input-type dotenv --output-type dotenv \
+      "$REPO_ROOT/secrets/.env.enc" > "$DOTENV_FILE"
+  fi
+fi
 
 # ---- Step 5: Telegram Bot Token ----
 step "5/9  Telegram Bot Token"

@@ -61,6 +61,17 @@ make restore      # List available backups (dry-run — safe)
 make restore EXECUTE=1 BACKUP=<file>  # Restore from backup
 ```
 
+**Health Monitoring** (opt-in, Telegram alerts):
+
+```bash
+make monitor-enable   # Deploy and start monitoring timer (5-min interval)
+make monitor-disable  # Stop and remove monitoring
+make monitor-status   # Show timer status, recent logs, and state
+make monitor-test     # Run one check cycle manually
+```
+
+See [Health Monitoring](#health-monitoring) below for setup and configuration.
+
 **Optional add-ons** (from `Makefile.local`):
 
 ```bash
@@ -123,6 +134,60 @@ https://openclaw-prod.<tailnet>.ts.net
 from any tailnet device. See [Tailscale](/docs/tailscale.md) for serve config details and troubleshooting.
 
 > Use Serve, not Funnel. Funnel exposes the service to the public internet.
+
+## Health Monitoring
+
+Optional health monitoring that checks the VPS every 5 minutes and sends Telegram alerts on failure.
+
+### What It Checks
+
+| Check | Threshold |
+|-------|-----------|
+| Container health | All containers must be running |
+| HTTP endpoint | `http://127.0.0.1:18789/health` must respond within 5s |
+| Disk usage | Warn at 85%, critical at 95% |
+| Memory usage | Warn at 90% |
+| Backup recency | Alert if no backup in 48 hours |
+
+Alerts have a 1-hour cooldown per check to prevent storms. A check must fail twice in a row before an alert is sent.
+
+### Prerequisites
+
+1. **Telegram bot token** — set `TELEGRAM_BOT_TOKEN` in your `.env` (or SOPS-encrypted `.env.enc`)
+2. **Chat ID** — automatically read from `openclaw.json` → `channels.telegram.allowFrom[0]`
+
+### Setup
+
+```bash
+make deploy                  # deploys the script to ~/scripts/ on the VPS
+make monitor-enable          # installs systemd timer and starts it
+```
+
+Verify it's running:
+
+```bash
+make monitor-status
+```
+
+### Testing
+
+Trigger one check cycle manually (will send an alert if any check fails):
+
+```bash
+make monitor-test
+```
+
+### State
+
+Monitoring state is stored at `~/.openclaw/monitor-state.json` on the VPS. Tracks last alert times, consecutive failures, and previously-failing checks (for recovery notifications).
+
+### Disabling
+
+```bash
+make monitor-disable
+```
+
+This stops the timer and removes the systemd files, monitor script, and state file (`~/.openclaw/monitor-state.json`) from the VPS.
 
 ## Troubleshooting
 
