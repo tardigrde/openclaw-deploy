@@ -42,11 +42,11 @@ prompt_value() {
   if [[ -n "$default" && ! "$default" =~ CHANGE_ME ]]; then
     echo -en "  ${prompt_text} [${DIM}${default}${NC}]: "
     read -r input
-    eval "$var_name='${input:-$default}'"
+    printf -v "$var_name" '%s' "${input:-$default}"
   else
     echo -en "  ${prompt_text}: "
     read -r input
-    eval "$var_name='${input}'"
+    printf -v "$var_name" '%s' "${input}"
   fi
 }
 
@@ -77,20 +77,28 @@ copy_example() {
   return 0
 }
 
-# sed_replace replaces a pattern in a file (portable for both GNU and BSD sed)
+# sed_replace replaces a pattern in a file (portable for both GNU and BSD sed).
+# Escapes \, &, and | in the replacement string so tokens with special chars are safe.
 sed_replace() {
   local file="$1" pattern="$2" replacement="$3"
+  # Escape sed replacement special chars: \ → \\, & → \&, | → \| (for | delimiter)
+  local escaped
+  escaped="${replacement//\\/\\\\}"
+  escaped="${escaped//&/\\&}"
+  escaped="${escaped//|/\\|}"
   if sed --version &>/dev/null 2>&1; then
-    sed -i "s|${pattern}|${replacement}|g" "$file"
+    sed -i "s|${pattern}|${escaped}|g" "$file"
   else
-    sed -i '' "s|${pattern}|${replacement}|g" "$file"
+    sed -i '' "s|${pattern}|${escaped}|g" "$file"
   fi
 }
 
-# get_current_value extracts a variable's current value from a shell file
+# get_current_value extracts a variable's current value from a shell file.
+# Uses grep to parse — never sources the file (safe against arbitrary code execution).
 get_current_value() {
   local file="$1" var="$2"
-  bash -c "source '$file' 2>/dev/null && echo \"\${$var:-}\"" 2>/dev/null || true
+  grep -E "^(export )?${var}=" "$file" 2>/dev/null \
+    | head -1 | sed -E "s/^(export )?${var}=[\"']?//;s/[\"']?$//" || true
 }
 
 # get_dotenv_value extracts a KEY=VALUE from a dotenv file
@@ -142,13 +150,13 @@ echo ""
 step "2/9  Copying example configuration files..."
 echo ""
 
-copy_example "secrets/inputs.example.sh" "secrets/inputs.sh" "secrets/inputs.sh" || true
-copy_example "secrets/.env.example" "secrets/.env" "secrets/.env" || true
-copy_example "openclaw.example.json" "openclaw.json" "openclaw.json" || true
+copy_example "secrets/inputs.example.sh" "secrets/inputs.sh" "secrets/inputs.sh" && STEPS_DONE=$((STEPS_DONE + 1)) || true
+copy_example "secrets/.env.example" "secrets/.env" "secrets/.env" && STEPS_DONE=$((STEPS_DONE + 1)) || true
+copy_example "openclaw.example.json" "openclaw.json" "openclaw.json" && STEPS_DONE=$((STEPS_DONE + 1)) || true
 copy_example "terraform/envs/prod/terraform.tfvars.example" \
-  "terraform/envs/prod/terraform.tfvars" "terraform.tfvars" || true
+  "terraform/envs/prod/terraform.tfvars" "terraform.tfvars" && STEPS_DONE=$((STEPS_DONE + 1)) || true
 copy_example "terraform/envs/prod/backend.tf.example" \
-  "terraform/envs/prod/backend.tf" "backend.tf" || true
+  "terraform/envs/prod/backend.tf" "backend.tf" && STEPS_DONE=$((STEPS_DONE + 1)) || true
 
 echo ""
 

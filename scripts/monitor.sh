@@ -8,9 +8,9 @@
 # Checks: container health, HTTP endpoint, disk, memory, backup recency.
 # Alerts via Telegram when checks fail (with cooldown to prevent storms).
 #
-# Environment (from ~/scripts/monitor.env):
-#   TELEGRAM_BOT_TOKEN  — Bot token for sending alerts
-#   MONITOR_CHAT_ID     — Telegram user/chat ID for alerts
+# Credentials are resolved at runtime (no plaintext secrets stored):
+#   TELEGRAM_BOT_TOKEN  — from ~/.openclaw/.env or sops-decrypted .env.enc
+#   MONITOR_CHAT_ID     — from ~/.openclaw/openclaw.json allowFrom[0]
 #
 # State file: ~/.openclaw/monitor-state.json
 set -euo pipefail
@@ -29,24 +29,57 @@ HEALTH_TIMEOUT=5
 
 STATE_FILE="${HOME}/.openclaw/monitor-state.json"
 
-# Source environment
-ENV_FILE="${HOME}/scripts/monitor.env"
-if [[ -f "$ENV_FILE" ]]; then
-  # shellcheck source=/dev/null
-  source "$ENV_FILE"
-fi
+# -----------------------------------------------------------------------------
+# Resolve credentials (no plaintext secrets on disk)
+# -----------------------------------------------------------------------------
+load_credentials() {
+  # Telegram bot token — try decrypted .env first, then decrypt .env.enc on the fly
+  if [[ -z "${TELEGRAM_BOT_TOKEN:-}" ]]; then
+    TELEGRAM_BOT_TOKEN="$(
+      grep -E '^TELEGRAM_BOT_TOKEN=' ~/.openclaw/.env 2>/dev/null | head -1 | cut -d= -f2-
+    )" || true
+  fi
 
-# Validate required vars
-if [[ -z "${TELEGRAM_BOT_TOKEN:-}" || -z "${MONITOR_CHAT_ID:-}" ]]; then
-  echo "[monitor] ERROR: TELEGRAM_BOT_TOKEN and MONITOR_CHAT_ID must be set in $ENV_FILE"
-  exit 1
-fi
+  if [[ -z "${TELEGRAM_BOT_TOKEN:-}" ]]; then
+    local env_enc="${HOME}/openclaw/secrets/.env.enc"
+    local sops_key="${HOME}/.config/sops/age/keys.txt"
+    if [[ -f "$env_enc" && -f "$sops_key" ]] && command -v sops &>/dev/null; then
+      TELEGRAM_BOT_TOKEN="$(
+        SOPS_AGE_KEY_FILE="$sops_key" \
+          sops -d --input-type dotenv --output-type dotenv "$env_enc" 2>/dev/null \
+          | grep -E '^TELEGRAM_BOT_TOKEN=' | head -1 | cut -d= -f2-
+      )" || true
+    fi
+  fi
+
+  # Chat ID — read from openclaw.json (no secrets involved)
+  if [[ -z "${MONITOR_CHAT_ID:-}" ]]; then
+    MONITOR_CHAT_ID="$(
+      jq -r '.channels.telegram.allowFrom[0] // empty' ~/.openclaw/openclaw.json 2>/dev/null
+    )" || true
+  fi
+
+  if [[ -z "${TELEGRAM_BOT_TOKEN:-}" || -z "${MONITOR_CHAT_ID:-}" ]]; then
+    echo "[monitor] ERROR: Could not resolve TELEGRAM_BOT_TOKEN or MONITOR_CHAT_ID"
+    echo "  Ensure ~/.openclaw/.env (or .env.enc + sops) and ~/.openclaw/openclaw.json are configured."
+    exit 1
+  fi
+}
+
+load_credentials
 
 # -----------------------------------------------------------------------------
 # State Management
 # -----------------------------------------------------------------------------
 
 init_state() {
+  if [[ -f "$STATE_FILE" ]]; then
+    # Validate existing state file — reinitialize if corrupted
+    if ! jq . "$STATE_FILE" > /dev/null 2>&1; then
+      echo "[monitor] WARNING: State file corrupted, reinitializing"
+      rm -f "$STATE_FILE"
+    fi
+  fi
   if [[ ! -f "$STATE_FILE" ]]; then
     mkdir -p "$(dirname "$STATE_FILE")"
     echo '{"last_alerts":{},"failures":{},"previously_failing":{}}' > "$STATE_FILE"
@@ -62,6 +95,7 @@ set_state_value() {
   local key="$1" value="$2"
   local tmp
   tmp="$(mktemp)"
+  trap 'rm -f "$tmp"' RETURN
   jq "$key = $value" "$STATE_FILE" > "$tmp" && mv "$tmp" "$STATE_FILE"
 }
 

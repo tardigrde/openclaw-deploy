@@ -376,7 +376,7 @@ monitor-status: ## Show monitoring timer status and recent state
 	@ssh -i $(SSH_KEY) -o StrictHostKeyChecking=accept-new openclaw@$(SERVER_IP) \
 		'echo "=== Timer ===" && systemctl --user status openclaw-monitor.timer 2>/dev/null || echo "Timer not installed"; \
 		 echo "" && echo "=== Last check ===" && journalctl --user -u openclaw-monitor.service --no-pager -n 20 2>/dev/null || echo "No logs"; \
-		 echo "" && echo "=== State ===" && cat ~/.openclaw/monitor-state.json 2>/dev/null | jq . || echo "No state file"'
+		 echo "" && echo "=== State ===" && (cat ~/.openclaw/monitor-state.json 2>/dev/null | jq . || cat ~/.openclaw/monitor-state.json 2>/dev/null) || echo "No state file"'
 
 monitor-test: ## Trigger one health check cycle manually (sends alert if checks fail)
 	$(call check-server-ip)

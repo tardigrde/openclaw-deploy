@@ -5,8 +5,8 @@
 # Tags: monitor_enable, monitor_disable (both tagged `never` — opt-in only)
 #
 # Deploys a systemd timer that checks gateway health every 5 minutes and
-# sends Telegram alerts when checks fail. Reuses the existing Telegram
-# bot token and the first allowFrom user ID from openclaw.json.
+# sends Telegram alerts when checks fail. Credentials are resolved at runtime
+# from existing encrypted secrets — no plaintext tokens stored.
 #
 # Usage:
 #   make monitor-enable   # Deploy and start the monitoring timer
@@ -28,34 +28,6 @@
         src: ../../scripts/monitor.sh
         dest: ~/scripts/monitor.sh
         mode: "0755"
-      tags: [never, monitor_enable]
-
-    - name: Read Telegram bot token from deployed .env
-      ansible.builtin.shell:
-        cmd: >
-          grep -E '^TELEGRAM_BOT_TOKEN=' ~/.openclaw/.env 2>/dev/null
-          | head -1 | cut -d= -f2-
-      register: telegram_token_result
-      changed_when: false
-      failed_when: telegram_token_result.stdout | length == 0
-      tags: [never, monitor_enable]
-
-    - name: Read Telegram chat ID from openclaw.json
-      ansible.builtin.shell:
-        cmd: >
-          jq -r '.channels.telegram.allowFrom[0] // empty' ~/.openclaw/openclaw.json 2>/dev/null
-      register: chat_id_result
-      changed_when: false
-      failed_when: chat_id_result.stdout | length == 0
-      tags: [never, monitor_enable]
-
-    - name: Write monitor environment file
-      ansible.builtin.copy:
-        content: |
-          TELEGRAM_BOT_TOKEN={{ telegram_token_result.stdout }}
-          MONITOR_CHAT_ID={{ chat_id_result.stdout }}
-        dest: ~/scripts/monitor.env
-        mode: "0600"
       tags: [never, monitor_enable]
 
     - name: Write monitor systemd service
@@ -98,16 +70,18 @@
         daemon_reload: true
       tags: [never, monitor_enable]
 
-    - name: Send test alert to confirm monitoring works
-      ansible.builtin.shell:
-        cmd: >
-          curl -sf --max-time 10
-          "https://api.telegram.org/bot{{ telegram_token_result.stdout }}/sendMessage"
-          -d "chat_id={{ chat_id_result.stdout }}"
-          -d "text=OpenClaw health monitoring enabled on $(hostname). You will receive alerts if the gateway goes down."
-          -d "parse_mode=HTML"
+    - name: Run test health check to verify monitoring works
+      ansible.builtin.command:
+        cmd: /home/openclaw/scripts/monitor.sh
+      register: monitor_test_result
       changed_when: false
       failed_when: false
+      tags: [never, monitor_enable]
+
+    - name: Show test health check result
+      ansible.builtin.debug:
+        msg: "{{ monitor_test_result.stdout_lines | default(['Monitor script ran successfully']) }}"
+      when: monitor_test_result is defined
       tags: [never, monitor_enable]
 
     # ----- monitor_disable -----
@@ -131,9 +105,9 @@
         - ~/.config/systemd/user/openclaw-monitor.timer
       tags: [never, monitor_disable]
 
-    - name: Remove monitor environment file
+    - name: Remove monitor script
       ansible.builtin.file:
-        path: ~/scripts/monitor.env
+        path: ~/scripts/monitor.sh
         state: absent
       tags: [never, monitor_disable]
 

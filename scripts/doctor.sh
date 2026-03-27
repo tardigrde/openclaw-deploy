@@ -131,7 +131,8 @@ check_no_placeholder() {
   fi
 }
 
-# check_env_var verifies a variable is set and not empty/placeholder in a sourced file
+# check_env_var verifies a variable is set and not empty/placeholder in a shell file.
+# Uses grep to parse — never sources the file (safe against arbitrary code execution).
 check_env_var() {
   local file="$1" var_name="$2"
   local label="${3:-$var_name}"
@@ -140,8 +141,10 @@ check_env_var() {
     return # already reported by check_file
   fi
 
+  # Match: export VAR="..." or VAR="..." or VAR=...
   local val
-  val="$(bash -c "source '$REPO_ROOT/$file' 2>/dev/null && echo \"\${$var_name:-}\"" 2>/dev/null)" || true
+  val="$(grep -E "^(export )?${var_name}=" "$REPO_ROOT/$file" 2>/dev/null \
+    | head -1 | sed -E "s/^(export )?${var_name}=[\"']?//;s/[\"']?$//")" || true
 
   if [[ -z "$val" ]]; then
     fail "$label — not set in $file"
@@ -203,7 +206,7 @@ check_tool "sops" "3.7" "sops --version" \
 check_tool "jq" "" "jq --version" \
   "https://jqlang.github.io/jq/download/"
 
-check_tool "shellcheck" "" "shellcheck --version" \
+check_tool "shellcheck" "0.7" "shellcheck --version" \
   "https://github.com/koalaman/shellcheck#installing"
 
 check_tool "ssh" "" "ssh -V 2>&1" ""
@@ -264,6 +267,17 @@ check_no_placeholder "openclaw.json" \
   "openclaw.json ${DIM}(no placeholders)${NC}" \
   '<your-' \
   "replace <your-...> placeholders with real values"
+
+# Validate openclaw.json is valid JSON
+if [[ -f "$REPO_ROOT/openclaw.json" ]]; then
+  if command -v jq &>/dev/null; then
+    if jq . "$REPO_ROOT/openclaw.json" > /dev/null 2>&1; then
+      pass "openclaw.json ${DIM}(valid JSON)${NC}"
+    else
+      fail "openclaw.json — invalid JSON syntax"
+    fi
+  fi
+fi
 
 echo ""
 
