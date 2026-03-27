@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v0.14.1 (2026-03-27)
+
+### Bug Fixes
+
+- Check secrets from .env.enc, fix shellcheck detection, idempotent setup
+  ([`d1ae372`](https://github.com/tardigrde/openclaw-deploy/commit/d1ae372faa99ab4eb26a737d90e40ee3d9028e7c))
+
+
 ## v0.14.0 (2026-03-27)
 
 ### Bug Fixes
