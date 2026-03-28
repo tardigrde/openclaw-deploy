@@ -115,6 +115,7 @@ set_state_value() {
   local key="$1" value="$2"
   local tmp
   tmp="$(mktemp)"
+  # shellcheck disable=SC2064  # intentional: $tmp must expand now, not when trap fires
   trap "rm -f -- '$tmp'" RETURN
   jq "$key = $value" "$STATE_FILE" > "$tmp" || return 1
   mv "$tmp" "$STATE_FILE"
