@@ -5,36 +5,18 @@ aliases: ["/headless-browser/"]
 ---
 # Headless Browser
 
-The stack includes a `chromium` container (`chromedp/headless-shell`) so OpenClaw can use the browser tool on the VPS — useful for scraping JS-heavy or paywalled pages via the `agent-browser` skill.
+OpenClaw includes a built-in browser powered by [agent-browser](https://github.com/nicedoc/agent-browser) running inside the gateway container. Chromium and its dependencies are installed at Docker build time via `agent-browser install --with-deps`.
+
+No sidecar container is needed — the browser runs in-process within the OpenClaw gateway.
 
 ## How It Works
 
-Chrome's CDP endpoint rejects WebSocket connections where the `Host` header is not an IP address or `localhost` (DNS rebinding protection). To work around this without a proxy, the `chromium` service is assigned a static IP (`172.20.0.10`) on a custom Docker bridge subnet (`172.20.0.0/24`). OpenClaw connects directly to `http://172.20.0.10:9222` — Chrome accepts IP addresses unconditionally.
+The `agent-browser` npm package manages a local Chromium installation and exposes browser automation capabilities to OpenClaw skills. The gateway configures it automatically.
 
-The `openclaw.json` browser profile:
-
-```json
-"browser": {
-  "profiles": {
-    "vps": {
-      "cdpUrl": "http://172.20.0.10:9222",
-      "color": "#00AA00"
-    }
-  }
-}
-```
-
-## Verifying the Connection
+## Verifying the Installation
 
 ```bash
-make exec CMD="curl -s http://172.20.0.10:9222/json/version"
+make exec CMD="npx agent-browser --version"
 ```
 
-**If that fails** (shouldn't happen unless services are added/removed and the network is recreated), find the new IP:
-
-```bash
-make ssh
-docker inspect openclaw-chromium-1 | grep IPAddress
-```
-
-Update `cdpUrl` in `openclaw.json` and run `make deploy`.
+The browser is ready when the gateway logs show `agent-browser` initialization complete.

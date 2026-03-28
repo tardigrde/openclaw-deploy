@@ -35,7 +35,7 @@
 # Tag reference:
 #   bootstrap            — first-time VPS dirs, systemd timers (runs on plain make bootstrap)
 #   tailscale            — install Tailscale + register node (runs on make bootstrap / make tailscale-setup)
-#   docker               — clone MC, copy compose + Dockerfiles, build images
+#   docker               — copy compose + Dockerfiles, build images
 #   config               — validate & copy openclaw.json, .env
 #   start                — manage containers, prune images
 #   setup_auth           — write auth-profiles.json, restart gateway [never by default]

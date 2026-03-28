@@ -11,7 +11,7 @@ For information about OpenClaw itself, see the [OpenClaw documentation](https://
 
 - Terraform provisions the VPS and firewall
 - Ansible handles all deployment tasks — idempotent, dry-run capable, single command for every scenario (runs locally only, never in CI)
-- Docker Compose runs OpenClaw gateway + headless Chromium on the VPS
+- Docker Compose runs OpenClaw gateway on the VPS
 - All day-to-day operations go through `make`
 
 ## Opinionated by Design
@@ -151,7 +151,6 @@ Open `http://localhost:18789` and paste your `OPENCLAW_GATEWAY_TOKEN` to authent
 │  │     Docker Compose     │  │
 │  │                        │  │
 │  │  openclaw-gateway      │  │
-│  │  chromium (headless)   │  │
 │  └────────────────────────┘  │
 │                              │
 │  UFW + Hetzner Firewall      │

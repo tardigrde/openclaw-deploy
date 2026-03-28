@@ -150,14 +150,6 @@
       "highWaterBytes": 4294967296
     }
   },
-  "browser": {
-    "profiles": {
-      "vps": {
-        "cdpUrl": "http://172.20.0.10:9222",
-        "color": "#00AA00"
-      }
-    }
-  },
   "logging": {
     "level": "info",
     "consoleLevel": "info",

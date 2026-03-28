@@ -7,7 +7,7 @@ Infrastructure-as-code for deploying [OpenClaw](https://openclaw.ai) on a Hetzne
 
 - Terraform provisions the VPS and firewall
 - Ansible handles all deployment tasks — idempotent, dry-run capable, single command for every scenario (runs locally only, never in CI)
-- Docker Compose runs OpenClaw gateway + headless Chromium on the VPS
+- Docker Compose runs OpenClaw gateway on the VPS
 - All day-to-day operations go through `make`
 
 ## Architecture
@@ -27,7 +27,6 @@ Infrastructure-as-code for deploying [OpenClaw](https://openclaw.ai) on a Hetzne
 │  │     Docker Compose     │  │
 │  │                        │  │
 │  │  openclaw-gateway      │  │
-│  │  chromium (headless)   │  │
 │  └────────────────────────┘  │
 │                              │
 │  UFW + Hetzner Firewall      │
