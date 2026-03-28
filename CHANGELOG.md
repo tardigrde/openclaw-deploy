@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v0.15.4 (2026-03-28)
+
+### Bug Fixes
+
+- **doctor**: Remove check for plaintext secrets/.env
+  ([`3b165ca`](https://github.com/tardigrde/openclaw-deploy/commit/3b165cae4d6630958b81da1efe3f4a11c54693a0))
+
+
 ## v0.15.3 (2026-03-28)
 
 ### Bug Fixes
