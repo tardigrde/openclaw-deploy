@@ -27,10 +27,10 @@ STEPS_DONE=0
 # Helpers
 # -----------------------------------------------------------------------------
 
-info()  { echo -e "${GREEN}[INFO]${NC}  $1"; }
-step()  { echo -e "${BLUE}[STEP]${NC}  ${BOLD}$1${NC}"; }
-skip()  { echo -e "${DIM}        $1 — already exists, skipping${NC}"; }
-done_msg() { echo -e "  ${GREEN}Done.${NC}"; }
+info()  { local msg="$1"; echo -e "${GREEN}[INFO]${NC}  $msg"; return 0; }
+step()  { local msg="$1"; echo -e "${BLUE}[STEP]${NC}  ${BOLD}$msg${NC}"; return 0; }
+skip()  { local msg="$1"; echo -e "${DIM}        $msg — already exists, skipping${NC}"; return 0; }
+done_msg() { echo -e "  ${GREEN}Done.${NC}"; return 0; }
 
 # prompt_value asks for a value with an optional default.
 # Usage: prompt_value "Enter token" "default_val" result_var
@@ -48,6 +48,7 @@ prompt_value() {
     read -r input
     printf -v "$var_name" '%s' "${input}"
   fi
+  return 0
 }
 
 # prompt_yn asks a yes/no question. Returns 0 for yes, 1 for no.
@@ -60,6 +61,7 @@ prompt_yn() {
   read -r input
   input="${input:-$default}"
   [[ "$input" =~ ^[Yy] ]]
+  return 0
 }
 
 # copy_example copies an example file if the target doesn't exist
@@ -91,6 +93,7 @@ sed_replace() {
   else
     sed -i '' "s|${pattern}|${escaped}|g" "$file"
   fi
+  return 0
 }
 
 # get_current_value extracts a variable's current value from a shell file.
@@ -99,12 +102,14 @@ get_current_value() {
   local file="$1" var="$2"
   grep -E "^(export )?${var}=" "$file" 2>/dev/null \
     | head -1 | sed -E "s/^(export )?${var}=[\"']?//;s/[\"']?$//" || true
+  return 0
 }
 
 # get_dotenv_value extracts a KEY=VALUE from a dotenv file
 get_dotenv_value() {
   local file="$1" key="$2"
   grep -E "^${key}=" "$file" 2>/dev/null | head -1 | cut -d= -f2- || true
+  return 0
 }
 
 # set_dotenv_value sets a KEY=VALUE in a dotenv file
@@ -115,6 +120,7 @@ set_dotenv_value() {
   else
     echo "${key}=${value}" >> "$file"
   fi
+  return 0
 }
 
 # =============================================================================
@@ -257,13 +263,11 @@ fi
 echo ""
 
 # ---- Decrypt existing .env.enc if .env is missing ----
-if [[ ! -f "$DOTENV_FILE" && -f "$REPO_ROOT/secrets/.env.enc" && -f "$REPO_ROOT/secrets/age-key.txt" ]]; then
-  if command -v sops &>/dev/null; then
+if [[ ! -f "$DOTENV_FILE" && -f "$REPO_ROOT/secrets/.env.enc" && -f "$REPO_ROOT/secrets/age-key.txt" ]] && command -v sops &>/dev/null; then
     info "Decrypting secrets/.env.enc -> secrets/.env ..."
     SOPS_AGE_KEY_FILE="$REPO_ROOT/secrets/age-key.txt" sops --decrypt \
       --input-type dotenv --output-type dotenv \
       "$REPO_ROOT/secrets/.env.enc" > "$DOTENV_FILE"
-  fi
 fi
 
 # ---- Step 5: Telegram Bot Token ----

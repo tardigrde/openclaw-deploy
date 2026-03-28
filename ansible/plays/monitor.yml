@@ -27,7 +27,7 @@
       ansible.builtin.copy:
         src: ../../scripts/monitor.sh
         dest: ~/scripts/monitor.sh
-        mode: "0755"
+        mode: "0750"
       tags: [never, monitor_enable]
 
     - name: Write monitor systemd service
@@ -41,7 +41,7 @@
           ExecStart=/home/openclaw/scripts/monitor.sh
           Environment=HOME=/home/openclaw
         dest: ~/.config/systemd/user/openclaw-monitor.service
-        mode: "0644"
+        mode: "0640"
       tags: [never, monitor_enable]
 
     - name: Write monitor systemd timer
@@ -58,7 +58,7 @@
           [Install]
           WantedBy=timers.target
         dest: ~/.config/systemd/user/openclaw-monitor.timer
-        mode: "0644"
+        mode: "0640"
       tags: [never, monitor_enable]
 
     - name: Enable and start monitor timer
