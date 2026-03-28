@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v0.16.0 (2026-03-28)
+
+### Features
+
+- **config**: Deploy exec-approvals.json seed on first install
+  ([`69eadac`](https://github.com/tardigrde/openclaw-deploy/commit/69eadacdab7eea9edeccef889b4a79bb7799aca2))
+
+
 ## v0.15.4 (2026-03-28)
 
 ### Bug Fixes
