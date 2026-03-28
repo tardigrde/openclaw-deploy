@@ -278,10 +278,6 @@ check_file "secrets/inputs.sh" \
   "secrets/inputs.sh" \
   "cp secrets/inputs.example.sh secrets/inputs.sh"
 
-check_file "secrets/.env" \
-  "secrets/.env" \
-  "cp secrets/.env.example secrets/.env"
-
 check_file "secrets/age-key.txt" \
   "secrets/age-key.txt" \
   "make secrets-generate-key"
