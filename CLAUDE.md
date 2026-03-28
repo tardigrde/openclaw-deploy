@@ -41,7 +41,7 @@ make fmt       # Format Terraform files
 
 ### Deployment
 ```bash
-make bootstrap        # First-time setup after `apply` (dirs, clones MC, builds Docker, sets up backup timer, starts containers)
+make bootstrap        # First-time setup after `apply` (dirs, builds Docker, sets up backup timer, starts containers)
 make deploy           # Push config/env to VPS and restart containers (day-to-day)
 make deploy REBUILD=1 # Also rebuild Docker images (use after docker/ or docker-compose.yml changes)
 make setup-auth       # Configure Claude subscription auth on VPS
