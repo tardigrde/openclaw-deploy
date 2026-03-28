@@ -53,7 +53,7 @@ load_credentials() {
     fi
   fi
 
-  # Chat ID — try env var TELEGRAM_CHAT_ID, then .env, then openclaw.json
+  # Chat ID — try env var TELEGRAM_CHAT_ID, then .env, then .env.enc (via sops), then openclaw.json
   if [[ -z "${MONITOR_CHAT_ID:-}" ]]; then
     MONITOR_CHAT_ID="${TELEGRAM_CHAT_ID:-}"
   fi
@@ -115,12 +115,9 @@ set_state_value() {
   local key="$1" value="$2"
   local tmp
   tmp="$(mktemp)"
-  if jq "$key = $value" "$STATE_FILE" > "$tmp"; then
-    mv "$tmp" "$STATE_FILE"
-  else
-    rm -f "$tmp"
-    return 1
-  fi
+  trap "rm -f -- '$tmp'" RETURN
+  jq "$key = $value" "$STATE_FILE" > "$tmp" || return 1
+  mv "$tmp" "$STATE_FILE"
   return 0
 }
 
