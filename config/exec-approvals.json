@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "defaults": {
+    "security": "allowlist",
+    "ask": "on-miss",
+    "askFallback": "deny",
+    "autoAllowSkills": true
+  },
+  "agents": {
+    "main": {
+      "security": "allowlist",
+      "ask": "on-miss",
+      "askFallback": "deny",
+      "autoAllowSkills": true,
+      "allowlist": [
+        { "pattern": "/usr/local/bin/*" },
+        { "pattern": "/usr/bin/git" },
+        { "pattern": "/usr/bin/python3" },
+        { "pattern": "/usr/bin/python3.*" },
+        { "pattern": "/usr/bin/curl" },
+        { "pattern": "/usr/bin/gh" },
+        { "pattern": "/usr/bin/ssh" },
+        { "pattern": "/usr/bin/ssh-keygen" },
+        { "pattern": "/bin/bash" },
+        { "pattern": "/bin/sh" }
+      ]
+    }
+  }
+}
