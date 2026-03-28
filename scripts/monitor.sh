@@ -53,7 +53,26 @@ load_credentials() {
     fi
   fi
 
-  # Chat ID — read from openclaw.json (no secrets involved)
+  # Chat ID — try env var TELEGRAM_CHAT_ID, then .env, then openclaw.json
+  if [[ -z "${MONITOR_CHAT_ID:-}" ]]; then
+    MONITOR_CHAT_ID="${TELEGRAM_CHAT_ID:-}"
+  fi
+  if [[ -z "${MONITOR_CHAT_ID:-}" ]]; then
+    MONITOR_CHAT_ID="$(
+      grep -E '^TELEGRAM_CHAT_ID=' ~/.openclaw/.env 2>/dev/null | head -1 | cut -d= -f2-
+    )" || true
+  fi
+  if [[ -z "${MONITOR_CHAT_ID:-}" ]]; then
+    local env_enc="${HOME}/openclaw/secrets/.env.enc"
+    local sops_key="${HOME}/.config/sops/age/keys.txt"
+    if [[ -f "$env_enc" && -f "$sops_key" ]] && command -v sops &>/dev/null; then
+      MONITOR_CHAT_ID="$(
+        SOPS_AGE_KEY_FILE="$sops_key" \
+          sops -d --input-type dotenv --output-type dotenv "$env_enc" 2>/dev/null \
+          | grep -E '^TELEGRAM_CHAT_ID=' | head -1 | cut -d= -f2-
+      )" || true
+    fi
+  fi
   if [[ -z "${MONITOR_CHAT_ID:-}" ]]; then
     MONITOR_CHAT_ID="$(
       jq -r '.channels.telegram.allowFrom[0] // empty' ~/.openclaw/openclaw.json 2>/dev/null
@@ -96,8 +115,12 @@ set_state_value() {
   local key="$1" value="$2"
   local tmp
   tmp="$(mktemp)"
-  trap 'rm -f "$tmp"' RETURN
-  jq "$key = $value" "$STATE_FILE" > "$tmp" && mv "$tmp" "$STATE_FILE"
+  if jq "$key = $value" "$STATE_FILE" > "$tmp"; then
+    mv "$tmp" "$STATE_FILE"
+  else
+    rm -f "$tmp"
+    return 1
+  fi
   return 0
 }
 
@@ -190,7 +213,7 @@ alert() {
   if should_alert "$check"; then
     local hostname
     hostname="$(hostname 2>/dev/null || echo "$UNKNOWN_STATE")"
-    send_telegram "<b>[OpenClaw Monitor]</b> ${hostname}
+    send_telegram "⚠️ <b>[OpenClaw Monitor]</b> ${hostname}
 ${message}"
     record_alert "$check"
     set_previously_failing "$check" "true"
@@ -205,7 +228,7 @@ recover() {
   if was_previously_failing "$check"; then
     local hostname
     hostname="$(hostname 2>/dev/null || echo "$UNKNOWN_STATE")"
-    send_telegram "<b>[OpenClaw Monitor]</b> ${hostname}
+    send_telegram "✅ <b>[OpenClaw Monitor]</b> ${hostname}
 ${message}"
     set_previously_failing "$check" "false"
   fi
@@ -223,7 +246,7 @@ check_container_health() {
 
   # Check if docker is available
   if ! command -v docker &>/dev/null; then
-    alert "$check_name" "Docker not found on this host."
+    alert "$check_name" "🐳 Docker not found on this host."
     return 0
   fi
 
@@ -232,7 +255,7 @@ check_container_health() {
   container_id="$(docker ps -q -f label=com.docker.compose.service=openclaw-gateway 2>/dev/null)" || true
 
   if [[ -z "$container_id" ]]; then
-    alert "$check_name" "Gateway container is not running."
+    alert "$check_name" "🔴 Gateway container is not running."
     return 0
   fi
 
@@ -242,10 +265,10 @@ check_container_health() {
 
   case "$health_status" in
     healthy)
-      recover "$check_name" "Gateway container is healthy again."
+      recover "$check_name" "🟢 Gateway container is healthy again."
       ;;
     unhealthy)
-      alert "$check_name" "Gateway container is <b>unhealthy</b>."
+      alert "$check_name" "🔴 Gateway container is <b>unhealthy</b>."
       ;;
     starting)
       # Don't alert during startup — wait for next cycle
@@ -255,9 +278,9 @@ check_container_health() {
       local state
       state="$(docker inspect --format='{{.State.Status}}' "$container_id" 2>/dev/null)" || state="$UNKNOWN_STATE"
       if [[ "$state" == "running" ]]; then
-        recover "$check_name" "Gateway container is running again."
+        recover "$check_name" "🟢 Gateway container is running again."
       else
-        alert "$check_name" "Gateway container state: <b>${state}</b>"
+        alert "$check_name" "🔴 Gateway container state: <b>${state}</b>"
       fi
       ;;
   esac
@@ -268,9 +291,9 @@ check_http_health() {
   local check_name="http_health"
 
   if curl -sf --max-time "$HEALTH_TIMEOUT" "$HEALTH_URL" > /dev/null 2>&1; then
-    recover "$check_name" "Gateway HTTP endpoint is responding again."
+    recover "$check_name" "🌐 Gateway HTTP endpoint is responding again."
   else
-    alert "$check_name" "Gateway HTTP health check failed (${HEALTH_URL})."
+    alert "$check_name" "🔴 Gateway HTTP health check failed (${HEALTH_URL})."
   fi
   return 0
 }
@@ -282,11 +305,11 @@ check_disk_usage() {
   usage_percent="$(df / --output=pcent 2>/dev/null | tail -1 | tr -d ' %')" || usage_percent=0
 
   if (( usage_percent >= DISK_CRIT_PERCENT )); then
-    alert "$check_name" "Disk usage is <b>CRITICAL: ${usage_percent}%</b> (>= ${DISK_CRIT_PERCENT}%)."
+    alert "$check_name" "🚨 Disk usage is <b>CRITICAL: ${usage_percent}%</b> (>= ${DISK_CRIT_PERCENT}%)."
   elif (( usage_percent >= DISK_WARN_PERCENT )); then
-    alert "$check_name" "Disk usage is <b>high: ${usage_percent}%</b> (>= ${DISK_WARN_PERCENT}%)."
+    alert "$check_name" "⚠️ Disk usage is <b>high: ${usage_percent}%</b> (>= ${DISK_WARN_PERCENT}%)."
   else
-    recover "$check_name" "Disk usage is back to normal: ${usage_percent}%."
+    recover "$check_name" "💾 Disk usage is back to normal: ${usage_percent}%."
   fi
   return 0
 }
@@ -314,9 +337,9 @@ check_memory() {
 
   if (( used_percent >= MEMORY_WARN_PERCENT )); then
     local avail_mb=$(( available / 1024 ))
-    alert "$check_name" "Memory usage is <b>high: ${used_percent}%</b> (${avail_mb}MB available)."
+    alert "$check_name" "⚠️ Memory usage is <b>high: ${used_percent}%</b> (${avail_mb}MB available)."
   else
-    recover "$check_name" "Memory usage is back to normal: ${used_percent}%."
+    recover "$check_name" "🧠 Memory usage is back to normal: ${used_percent}%."
   fi
   return 0
 }
@@ -334,7 +357,7 @@ check_backup_recency() {
     | sort -rn | head -1 | cut -d' ' -f2-)" || true
 
   if [[ -z "$latest_backup" ]]; then
-    alert "$check_name" "No backups found in ${backup_dir}."
+    alert "$check_name" "💾 No backups found in ${backup_dir}."
     return 0
   fi
 
@@ -346,9 +369,9 @@ check_backup_recency() {
 
   if (( backup_age_seconds > max_age_seconds )); then
     local hours_ago=$(( backup_age_seconds / 3600 ))
-    alert "$check_name" "Latest backup is <b>${hours_ago}h old</b> (threshold: ${BACKUP_MAX_AGE_HOURS}h)."
+    alert "$check_name" "💾 Latest backup is <b>${hours_ago}h old</b> (threshold: ${BACKUP_MAX_AGE_HOURS}h)."
   else
-    recover "$check_name" "Backup is recent (within ${BACKUP_MAX_AGE_HOURS}h)."
+    recover "$check_name" "✅ Backup is recent (within ${BACKUP_MAX_AGE_HOURS}h)."
   fi
   return 0
 }
