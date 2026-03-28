@@ -122,20 +122,6 @@
       "extractVersionTemplate": "^v(?<version>.+)$"
     },
     {
-      "description": "Track Mission Control version pinned in Ansible plays",
-      "customType": "regex",
-      "managerFilePatterns": [
-        "/^ansible/plays/docker\\.yml$/",
-        "/^ansible/deploy\\.yml$/"
-      ],
-      "matchStrings": [
-        "crshdn/mission-control\\.git[\\s\\S]*?version: v?(?<currentValue>[\\d]+\\.[\\d]+\\.[\\d]+)"
-      ],
-      "depNameTemplate": "crshdn/mission-control",
-      "datasourceTemplate": "github-releases",
-      "extractVersionTemplate": "^v(?<version>.+)$"
-    },
-    {
       "description": "Track SOPS binary release referenced in Dockerfile",
       "customType": "regex",
       "managerFilePatterns": [

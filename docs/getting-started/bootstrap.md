@@ -35,7 +35,7 @@ make secrets-encrypt        # encrypts secrets/.env → secrets/.env.enc
 
 Plain `.env` works for local use. SOPS is **required** for the [GitOps auto-deploy workflow](/operations/gitops-auto-deploy/). See [Secrets Reference § SOPS](/configuration/secrets/#sops-encryption-optional-for-local-required-for-ci) for the full workflow.
 
-> **Adding extra services?** If you plan to run additional services (e.g. Mission Control), copy `docker-compose.override.example.yml → docker-compose.override.yml` before the next step — it cannot be merged in after bootstrap without re-running it.
+> **Adding extra services?** Copy `docker-compose.override.example.yml → docker-compose.override.yml` before the next step — it cannot be merged in after bootstrap without re-running it.
 >
 > ```bash
 > cp docker-compose.override.example.yml docker-compose.override.yml

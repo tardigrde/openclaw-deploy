@@ -11,8 +11,7 @@
 #     2. Stops containers
 #     3. Creates a safety backup of current state (including SOPS age key)
 #     4. Replaces ~/.openclaw with the backup contents
-#     5. Restores Mission Control database (if matching backup exists)
-#     6. Restarts containers and verifies health
+#     5. Restarts containers and verifies health
 #
 # Usage:
 #   make restore                    # dry-run: list available backups
@@ -125,15 +124,6 @@
         tar -czf ~/backups/openclaw_pre_restore_${TIMESTAMP}.tar.gz -C ~ $SAFETY_PATHS
         echo "[OK] Safety backup created: ~/backups/openclaw_pre_restore_${TIMESTAMP}.tar.gz"
 
-        if docker volume inspect openclaw_mission-control-data > /dev/null 2>&1; then
-          echo "[...] Creating MC DB safety backup..."
-          docker run --rm \
-            -v openclaw_mission-control-data:/data \
-            -v ~/backups:/backup \
-            alpine sh -c "apk add -q sqlite > /dev/null 2>&1 && sqlite3 /data/mission-control.db '.backup /backup/mc_pre_restore_'${TIMESTAMP}'.db'"
-          echo "[OK] MC DB safety backup created: ~/backups/mc_pre_restore_${TIMESTAMP}.db"
-        fi
-
         echo "[OK] Safety backup complete — you can restore from this if the restore fails"
       args:
         executable: /bin/bash
@@ -222,34 +212,6 @@
         chdir: ~/openclaw
       changed_when: false
       when: execute | default('false') | bool
-      tags: [never, restore]
-
-    - name: Derive Mission Control backup filename
-      ansible.builtin.set_fact:
-        mc_backup_file: "{{ (backup_file | default('')) | regex_replace('openclaw_backup_', 'mc_backup_') | regex_replace('\\.tar\\.gz$', '.db') }}"
-      when: execute | default('false') | bool
-      tags: [never, restore]
-
-    - name: Check if Mission Control backup exists
-      ansible.builtin.stat:
-        path: ~/backups/{{ mc_backup_file | default('') }}
-      register: mc_backup_stat
-      when: execute | default('false') | bool
-      tags: [never, restore]
-
-    - name: Restore Mission Control database
-      ansible.builtin.command:
-        cmd: >
-          docker run --rm
-          -v openclaw_mission-control-data:/data
-          -v ~/backups:/backup
-          alpine sh -c
-          "cp /backup/{{ mc_backup_file }} /data/mission-control.db
-          && rm -f /data/mission-control.db-wal /data/mission-control.db-shm"
-      changed_when: true
-      when:
-        - execute | default('false') | bool
-        - mc_backup_stat.stat.exists
       tags: [never, restore]
 
     - name: Restart containers after restore

@@ -20,9 +20,6 @@ services:
       TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
       BRAVE_API_KEY: ${BRAVE_API_KEY}
       GH_TOKEN: ${GH_TOKEN:-}
-      # Allow private-network ws:// connections from mission-control (Docker bridge)
-      # Required since v2026.3.2 which restricts plaintext WS to loopback by default
-      OPENCLAW_ALLOW_INSECURE_PRIVATE_WS: "1"
       # lossless-claw: set to "0" to disable installation (enabled by default)
       INSTALL_LOSSLESS_CLAW: ${INSTALL_LOSSLESS_CLAW:-1}
       # lossless-claw: use Anthropic Haiku for context summarization (cheaper than main model)

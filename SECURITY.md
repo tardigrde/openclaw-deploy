@@ -129,8 +129,6 @@ This project deploys cloud infrastructure. Please be aware of:
 - Gateway uses API tokens for authentication (consider adding TLS)
 - **`journalctl *` sudo rule** — the app user (`openclaw`) can read all systemd journal entries, including auth logs and anything containers write to stderr. This is intentional to support container log streaming from Ansible/Makefile commands. Side effect: API keys accidentally printed to stderr by containers are readable by the app user. Mitigate by ensuring containers do not log secrets.
 - **Tailscale installed via `curl | sh`** — bootstrapping runs `curl -fsSL https://tailscale.com/install.sh | sh` as root without checksum verification. This is the upstream-recommended install path. Risk: a supply chain compromise of tailscale.com at bootstrap time would result in RCE. Mitigate by reviewing the script before running or switching to the APT package method.
-- **Unencrypted intra-container WebSocket** — `OPENCLAW_ALLOW_INSECURE_PRIVATE_WS=1` permits plain `ws://` connections between mission-control and the gateway over the Docker bridge network. Any process on the host that can reach the bridge (e.g., another container) can observe tokens in transit. Acceptable for a single-tenant VPS where no untrusted containers share the host.
-
 ### Out of Scope
 
 This project does NOT provide:

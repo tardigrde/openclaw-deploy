@@ -8,8 +8,7 @@
 # This script:
 #   1. Creates a timestamped tar.gz of ~/.openclaw + SOPS age key (~/.config/sops)
 #   2. Stores it in ~/backups/
-#   3. Backs up Mission Control database from Docker volume (if present)
-#   4. Removes backups older than 7 days
+#   3. Removes backups older than 7 days
 #
 # Note: This script is meant to run ON the VPS, not from your laptop.
 #       For remote backup, use: ssh openclaw@VPS ./scripts/backup.sh
@@ -70,26 +69,6 @@ BACKUP_SIZE=$(du -h "$BACKUP_FILE" | cut -f1)
 echo "[OK] Backup created: $BACKUP_FILE ($BACKUP_SIZE)"
 
 # -----------------------------------------------------------------------------
-# Backup Mission Control database from Docker volume
-# -----------------------------------------------------------------------------
-
-MC_BACKUP_FILE="$BACKUP_DIR/mc_backup_$TIMESTAMP.db"
-
-echo ""
-echo "[...] Backing up Mission Control database..."
-
-if docker volume inspect openclaw_mission-control-data > /dev/null 2>&1; then
-    docker run --rm \
-        -v openclaw_mission-control-data:/data \
-        -v "$BACKUP_DIR":/backup \
-        alpine sh -c "apk add -q sqlite > /dev/null 2>&1 && sqlite3 /data/mission-control.db '.backup /backup/mc_backup_${TIMESTAMP}.db'"
-    MC_SIZE=$(du -h "$MC_BACKUP_FILE" | cut -f1)
-    echo "[OK] MC database backed up: $MC_BACKUP_FILE ($MC_SIZE)"
-else
-    echo "[SKIP] Mission Control volume not found — skipping"
-fi
-
-# -----------------------------------------------------------------------------
 # Clean up old backups
 # -----------------------------------------------------------------------------
 
@@ -101,7 +80,6 @@ OLD_COUNT=$(find "$BACKUP_DIR" -name "openclaw_backup_*.tar.gz" -type f -mtime +
 
 if [[ $OLD_COUNT -gt 0 ]]; then
     find "$BACKUP_DIR" -name "openclaw_backup_*.tar.gz" -type f -mtime +$RETENTION_DAYS -delete
-    find "$BACKUP_DIR" -name "mc_backup_*.db" -type f -mtime +$RETENTION_DAYS -delete
     echo "[OK] Deleted $OLD_COUNT old backup(s)"
 else
     echo "[OK] No old backups to delete"

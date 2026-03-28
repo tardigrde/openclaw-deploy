@@ -40,7 +40,7 @@ Default (single service, port 18789 → HTTPS 443):
 
 ### Exposing additional services
 
-To expose extra ports (e.g. Mission Control on 4000, a monitoring dashboard on 3001), add `TCPForward` entries:
+To expose extra ports (e.g. a monitoring dashboard on 3001), add `TCPForward` entries:
 
 ```json
 {

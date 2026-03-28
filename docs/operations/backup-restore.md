@@ -38,9 +38,8 @@ With `EXECUTE=1`, the restore play:
 4. Extracts the archive
 5. Validates critical files exist after extraction
 6. Pulls latest container images
-7. Restores Mission Control database (if matching backup exists)
-8. Restarts containers
-9. Waits for gateway health endpoint (30s timeout)
+7. Restarts containers
+8. Waits for gateway health endpoint (30s timeout)
 10. Prints a summary with undo instructions
 
 ## Undoing a Restore
