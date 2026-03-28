@@ -1,6 +1,20 @@
 # CHANGELOG
 
 
+## v0.15.3 (2026-03-28)
+
+### Bug Fixes
+
+- Propagate set_state_value errors to callers
+  ([`a0d56db`](https://github.com/tardigrde/openclaw-deploy/commit/a0d56db7db6b00cb0ab5bd698ec4de535562bee3))
+
+### Chores
+
+- **deps**: Update actions/configure-pages action to v6
+  ([#71](https://github.com/tardigrde/openclaw-deploy/pull/71),
+  [`e75c0ec`](https://github.com/tardigrde/openclaw-deploy/commit/e75c0ec43b8ec8d58e113d2f6a3bddcd0387fd7d))
+
+
 ## v0.15.2 (2026-03-28)
 
 ### Bug Fixes
