@@ -118,7 +118,7 @@ set_state_value() {
   # shellcheck disable=SC2064  # intentional: $tmp must expand now, not when trap fires
   trap "rm -f -- '$tmp'" RETURN
   jq "$key = $value" "$STATE_FILE" > "$tmp" || return 1
-  mv "$tmp" "$STATE_FILE"
+  mv "$tmp" "$STATE_FILE" || return 1
   return 0
 }
 
@@ -132,13 +132,13 @@ increment_failures() {
   local check="$1"
   local count
   count="$(get_failure_count "$check")"
-  set_state_value ".failures.\"$check\"" "$(( count + 1 ))"
+  set_state_value ".failures.\"$check\"" "$(( count + 1 ))" || return 1
   return 0
 }
 
 reset_failures() {
   local check="$1"
-  set_state_value ".failures.\"$check\"" "0"
+  set_state_value ".failures.\"$check\"" "0" || return 1
   return 0
 }
 
@@ -151,7 +151,7 @@ was_previously_failing() {
 
 set_previously_failing() {
   local check="$1" value="$2"
-  set_state_value ".previously_failing.\"$check\"" "$value"
+  set_state_value ".previously_failing.\"$check\"" "$value" || return 1
   return 0
 }
 
@@ -183,7 +183,7 @@ should_alert() {
 
 record_alert() {
   local check="$1"
-  set_state_value ".last_alerts.\"$check\"" "\"$(date -Iseconds)\""
+  set_state_value ".last_alerts.\"$check\"" "\"$(date -Iseconds)\"" || return 1
   return 0
 }
 
