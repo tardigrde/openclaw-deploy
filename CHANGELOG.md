@@ -1,6 +1,20 @@
 # CHANGELOG
 
 
+## v0.15.2 (2026-03-28)
+
+### Bug Fixes
+
+- Address PR review comments on monitor.sh
+  ([`2248312`](https://github.com/tardigrde/openclaw-deploy/commit/224831273f3d70f9daf2d57c2d51f9e7b67bce80))
+
+- Disable SC2064 for intentional early expansion in trap
+  ([`d62e87f`](https://github.com/tardigrde/openclaw-deploy/commit/d62e87fc23f7240835d49d8ddbe7ef8c2051b9ec))
+
+- Resolve monitoring credential and runtime issues
+  ([`dfb283d`](https://github.com/tardigrde/openclaw-deploy/commit/dfb283d510db05e58898c4339cbd73786c3296f4))
+
+
 ## v0.15.1 (2026-03-28)
 
 ### Bug Fixes
