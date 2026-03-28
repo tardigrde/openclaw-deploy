@@ -61,7 +61,8 @@ prompt_yn() {
   read -r input
   input="${input:-$default}"
   [[ "$input" =~ ^[Yy] ]]
-  return 0
+  local result=$?
+  return $result
 }
 
 # copy_example copies an example file if the target doesn't exist
