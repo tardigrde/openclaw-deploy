@@ -1,6 +1,22 @@
 # CHANGELOG
 
 
+## v0.15.1 (2026-03-28)
+
+### Bug Fixes
+
+- Prompt_yn return value not overridden by return 0
+  ([`548e4ca`](https://github.com/tardigrde/openclaw-deploy/commit/548e4ca028794c21d282f4a30649175da4624ae8))
+
+- Resolve SonarCloud quality gate issues
+  ([`5eb07bd`](https://github.com/tardigrde/openclaw-deploy/commit/5eb07bd35d5608a2d3ee4eca2f240907e33b72a9))
+
+### Documentation
+
+- Add CI, Docker, Ansible, SonarCloud, Stars, and version badges
+  ([`e9dfd28`](https://github.com/tardigrde/openclaw-deploy/commit/e9dfd288f7689a59efd3f9c05eb59111d8bda1e6))
+
+
 ## v0.15.0 (2026-03-28)
 
 ### Chores
