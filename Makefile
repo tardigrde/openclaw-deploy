@@ -382,7 +382,7 @@ monitor-test: ## Trigger one health check cycle manually (sends alert if checks 
 	$(call check-server-ip)
 	@echo -e "$(GREEN)[INFO]$(NC) Running health check on $(SERVER_IP)..."
 	@ssh -i $(SSH_KEY) -o StrictHostKeyChecking=accept-new openclaw@$(SERVER_IP) \
-		'bash ~/scripts/monitor.sh'
+		'export PATH=/home/openclaw/.local/bin:$$PATH && bash ~/scripts/monitor.sh'
 
 # =============================================================================
 # Help

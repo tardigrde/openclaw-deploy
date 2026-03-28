@@ -40,6 +40,7 @@
           Type=oneshot
           ExecStart=/home/openclaw/scripts/monitor.sh
           Environment=HOME=/home/openclaw
+          Environment=PATH=/home/openclaw/.local/bin:/usr/local/bin:/usr/bin:/bin
         dest: ~/.config/systemd/user/openclaw-monitor.service
         mode: "0640"
       tags: [never, monitor_enable]
