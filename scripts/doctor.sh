@@ -33,18 +33,24 @@ TOOLS_ONLY=false
 # -----------------------------------------------------------------------------
 
 pass() {
-  echo -e "  ${GREEN}[OK]${NC}    $1"
+  local msg="$1"
+  echo -e "  ${GREEN}[OK]${NC}    $msg"
   PASS=$((PASS + 1))
+  return 0
 }
 
 warn() {
-  echo -e "  ${YELLOW}[WARN]${NC}  $1"
+  local msg="$1"
+  echo -e "  ${YELLOW}[WARN]${NC}  $msg"
   WARN=$((WARN + 1))
+  return 0
 }
 
 fail() {
-  echo -e "  ${RED}[FAIL]${NC}  $1"
+  local msg="$1"
+  echo -e "  ${RED}[FAIL]${NC}  $msg"
   FAIL=$((FAIL + 1))
+  return 0
 }
 
 # version_gte returns 0 if $1 >= $2 (semantic version comparison)
@@ -60,7 +66,9 @@ version_gte() {
 
 # extract_version strips everything except digits and dots from a version string
 extract_version() {
-  echo "$1" | grep -oE '[0-9]+\.[0-9]+(\.[0-9]+)?' | head -1
+  local ver="$1"
+  echo "$ver" | grep -oE '[0-9]+\.[0-9]+(\.[0-9]+)?' | head -1
+  return 0
 }
 
 # check_tool verifies a tool exists and optionally meets a minimum version
@@ -99,6 +107,7 @@ check_tool() {
   else
     fail "$cmd v${actual_version} — too old (>= $min_version required)"
   fi
+  return 0
 }
 
 # check_file verifies a file exists
@@ -112,6 +121,7 @@ check_file() {
     [[ -n "$hint" ]] && msg="$msg ($hint)"
     fail "$msg"
   fi
+  return 0
 }
 
 # check_no_placeholder verifies a file doesn't still contain placeholder values
@@ -129,6 +139,7 @@ check_no_placeholder() {
   else
     pass "$label"
   fi
+  return 0
 }
 
 # check_env_var verifies a variable is set and not empty/placeholder in a shell file.
@@ -153,6 +164,7 @@ check_env_var() {
   else
     pass "$label ${DIM}(set in $file)${NC}"
   fi
+  return 0
 }
 
 # check_dotenv_var verifies a KEY=VALUE exists and is not empty in a dotenv file
@@ -176,6 +188,7 @@ check_dotenv_var() {
   else
     pass "$label ${DIM}(set in $file)${NC}"
   fi
+  return 0
 }
 
 # check_encrypted_dotenv_var verifies a KEY=VALUE in a SOPS-encrypted dotenv file.
@@ -211,6 +224,7 @@ check_encrypted_dotenv_var() {
   else
     pass "$label ${DIM}(set in $source)${NC}"
   fi
+  return 0
 }
 
 # =============================================================================
@@ -304,13 +318,11 @@ check_no_placeholder "openclaw.json" \
   "replace <your-...> placeholders with real values"
 
 # Validate openclaw.json is valid JSON
-if [[ -f "$REPO_ROOT/openclaw.json" ]]; then
-  if command -v jq &>/dev/null; then
-    if jq . "$REPO_ROOT/openclaw.json" > /dev/null 2>&1; then
-      pass "openclaw.json ${DIM}(valid JSON)${NC}"
-    else
-      fail "openclaw.json — invalid JSON syntax"
-    fi
+if [[ -f "$REPO_ROOT/openclaw.json" ]] && command -v jq &>/dev/null; then
+  if jq . "$REPO_ROOT/openclaw.json" > /dev/null 2>&1; then
+    pass "openclaw.json ${DIM}(valid JSON)${NC}"
+  else
+    fail "openclaw.json — invalid JSON syntax"
   fi
 fi
 
@@ -320,8 +332,9 @@ echo ""
 echo -e "${BOLD}Checking secrets...${NC}"
 echo ""
 
-check_env_var "secrets/inputs.sh" "HCLOUD_TOKEN" "HCLOUD_TOKEN"
-check_env_var "secrets/inputs.sh" "TF_VAR_ssh_key_fingerprint" "SSH_KEY_FINGERPRINT"
+INPUTS_FILE="secrets/inputs.sh"
+check_env_var "$INPUTS_FILE" "HCLOUD_TOKEN" "HCLOUD_TOKEN"
+check_env_var "$INPUTS_FILE" "TF_VAR_ssh_key_fingerprint" "SSH_KEY_FINGERPRINT"
 
 check_encrypted_dotenv_var "TELEGRAM_BOT_TOKEN" "TELEGRAM_BOT_TOKEN"
 check_encrypted_dotenv_var "OPENCLAW_GATEWAY_TOKEN" "OPENCLAW_GATEWAY_TOKEN"

@@ -28,6 +28,7 @@ HEALTH_URL="http://127.0.0.1:18789/health"
 HEALTH_TIMEOUT=5
 
 STATE_FILE="${HOME}/.openclaw/monitor-state.json"
+UNKNOWN_STATE="unknown"
 
 # -----------------------------------------------------------------------------
 # Resolve credentials (no plaintext secrets on disk)
@@ -60,10 +61,11 @@ load_credentials() {
   fi
 
   if [[ -z "${TELEGRAM_BOT_TOKEN:-}" || -z "${MONITOR_CHAT_ID:-}" ]]; then
-    echo "[monitor] ERROR: Could not resolve TELEGRAM_BOT_TOKEN or MONITOR_CHAT_ID"
-    echo "  Ensure ~/.openclaw/.env (or .env.enc + sops) and ~/.openclaw/openclaw.json are configured."
+    echo "[monitor] ERROR: Could not resolve TELEGRAM_BOT_TOKEN or MONITOR_CHAT_ID" >&2
+    echo "  Ensure ~/.openclaw/.env (or .env.enc + sops) and ~/.openclaw/openclaw.json are configured." >&2
     exit 1
   fi
+  return 0
 }
 
 load_credentials
@@ -73,22 +75,21 @@ load_credentials
 # -----------------------------------------------------------------------------
 
 init_state() {
-  if [[ -f "$STATE_FILE" ]]; then
-    # Validate existing state file — reinitialize if corrupted
-    if ! jq . "$STATE_FILE" > /dev/null 2>&1; then
-      echo "[monitor] WARNING: State file corrupted, reinitializing"
-      rm -f "$STATE_FILE"
-    fi
+  if [[ -f "$STATE_FILE" ]] && ! jq . "$STATE_FILE" > /dev/null 2>&1; then
+    echo "[monitor] WARNING: State file corrupted, reinitializing" >&2
+    rm -f "$STATE_FILE"
   fi
   if [[ ! -f "$STATE_FILE" ]]; then
     mkdir -p "$(dirname "$STATE_FILE")"
     echo '{"last_alerts":{},"failures":{},"previously_failing":{}}' > "$STATE_FILE"
   fi
+  return 0
 }
 
 get_state_value() {
   local key="$1"
   jq -r "$key // empty" "$STATE_FILE" 2>/dev/null || true
+  return 0
 }
 
 set_state_value() {
@@ -97,11 +98,13 @@ set_state_value() {
   tmp="$(mktemp)"
   trap 'rm -f "$tmp"' RETURN
   jq "$key = $value" "$STATE_FILE" > "$tmp" && mv "$tmp" "$STATE_FILE"
+  return 0
 }
 
 get_failure_count() {
   local check="$1"
   get_state_value ".failures.\"$check\" // 0"
+  return 0
 }
 
 increment_failures() {
@@ -109,11 +112,13 @@ increment_failures() {
   local count
   count="$(get_failure_count "$check")"
   set_state_value ".failures.\"$check\"" "$(( count + 1 ))"
+  return 0
 }
 
 reset_failures() {
   local check="$1"
   set_state_value ".failures.\"$check\"" "0"
+  return 0
 }
 
 was_previously_failing() {
@@ -126,6 +131,7 @@ was_previously_failing() {
 set_previously_failing() {
   local check="$1" value="$2"
   set_state_value ".previously_failing.\"$check\"" "$value"
+  return 0
 }
 
 # should_alert returns 0 if we should send an alert for this check
@@ -157,6 +163,7 @@ should_alert() {
 record_alert() {
   local check="$1"
   set_state_value ".last_alerts.\"$check\"" "\"$(date -Iseconds)\""
+  return 0
 }
 
 # -----------------------------------------------------------------------------
@@ -170,7 +177,8 @@ send_telegram() {
     -d "chat_id=${MONITOR_CHAT_ID}" \
     -d "text=${message}" \
     -d "parse_mode=HTML" \
-    > /dev/null 2>&1 || echo "[monitor] WARNING: Failed to send Telegram alert"
+    > /dev/null 2>&1 || echo "[monitor] WARNING: Failed to send Telegram alert" >&2
+  return 0
 }
 
 # alert sends a failure notification (with cooldown + consecutive failure check)
@@ -181,12 +189,13 @@ alert() {
 
   if should_alert "$check"; then
     local hostname
-    hostname="$(hostname 2>/dev/null || echo "unknown")"
+    hostname="$(hostname 2>/dev/null || echo "$UNKNOWN_STATE")"
     send_telegram "<b>[OpenClaw Monitor]</b> ${hostname}
 ${message}"
     record_alert "$check"
     set_previously_failing "$check" "true"
   fi
+  return 0
 }
 
 # recover sends a recovery notification if the check was previously failing
@@ -195,13 +204,14 @@ recover() {
 
   if was_previously_failing "$check"; then
     local hostname
-    hostname="$(hostname 2>/dev/null || echo "unknown")"
+    hostname="$(hostname 2>/dev/null || echo "$UNKNOWN_STATE")"
     send_telegram "<b>[OpenClaw Monitor]</b> ${hostname}
 ${message}"
     set_previously_failing "$check" "false"
   fi
 
   reset_failures "$check"
+  return 0
 }
 
 # -----------------------------------------------------------------------------
@@ -214,7 +224,7 @@ check_container_health() {
   # Check if docker is available
   if ! command -v docker &>/dev/null; then
     alert "$check_name" "Docker not found on this host."
-    return
+    return 0
   fi
 
   # Check if the gateway container is running
@@ -223,12 +233,12 @@ check_container_health() {
 
   if [[ -z "$container_id" ]]; then
     alert "$check_name" "Gateway container is not running."
-    return
+    return 0
   fi
 
   # Check container health status
   local health_status
-  health_status="$(docker inspect --format='{{.State.Health.Status}}' "$container_id" 2>/dev/null)" || health_status="unknown"
+  health_status="$(docker inspect --format='{{.State.Health.Status}}' "$container_id" 2>/dev/null)" || health_status="$UNKNOWN_STATE"
 
   case "$health_status" in
     healthy)
@@ -243,7 +253,7 @@ check_container_health() {
     *)
       # No healthcheck configured or unknown — check if running
       local state
-      state="$(docker inspect --format='{{.State.Status}}' "$container_id" 2>/dev/null)" || state="unknown"
+      state="$(docker inspect --format='{{.State.Status}}' "$container_id" 2>/dev/null)" || state="$UNKNOWN_STATE"
       if [[ "$state" == "running" ]]; then
         recover "$check_name" "Gateway container is running again."
       else
@@ -251,6 +261,7 @@ check_container_health() {
       fi
       ;;
   esac
+  return 0
 }
 
 check_http_health() {
@@ -261,6 +272,7 @@ check_http_health() {
   else
     alert "$check_name" "Gateway HTTP health check failed (${HEALTH_URL})."
   fi
+  return 0
 }
 
 check_disk_usage() {
@@ -276,6 +288,7 @@ check_disk_usage() {
   else
     recover "$check_name" "Disk usage is back to normal: ${usage_percent}%."
   fi
+  return 0
 }
 
 check_memory() {
@@ -285,7 +298,7 @@ check_memory() {
   mem_info="$(free | grep '^Mem:')" || true
 
   if [[ -z "$mem_info" ]]; then
-    return
+    return 0
   fi
 
   local total available
@@ -293,7 +306,7 @@ check_memory() {
   available="$(echo "$mem_info" | awk '{print $7}')"
 
   if [[ "$total" -eq 0 ]]; then
-    return
+    return 0
   fi
 
   local used_percent
@@ -305,6 +318,7 @@ check_memory() {
   else
     recover "$check_name" "Memory usage is back to normal: ${used_percent}%."
   fi
+  return 0
 }
 
 check_backup_recency() {
@@ -312,7 +326,7 @@ check_backup_recency() {
   local backup_dir="${HOME}/backups"
 
   if [[ ! -d "$backup_dir" ]]; then
-    return # No backup dir — backups not configured
+    return 0
   fi
 
   local latest_backup
@@ -321,7 +335,7 @@ check_backup_recency() {
 
   if [[ -z "$latest_backup" ]]; then
     alert "$check_name" "No backups found in ${backup_dir}."
-    return
+    return 0
   fi
 
   local backup_age_seconds now_epoch backup_epoch
@@ -336,6 +350,7 @@ check_backup_recency() {
   else
     recover "$check_name" "Backup is recent (within ${BACKUP_MAX_AGE_HOURS}h)."
   fi
+  return 0
 }
 
 # =============================================================================
