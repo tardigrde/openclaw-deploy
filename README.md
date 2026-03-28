@@ -2,6 +2,12 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Terraform](https://img.shields.io/badge/Terraform-1.5+-purple.svg)](https://www.terraform.io/)
+[![Ansible](https://img.shields.io/badge/Ansible-EE0000?logo=ansible&logoColor=white)](https://www.ansible.com/)
+[![OpenClaw](https://img.shields.io/badge/OpenClaw-2026.3.24-blue)](https://openclaw.ai)
+[![CI](https://github.com/tardigrde/openclaw-deploy/actions/workflows/validate.yml/badge.svg)](https://github.com/tardigrde/openclaw-deploy/actions/workflows/validate.yml)
+[![Docker Build](https://github.com/tardigrde/openclaw-deploy/actions/workflows/docker-build.yml/badge.svg)](https://github.com/tardigrde/openclaw-deploy/actions/workflows/docker-build.yml)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=tardigrde_openclaw-deploy&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=tardigrde_openclaw-deploy)
+[![GitHub Stars](https://img.shields.io/github/stars/tardigrde/openclaw-deploy?style=social)](https://github.com/tardigrde/openclaw-deploy)
 
 Infrastructure-as-code for deploying [OpenClaw](https://openclaw.ai) on a Hetzner Cloud VPS inside Docker. Includes VPS provisioning, firewall configuration, cloud-init automation, and Ansible-driven deployment.
 
