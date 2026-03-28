@@ -1,6 +1,28 @@
 # CHANGELOG
 
 
+## v0.15.0 (2026-03-28)
+
+### Chores
+
+- Remove Mission Control
+  ([`57acfa1`](https://github.com/tardigrde/openclaw-deploy/commit/57acfa1075d8aadf49a43decac69ffb45de4cabf))
+
+- Remove remaining MC and chromium sidecar references
+  ([`32f3078`](https://github.com/tardigrde/openclaw-deploy/commit/32f30781d17e7379c1dac6cbfffb91c660620dfb))
+
+- **deps**: Update dependency python-semantic-release to v10.5.3
+  ([`40198e6`](https://github.com/tardigrde/openclaw-deploy/commit/40198e6d1c13646a448694974e6222eee0b8a24c))
+
+- **deps**: Update patch updates
+  ([`a482760`](https://github.com/tardigrde/openclaw-deploy/commit/a482760be63bb50fc3d7016920cd99ec22580a63))
+
+### Features
+
+- Push docker-compose.override.yml on deploy too
+  ([`ebd4f0c`](https://github.com/tardigrde/openclaw-deploy/commit/ebd4f0c98dc2f05aca12a0671adbd6d404101549))
+
+
 ## v0.14.1 (2026-03-27)
 
 ### Bug Fixes
