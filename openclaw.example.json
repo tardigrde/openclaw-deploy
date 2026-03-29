@@ -17,6 +17,12 @@
       "172.20.0.0/24"
     ]
   },
+  "approvals": {
+    "exec": {
+      "enabled": true,
+      "mode": "session"
+    }
+  },
   "channels": {
     "telegram": {
       "enabled": true,
@@ -24,6 +30,11 @@
       "allowFrom": [
         "<your-telegram-user-id>"
       ],
+      "execApprovals": {
+        "enabled": true,
+        "target": "dm",
+        "approvers": ["<your-telegram-user-id>"]
+      },
       "groupPolicy": "allowlist",
       "groupAllowFrom": [
         "<your-telegram-user-id>"
@@ -109,8 +120,8 @@
   },
   "tools": {
     "exec": {
-      "security": "full",
-      "ask": "off"
+      "security": "allowlist",
+      "ask": "on-miss"
     },
     "elevated": {
       "enabled": true,

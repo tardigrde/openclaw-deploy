@@ -87,25 +87,19 @@
         mode: "0600"
       tags: [config]
 
-    - name: Check if exec-approvals.json already exists on VPS
-      ansible.builtin.stat:
-        path: "{{ remote_config_dir }}/exec-approvals.json"
-      register: exec_approvals_file
-      tags: [config]
-
-    - name: Check if exec-approvals seed template exists locally
+    - name: Check if exec-approvals.json exists locally
       ansible.builtin.stat:
         path: "{{ playbook_dir }}/../../config/exec-approvals.json"
       delegate_to: localhost
-      register: exec_approvals_seed
+      register: exec_approvals_local
       tags: [config]
 
-    - name: Deploy exec-approvals.json seed (first install only — never overwrites)
+    - name: Push exec-approvals.json
       ansible.builtin.copy:
         src: ../../config/exec-approvals.json
         dest: "{{ remote_config_dir }}/exec-approvals.json"
         mode: "0600"
-      when: exec_approvals_seed.stat.exists and not exec_approvals_file.stat.exists
+      when: exec_approvals_local.stat.exists
       tags: [config]
 
     # -----------------------------------------------------------------
