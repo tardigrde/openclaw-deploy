@@ -1,6 +1,19 @@
 # CHANGELOG
 
 
+## v0.16.1 (2026-03-29)
+
+### Bug Fixes
+
+- **config**: Push exec-approvals.json on every deploy + secure example defaults
+  ([`668574a`](https://github.com/tardigrde/openclaw-deploy/commit/668574ab61fb274052be9227759ee681a93aaeec))
+
+### Chores
+
+- **deps**: Update dependency openclaw to v2026.3.28
+  ([`e120b12`](https://github.com/tardigrde/openclaw-deploy/commit/e120b127e83e1e585dc630cbd67dc84f647a91e2))
+
+
 ## v0.16.0 (2026-03-28)
 
 ### Features
