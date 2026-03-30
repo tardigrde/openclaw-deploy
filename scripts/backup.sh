@@ -6,7 +6,7 @@
 # Usage: Run on the VPS directly, or called by systemd timer.
 #
 # This script:
-#   1. Creates a timestamped tar.gz of ~/.openclaw + SOPS age key (~/.config/sops)
+#   1. Creates a timestamped tar.gz of ~/.openclaw (age key excluded for security)
 #   2. Stores it in ~/backups/
 #   3. Removes backups older than 7 days
 #

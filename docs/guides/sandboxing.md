@@ -16,7 +16,7 @@ Without sandboxing, agent tool execution (file operations, shell commands) runs 
 
 With sandboxing enabled, tools run in isolated containers or remote environments.
 
-##Security Considerations
+## Security Considerations
 
 | Without Sandbox | With Sandbox |
 |-----------------|--------------|
