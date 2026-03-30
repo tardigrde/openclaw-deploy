@@ -1,6 +1,23 @@
 # CHANGELOG
 
 
+## v0.17.0 (2026-03-30)
+
+### Bug Fixes
+
+- Address CodeRabbit comments - header docstring and heading spacing
+  ([`291f945`](https://github.com/tardigrde/openclaw-deploy/commit/291f9456f5525981a664b260966976a8902d299e))
+
+- Address PR comments - clarify backup restore, cleaner token note
+  ([`42d9b34`](https://github.com/tardigrde/openclaw-deploy/commit/42d9b34ca6cec694a64d1f0c78bace06f2cb90ff))
+
+- Address PR comments - clarify backup restore, remove audit doc, update token note
+  ([`df08430`](https://github.com/tardigrde/openclaw-deploy/commit/df08430dfff70ea73619305615c7487c2a10b2fa))
+
+- Resolve security audit findings
+  ([`d094d94`](https://github.com/tardigrde/openclaw-deploy/commit/d094d94e8f0ecf3bf23af2bc1ab01e0306ebe10e))
+
+
 ## v0.16.1 (2026-03-29)
 
 ### Bug Fixes
