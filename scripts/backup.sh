@@ -59,9 +59,10 @@ echo "[...] Creating backup..."
 # SECURITY NOTE: The SOPS age key is NOT included in backups.
 # This prevents a stolen backup from being decrypted by an attacker.
 #
-# For restore, you have two options:
-#   1. Keep your original age key safe (required to decrypt .env.enc)
-#   2. After restore, re-encrypt .env with a new age key: make secrets-encrypt
+# IMPORTANT: Keep your original age key safe!
+# Without it, you cannot decrypt your existing .env.enc file.
+# Store the age key separately (e.g., password manager, encrypted USB).
+# If lost, you must create new secrets via: make secrets-generate-key && make secrets-encrypt
 #
 # To backup the age key separately (advanced users only):
 #   tar -czf ~/backups/age_key_backup.tar.gz -C "$HOME" .config/sops

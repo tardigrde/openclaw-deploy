@@ -68,9 +68,10 @@ REMOTE_URL="https://github.com/${GIT_WORKSPACE_REPO}.git"
 #   - process listings (ps aux)
 #   - logs
 #
-# IMPORTANT: For production, use a GitHub deploy key with read-only access
-# instead of a personal access token. Deploy keys can be scoped to specific
-# repos and don't grant broader account access.
+# NOTE: Changing from "token:" to "x-access-token:" format is just GitHub's
+# recommended format - it doesn't improve security. For real security,
+# use a GitHub deploy key with read-only access instead of a personal token.
+# Deploy keys can be scoped to specific repos and don't grant broader access.
 _CRED_FILE=$(mktemp)
 chmod 600 "$_CRED_FILE"
 printf 'https://x-access-token:%s@github.com\n' "$GIT_WORKSPACE_TOKEN" > "$_CRED_FILE"
