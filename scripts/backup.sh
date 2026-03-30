@@ -6,7 +6,7 @@
 # Usage: Run on the VPS directly, or called by systemd timer.
 #
 # This script:
-#   1. Creates a timestamped tar.gz of ~/.openclaw + SOPS age key (~/.config/sops)
+#   1. Creates a timestamped tar.gz of ~/.openclaw (age key excluded for security)
 #   2. Stores it in ~/backups/
 #   3. Removes backups older than 7 days
 #
@@ -54,14 +54,20 @@ echo ""
 
 echo "[...] Creating backup..."
 
-# Create tar.gz archive — includes .openclaw and SOPS age key (if present)
-# The age key is critical: without it, encrypted secrets (.env.enc) can't
-# be decrypted after restore. Including it makes backups self-contained.
-BACKUP_PATHS=(".openclaw")
-if [[ -d "$HOME/.config/sops" ]]; then
-    BACKUP_PATHS+=(".config/sops")
-fi
-tar -czf "$BACKUP_FILE" -C "$HOME" "${BACKUP_PATHS[@]}"
+# Create tar.gz archive of .openclaw only (NO age key for security)
+#
+# SECURITY NOTE: The SOPS age key is NOT included in backups.
+# This prevents a stolen backup from being decrypted by an attacker.
+#
+# IMPORTANT: Keep your original age key safe!
+# Without it, you cannot decrypt your existing .env.enc file.
+# Store the age key separately (e.g., password manager, encrypted USB).
+# If lost, you must create new secrets via: make secrets-generate-key && make secrets-encrypt
+#
+# To backup the age key separately (advanced users only):
+#   tar -czf ~/backups/age_key_backup.tar.gz -C "$HOME" .config/sops
+#   Store that file securely (encrypted storage, password-protected, etc.)
+tar -czf "$BACKUP_FILE" -C "$HOME" .openclaw
 
 # Get backup size
 BACKUP_SIZE=$(du -h "$BACKUP_FILE" | cut -f1)

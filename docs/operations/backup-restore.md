@@ -20,8 +20,22 @@ make restore EXECUTE=1 BACKUP=<file>  # Restore from backup
 
 Each archive (`openclaw_backup_*.tar.gz`) includes:
 
-- `~/.openclaw/` — full OpenClaw state (config, workspace, LCM history)
-- `~/.config/sops/` — SOPS age key (required to decrypt secrets)
+- `~/.openclaw/` — full OpenClaw state (config, workspace, LLM history)
+
+> **⚠️ Security Note:** The SOPS age key is NOT included in backups. This prevents a stolen backup from being decrypted. You must keep your age key safe elsewhere (password manager, secure storage). Without it, secrets cannot be recovered.
+
+## Required: Age Key Backup
+
+The age key at `~/.config/sops/age/keys.txt` is NOT included in automatic backups. You must back it up separately:
+
+```bash
+# Export your age key (one-time, keep this safe!)
+age-keygen -o /tmp/age-key.txt
+# Store this file securely (password manager, encrypted storage)
+
+# To restore: ensure the age key exists at ~/.config/sops/age/keys.txt
+# If you lost it: make secrets-generate-key && make secrets-encrypt  # re-creates all secrets
+```
 
 ## Restore Procedure
 

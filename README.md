@@ -274,8 +274,7 @@ Tailscale creates a private WireGuard mesh so SSH is reachable only from devices
      "gateway": {
        "auth": { "allowTailscale": true },
        "controlUi": {
-         "allowInsecureAuth": true,
-         "allowedOrigins": ["localhost", "127.0.0.1", "https://<your-node>.tailXXXX.ts.net"]
+         "allowedOrigins": ["localhost", "127.0.0.1", "https://<your-node>.<tailnet>.ts.net"]
        },
        "trustedProxies": ["172.20.0.0/24"]
      }
@@ -286,7 +285,7 @@ Tailscale creates a private WireGuard mesh so SSH is reachable only from devices
 
    > `allowTailscale` authenticates dashboard users via Tailscale identity headers.
    >
-   > `allowInsecureAuth` lets the control UI authenticate over plain HTTP — safe because it's only reachable inside your tailnet.
+   > **Note:** With Tailscale Serve, you get HTTPS automatically inside your tailnet — no `allowInsecureAuth` needed. Use SSH tunnel (`ssh -L 18789:127.0.0.1:18789 user@vps`) for local-only access without Tailscale.
    >
    > `allowedOrigins` is required since OpenClaw v2026.3.2 for any non-loopback bind. Include `localhost` and `127.0.0.1` for SSH-tunnel access, plus the Tailscale HTTPS URL for Tailscale Serve access.
    >
