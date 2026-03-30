@@ -54,14 +54,19 @@ echo ""
 
 echo "[...] Creating backup..."
 
-# Create tar.gz archive — includes .openclaw and SOPS age key (if present)
-# The age key is critical: without it, encrypted secrets (.env.enc) can't
-# be decrypted after restore. Including it makes backups self-contained.
-BACKUP_PATHS=(".openclaw")
-if [[ -d "$HOME/.config/sops" ]]; then
-    BACKUP_PATHS+=(".config/sops")
-fi
-tar -czf "$BACKUP_FILE" -C "$HOME" "${BACKUP_PATHS[@]}"
+# Create tar.gz archive of .openclaw only (NO age key for security)
+#
+# SECURITY NOTE: The SOPS age key is NOT included in backups.
+# This prevents a stolen backup from being decrypted by an attacker.
+#
+# For restore, you have two options:
+#   1. Keep your original age key safe (required to decrypt .env.enc)
+#   2. After restore, re-encrypt .env with a new age key: make secrets-encrypt
+#
+# To backup the age key separately (advanced users only):
+#   tar -czf ~/backups/age_key_backup.tar.gz -C "$HOME" .config/sops
+#   Store that file securely (encrypted storage, password-protected, etc.)
+tar -czf "$BACKUP_FILE" -C "$HOME" .openclaw
 
 # Get backup size
 BACKUP_SIZE=$(du -h "$BACKUP_FILE" | cut -f1)

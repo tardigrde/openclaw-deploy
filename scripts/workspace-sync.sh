@@ -61,11 +61,19 @@ fi
 
 REMOTE_URL="https://github.com/${GIT_WORKSPACE_REPO}.git"
 
-# Store credentials in a temp file (mode 600) rather than embedding in the URL.
-# This prevents the token from appearing in .git/config or ps aux.
+# Use git credential helper instead of embedding token in URL.
+# This prevents the token from appearing in:
+#   - git history (commit URLs)
+#   - .git/config
+#   - process listings (ps aux)
+#   - logs
+#
+# IMPORTANT: For production, use a GitHub deploy key with read-only access
+# instead of a personal access token. Deploy keys can be scoped to specific
+# repos and don't grant broader account access.
 _CRED_FILE=$(mktemp)
 chmod 600 "$_CRED_FILE"
-printf 'https://token:%s@github.com\n' "$GIT_WORKSPACE_TOKEN" > "$_CRED_FILE"
+printf 'https://x-access-token:%s@github.com\n' "$GIT_WORKSPACE_TOKEN" > "$_CRED_FILE"
 trap 'rm -f "$_CRED_FILE"' EXIT
 export GIT_CONFIG_COUNT=1
 export GIT_CONFIG_KEY_0="credential.helper"

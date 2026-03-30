@@ -22,11 +22,14 @@ export TF_VAR_hcloud_token="$HCLOUD_TOKEN"
 # ============================================
 # REQUIRED: SSH Configuration
 # ============================================
-# Allowed CIDRs for SSH access (use YOUR_IP/32 for single IPs)
-# Find your IP: curl -s ifconfig.me
+# WARNING: Default value ["0.0.0.0/0"] allows SSH from ANY IP - INsecure!
+# For production, change to your IP: ["YOUR_IP/32"]
+# Or use '[]' for Tailscale-only access (requires enable_tailscale=true)
+#
+# To find your IP: curl -s ifconfig.me
 # After confirming Tailscale SSH works, set this to '[]' and set SERVER_IP="openclaw-prod"
 # below, then re-run: make apply
-export TF_VAR_ssh_allowed_cidrs='["0.0.0.0/0"]'
+export TF_VAR_ssh_allowed_cidrs='["0.0.0.0/0"]'  # CHANGE THIS!
 
 # Fingerprint of your existing Hetzner SSH key (avoids recreating shared keys)
 # List yours: curl -s -H "Authorization: Bearer $HCLOUD_TOKEN" https://api.hetzner.cloud/v1/ssh_keys | jq '.ssh_keys[] | {name, fingerprint}'
