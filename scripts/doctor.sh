@@ -112,7 +112,9 @@ check_tool() {
 
 # check_file verifies a file exists
 check_file() {
-  local path="$1" label="${2:-$1}" hint="${3:-}"
+  local path="$1"
+  local label="${2:-$path}"
+  local hint="${3:-}"
 
   if [[ -f "$REPO_ROOT/$path" ]]; then
     pass "$label"
