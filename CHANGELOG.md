@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v0.17.1 (2026-03-31)
+
+### Bug Fixes
+
+- Resolve SonarQube issues - move GH permissions to job level, fix shell param expansion
+  ([`288afdc`](https://github.com/tardigrde/openclaw-deploy/commit/288afdc27565bfbafec6fb12a032dfbaf8060770))
+
+
 ## v0.17.0 (2026-03-30)
 
 ### Bug Fixes
