@@ -1,6 +1,25 @@
 # CHANGELOG
 
 
+## v0.17.2 (2026-04-01)
+
+### Bug Fixes
+
+- **docs**: Correct age key backup command and remove non-existent sandbox scripts
+  ([#86](https://github.com/tardigrde/openclaw-deploy/pull/86),
+  [`1e84c4a`](https://github.com/tardigrde/openclaw-deploy/commit/1e84c4afd0d36c7b9c0ffb4718daafaa84e0b694))
+
+### Chores
+
+- **deps**: Update dependency @martian-engineering/lossless-claw to v0.5.3
+  ([#84](https://github.com/tardigrde/openclaw-deploy/pull/84),
+  [`16518b4`](https://github.com/tardigrde/openclaw-deploy/commit/16518b4ec9788594e54813c6b22bbf2c934a70e3))
+
+- **deps**: Update dependency openclaw to v2026.3.31
+  ([#85](https://github.com/tardigrde/openclaw-deploy/pull/85),
+  [`a93acf5`](https://github.com/tardigrde/openclaw-deploy/commit/a93acf5474224bffb4992673f337b0cc0d193110))
+
+
 ## v0.17.1 (2026-03-31)
 
 ### Bug Fixes

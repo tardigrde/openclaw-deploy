@@ -1,6 +1,6 @@
 [project]
 name = "openclaw-deploy"
-version = "0.17.1"
+version = "0.17.2"
 
 [tool.semantic_release]
 major_on_zero = false
