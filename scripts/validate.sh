@@ -63,8 +63,8 @@ for pattern in "${SECRET_PATTERNS[@]}"; do
     FILEPATH="$REPO_ROOT/$file"
     [[ -f "$FILEPATH" ]] || continue
     if grep -qE "$pattern" "$FILEPATH" 2>/dev/null; then
-      # Filter out SHA256 checksums and age public keys (not secrets)
-      MATCHES=$(grep -nE "$pattern" "$FILEPATH" | grep -viE 'SHA256=|sha256sum|age1[a-z0-9]{50,}|version:\s+[0-9a-f]{40}' || true)
+      # Filter out SHA256 checksums, age public keys, and git SHAs in variable assignments (not secrets)
+      MATCHES=$(grep -nE "$pattern" "$FILEPATH" | grep -viE 'SHA256=|sha256sum|age1[a-z0-9]{50,}|version:\s+[0-9a-f]{40}|[A-Za-z0-9_]+=.{0,1}[0-9a-f]{40}.{0,1}' || true)
       if [[ -n "$MATCHES" ]]; then
         echo "SECRET DETECTED in $file:"
         echo "$MATCHES"

@@ -29,11 +29,10 @@ Each archive (`openclaw_backup_*.tar.gz`) includes:
 The age key at `~/.config/sops/age/keys.txt` is NOT included in automatic backups. You must back it up separately:
 
 ```bash
-# Export your age key (one-time, keep this safe!)
-age-keygen -o /tmp/age-key.txt
-# Store this file securely (password manager, encrypted storage)
+# View your age key and save the output to a password manager or encrypted storage
+cat ~/.config/sops/age/keys.txt
 
-# To restore: ensure the age key exists at ~/.config/sops/age/keys.txt
+# To restore: copy the key back to ~/.config/sops/age/keys.txt
 # If you lost it: make secrets-generate-key && make secrets-encrypt  # re-creates all secrets
 ```
 
