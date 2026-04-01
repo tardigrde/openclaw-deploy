@@ -68,16 +68,7 @@ To enable sandboxing, add this to your `openclaw.json`:
 
 ## Docker Sandbox Setup
 
-Before using sandbox, build the sandbox image:
-
-```bash
-# On your VPS, run:
-docker build -t openclaw-sandbox:bookworm-slim -f Dockerfile.sandbox scripts/sandbox/
-# Or use the convenience script:
-./scripts/sandbox-setup.sh
-```
-
-> **Note:** For the openclaw-deploy repo, the Dockerfile already includes the necessary sandbox setup. The sandbox image is built automatically when you `make deploy REBUILD=1`.
+The sandbox image is built automatically when you run `make deploy REBUILD=1` — no manual setup required.
 
 ## Per-Agent Override
 
