@@ -56,7 +56,7 @@ fi
 ###############################################################################
 if [[ "${INSTALL_LOSSLESS_CLAW:-1}" != "0" ]]; then
   echo "[entrypoint] Installing lossless-claw plugin ..."
-  openclaw plugins install @martian-engineering/lossless-claw@0.6.2 2>&1 || {
+  openclaw plugins install @martian-engineering/lossless-claw@0.6.3 2>&1 || {
     echo "[entrypoint] WARNING: Failed to install lossless-claw — continuing"
   }
 else
