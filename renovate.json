@@ -14,17 +14,23 @@
     {
       "description": "Group all patch updates into one PR — low risk, auto-merge",
       "matchUpdateTypes": ["patch"],
-      "excludePackageNames": ["openclaw", "getsops/sops"],
       "groupName": "Patch updates",
       "automerge": true,
       "automergeType": "pr",
-      "platformAutomerge": true
+      "platformAutomerge": true,
+      "matchPackageNames": [
+        "!openclaw",
+        "!getsops/sops"
+      ]
     },
     {
       "description": "Group all minor updates into one PR for manual review",
       "matchUpdateTypes": ["minor"],
-      "excludePackageNames": ["openclaw", "getsops/sops"],
-      "groupName": "Minor updates"
+      "groupName": "Minor updates",
+      "matchPackageNames": [
+        "!openclaw",
+        "!getsops/sops"
+      ]
     },
     {
       "description": "Group GitHub Actions updates — low-risk, auto-merge",
