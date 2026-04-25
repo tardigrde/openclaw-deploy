@@ -49,7 +49,7 @@ RUN curl -LsSf https://astral.sh/uv/${UV_VERSION}/install.sh | sh \
 # Pin versions for reproducible builds — bump explicitly when upgrading
 ARG OPENCLAW_VERSION=2026.4.15
 ARG CLAWHUB_VERSION=0.9.0
-ARG SUMMARIZE_VERSION=0.13.0
+ARG SUMMARIZE_VERSION=0.13.1
 ARG WS_VERSION=8.20.0
 ARG AGENT_BROWSER_VERSION=0.22.3
 # Optional packages (e.g. acpx, claude-code) go in docker/install-optional.sh

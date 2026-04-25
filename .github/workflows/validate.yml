@@ -17,10 +17,10 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v4
         with:
-          terraform_version: "1.14.8"
+          terraform_version: "1.14.9"
 
       - name: Install Ansible
-        run: pip install "ansible-core>=2.20.4,<3" --quiet
+        run: pip install "ansible-core>=2.20.5,<3" --quiet
 
       - name: Run make validate
         run: make validate
@@ -35,7 +35,7 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v4
         with:
-          terraform_version: "1.14.8"
+          terraform_version: "1.14.9"
 
       - name: Setup TFLint
         uses: terraform-linters/setup-tflint@v6
