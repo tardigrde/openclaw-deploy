@@ -40,7 +40,7 @@ COPY scripts/install-sops.sh /usr/local/bin/install-sops.sh
 RUN bash /usr/local/bin/install-sops.sh "${SOPS_VERSION}"
 
 # Install uv (Python package manager) — manages Python versions and project deps
-ARG UV_VERSION=0.11.7
+ARG UV_VERSION=0.11.8
 RUN curl -LsSf https://astral.sh/uv/${UV_VERSION}/install.sh | sh \
   && mv /root/.local/bin/uv /usr/local/bin/uv \
   && mv /root/.local/bin/uvx /usr/local/bin/uvx \
