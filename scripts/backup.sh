@@ -67,7 +67,9 @@ echo "[...] Creating backup..."
 # To backup the age key separately (advanced users only):
 #   tar -czf ~/backups/age_key_backup.tar.gz -C "$HOME" .config/sops
 #   Store that file securely (encrypted storage, password-protected, etc.)
-tar -czf "$BACKUP_FILE" -C "$HOME" .openclaw
+# --warning=no-file-changed: the gateway writes constantly, so tar reports
+# "file changed as we read it" and exits 1, failing the backup under set -e.
+tar --warning=no-file-changed -czf "$BACKUP_FILE" -C "$HOME" .openclaw
 
 # Get backup size
 BACKUP_SIZE=$(du -h "$BACKUP_FILE" | cut -f1)
