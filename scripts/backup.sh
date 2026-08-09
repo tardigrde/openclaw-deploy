@@ -67,9 +67,12 @@ echo "[...] Creating backup..."
 # To backup the age key separately (advanced users only):
 #   tar -czf ~/backups/age_key_backup.tar.gz -C "$HOME" .config/sops
 #   Store that file securely (encrypted storage, password-protected, etc.)
-# --warning=no-file-changed: the gateway writes constantly, so tar reports
-# "file changed as we read it" and exits 1, failing the backup under set -e.
-tar --warning=no-file-changed -czf "$BACKUP_FILE" -C "$HOME" .openclaw
+# --warning=no-file-changed --ignore-failed-read: the gateway writes
+# constantly, so tar reports "file changed as we read it" and exits 1,
+# failing the backup under set -e. Suppress the warning AND keep the exit
+# status 0; without --ignore-failed-read tar still returns 1 (verified on
+# GNU tar 1.35).
+tar --warning=no-file-changed --ignore-failed-read -czf "$BACKUP_FILE" -C "$HOME" .openclaw
 
 # Get backup size
 BACKUP_SIZE=$(du -h "$BACKUP_FILE" | cut -f1)
