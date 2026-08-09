@@ -33,9 +33,13 @@
       ]
     },
     {
-      "description": "Group GitHub Actions updates — low-risk, auto-merge",
+      "description": "Group GitHub Actions updates — low-risk patch/minor, auto-merge; majors need manual review",
       "matchManagers": [
         "github-actions"
+      ],
+      "matchUpdateTypes": [
+        "patch",
+        "minor"
       ],
       "groupName": "GitHub Actions",
       "automerge": true,
@@ -193,26 +197,13 @@
       "extractVersionTemplate": "^v(?<version>.+)$"
     },
     {
-      "description": "Track ansible-core lower bound in GitHub Actions workflows (range: >=X.Y,<Z)",
-      "customType": "regex",
-      "managerFilePatterns": [
-        "/^\\.github/workflows/[^/]+\\.yml$/"
-      ],
-      "matchStrings": [
-        "pip install \"ansible-core>=(?<currentValue>[\\d]+\\.[\\d]+(?:\\.[\\d]+)?),<[\\d]+\""
-      ],
-      "depNameTemplate": "ansible-core",
-      "datasourceTemplate": "pypi",
-      "versioningTemplate": "pep440"
-    },
-    {
-      "description": "Track Hugo version in docs workflow",
+      "description": "Track Hugo version pinned as env var in pages.yml",
       "customType": "regex",
       "managerFilePatterns": [
         "/^\\.github/workflows/pages\\.yml$/"
       ],
       "matchStrings": [
-        "HUGO_VERSION: (?<currentValue>[\\d]+\\.[\\d]+(?:\\.[\\d]+)?)"
+        "HUGO_VERSION: (?<currentValue>[\\d]+\\.[\\d]+\\.[\\d]+)"
       ],
       "depNameTemplate": "gohugoio/hugo",
       "datasourceTemplate": "github-releases",
