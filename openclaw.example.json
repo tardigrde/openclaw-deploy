@@ -38,7 +38,13 @@
       "groupAllowFrom": [
         "<your-telegram-user-id>"
       ],
-      "streaming": "partial",
+      "streaming": {
+        "mode": "progress",
+        "progress": {
+          "toolProgress": true,
+          "commandText": "status"
+        }
+      },
       "retry": {
         "attempts": 3,
         "minDelayMs": 400,
@@ -68,6 +74,15 @@
           "freshTailCount": 32,
           "contextThreshold": 0.75,
           "incrementalMaxDepth": -1
+        }
+      },
+      "memory-core": {
+        "enabled": true,
+        "config": {
+          "dreaming": {
+            "enabled": true,
+            "timezone": "UTC"
+          }
         }
       },
       "diffs": {

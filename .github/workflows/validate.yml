@@ -25,6 +25,35 @@ jobs:
       - name: Run make validate
         run: make validate
 
+  openclaw-config:
+    name: OpenClaw config schema
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Validate configs against pinned OpenClaw schema
+        run: |
+          VER=$(grep -oP 'ARG OPENCLAW_VERSION=\K[^ ]+' docker/Dockerfile)
+          if [[ -z "$VER" ]]; then
+            echo "ERROR: could not read OPENCLAW_VERSION from docker/Dockerfile" >&2
+            exit 1
+          fi
+          for cfg in openclaw.json openclaw.example.json; do
+            if [[ ! -f "$cfg" ]]; then
+              echo "SKIP: $cfg not present in this repo"
+              continue
+            fi
+            echo "Validating $cfg against openclaw@${VER} schema..."
+            if ! OPENCLAW_CONFIG_PATH="$GITHUB_WORKSPACE/$cfg" npx -y "openclaw@${VER}" config validate --json \
+                 | jq -e '.valid == true' > /dev/null; then
+              echo "ERROR: $cfg is invalid against openclaw@${VER} schema" >&2
+              OPENCLAW_CONFIG_PATH="$GITHUB_WORKSPACE/$cfg" npx -y "openclaw@${VER}" config validate --json >&2 || true
+              exit 1
+            fi
+            echo "✓ $cfg validates against openclaw@${VER}"
+          done
+
   terraform-test:
     name: Terraform Lint & Test
     runs-on: ubuntu-latest
