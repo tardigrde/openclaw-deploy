@@ -1,6 +1,174 @@
 # CHANGELOG
 
 
+## v0.18.0 (2026-08-09)
+
+### Chores
+
+- Bump OpenClaw to 2026.7.1 and lossless-claw to 0.15.1
+  ([#137](https://github.com/tardigrde/openclaw-deploy/pull/137),
+  [`2492895`](https://github.com/tardigrde/openclaw-deploy/commit/24928953c736b8a4b5e7324a0c2ebc8e7e2c5386))
+
+- **config**: Migrate config renovate.json
+  ([#102](https://github.com/tardigrde/openclaw-deploy/pull/102),
+  [`f5a520e`](https://github.com/tardigrde/openclaw-deploy/commit/f5a520eca3d1feb3c8f3815558e7d2b41311de2f))
+
+- **deps**: Bump lossless-claw to 0.6.3
+  ([`a868119`](https://github.com/tardigrde/openclaw-deploy/commit/a868119dc585c99ad9739bd7fce32cb2114495ef))
+
+- **deps**: Update actions/cache action to v6
+  ([#130](https://github.com/tardigrde/openclaw-deploy/pull/130),
+  [`58c7a86`](https://github.com/tardigrde/openclaw-deploy/commit/58c7a86891f80a07e3f60539a599fa3bdda7e914))
+
+- **deps**: Update actions/upload-pages-artifact action to v5
+  ([#106](https://github.com/tardigrde/openclaw-deploy/pull/106),
+  [`692ab70`](https://github.com/tardigrde/openclaw-deploy/commit/692ab701da7db49e538130d4726528d86475b1a8))
+
+- **deps**: Update dependency @martian-engineering/lossless-claw to v0.8.0
+  ([#99](https://github.com/tardigrde/openclaw-deploy/pull/99),
+  [`6bba1f3`](https://github.com/tardigrde/openclaw-deploy/commit/6bba1f3c039b2618a688080967edf374c5ca4245))
+
+- **deps**: Update dependency @martian-engineering/lossless-claw to v0.8.2
+  ([#101](https://github.com/tardigrde/openclaw-deploy/pull/101),
+  [`af9114c`](https://github.com/tardigrde/openclaw-deploy/commit/af9114cbd149f12c1806fe008a8f44327536b4c0))
+
+- **deps**: Update dependency @martian-engineering/lossless-claw to v0.9.2
+  ([#108](https://github.com/tardigrde/openclaw-deploy/pull/108),
+  [`02432fb`](https://github.com/tardigrde/openclaw-deploy/commit/02432fb384a174ba20b3084f8deaf4a9c36be808))
+
+- **deps**: Update dependency @martian-engineering/lossless-claw to v0.9.3
+  ([#115](https://github.com/tardigrde/openclaw-deploy/pull/115),
+  [`cfa30a8`](https://github.com/tardigrde/openclaw-deploy/commit/cfa30a8420d474efb9769d55c12e82a79d58827e))
+
+- **deps**: Update dependency @steipete/summarize to v0.14.1
+  ([`b03ae50`](https://github.com/tardigrde/openclaw-deploy/commit/b03ae5065e337aea98c679e4176af1d66284069c))
+
+- **deps**: Update dependency @steipete/summarize to v0.14.1
+  ([`6250c22`](https://github.com/tardigrde/openclaw-deploy/commit/6250c2210b6d69c0007ff9e2236d076d3ce04aee))
+
+- **deps**: Update dependency astral-sh/uv to v0.11.26
+  ([#131](https://github.com/tardigrde/openclaw-deploy/pull/131),
+  [`1a9c7c4`](https://github.com/tardigrde/openclaw-deploy/commit/1a9c7c442def436d5e3cf9d676c10f974f6a80bf))
+
+- **deps**: Update dependency astral-sh/uv to v0.11.29
+  ([#134](https://github.com/tardigrde/openclaw-deploy/pull/134),
+  [`67b6bcd`](https://github.com/tardigrde/openclaw-deploy/commit/67b6bcd00d664e2d9abd0f91bfec2fab6b309d0a))
+
+- **deps**: Update dependency astral-sh/uv to v0.11.6
+  ([#98](https://github.com/tardigrde/openclaw-deploy/pull/98),
+  [`b0ea440`](https://github.com/tardigrde/openclaw-deploy/commit/b0ea4409016d18b9b2e6d67f2319ede5ce7ec44c))
+
+- **deps**: Update dependency astral-sh/uv to v0.11.7
+  ([#107](https://github.com/tardigrde/openclaw-deploy/pull/107),
+  [`77dca01`](https://github.com/tardigrde/openclaw-deploy/commit/77dca012aee8044cddd783114496ac1473faedd0))
+
+- **deps**: Update dependency astral-sh/uv to v0.11.8
+  ([#112](https://github.com/tardigrde/openclaw-deploy/pull/112),
+  [`becbefc`](https://github.com/tardigrde/openclaw-deploy/commit/becbefc1bf8d21ce93540f348e700b96f9c0cb47))
+
+- **deps**: Update dependency openclaw to v2026.4.1
+  ([`c3e32e0`](https://github.com/tardigrde/openclaw-deploy/commit/c3e32e0f2b4e9b302c4a98b18aa7084b4cbd4d3d))
+
+- **deps**: Update dependency openclaw to v2026.4.11
+  ([#100](https://github.com/tardigrde/openclaw-deploy/pull/100),
+  [`ac1e64b`](https://github.com/tardigrde/openclaw-deploy/commit/ac1e64b8580f09c10562549f3eab631daf79ca8d))
+
+- **deps**: Update dependency openclaw to v2026.4.12
+  ([#103](https://github.com/tardigrde/openclaw-deploy/pull/103),
+  [`a57174b`](https://github.com/tardigrde/openclaw-deploy/commit/a57174b80049128e2c75d3c718fff10f76ed4e16))
+
+- **deps**: Update dependency openclaw to v2026.4.15
+  ([#104](https://github.com/tardigrde/openclaw-deploy/pull/104),
+  [`96909fd`](https://github.com/tardigrde/openclaw-deploy/commit/96909fdbc2b5130c9923f6876cfbbe700af08cf0))
+
+- **deps**: Update dependency openclaw to v2026.4.26
+  ([`6926db9`](https://github.com/tardigrde/openclaw-deploy/commit/6926db9c200ac75b694bf804f28aeca1e80d6f70))
+
+- **deps**: Update dependency openclaw to v2026.4.26
+  ([`e7b51a4`](https://github.com/tardigrde/openclaw-deploy/commit/e7b51a487d74ad90228dba039b63d7327075c45a))
+
+- **deps**: Update dependency openclaw to v2026.4.5
+  ([`56f7582`](https://github.com/tardigrde/openclaw-deploy/commit/56f75829470dd4b55091942d521f583f7e72f52d))
+
+- **deps**: Update dependency openclaw to v2026.4.7
+  ([#94](https://github.com/tardigrde/openclaw-deploy/pull/94),
+  [`840dd8b`](https://github.com/tardigrde/openclaw-deploy/commit/840dd8b1c95c65ee859b5829a8d3b66e72dc5081))
+
+- **deps**: Update dependency openclaw to v2026.4.9
+  ([#95](https://github.com/tardigrde/openclaw-deploy/pull/95),
+  [`506646c`](https://github.com/tardigrde/openclaw-deploy/commit/506646c2cf461c904e3be70866d9c3c153e82a8e))
+
+- **deps**: Update dependency openclaw to v2026.5.7
+  ([`7cab496`](https://github.com/tardigrde/openclaw-deploy/commit/7cab496a9737c764ac2279e5f63968db4d547617))
+
+- **deps**: Update gcr.io/projectsigstore/cosign docker tag to v3.0.6
+  ([#92](https://github.com/tardigrde/openclaw-deploy/pull/92),
+  [`e3f7746`](https://github.com/tardigrde/openclaw-deploy/commit/e3f774633452e0cb9c0baccab6d47fa3a09d20c9))
+
+- **deps**: Update github actions to v7
+  ([#128](https://github.com/tardigrde/openclaw-deploy/pull/128),
+  [`a0980aa`](https://github.com/tardigrde/openclaw-deploy/commit/a0980aa63b9c034f5757e24a544df7b72d4e2703))
+
+- **deps**: Update minor updates
+  ([`30f8b15`](https://github.com/tardigrde/openclaw-deploy/commit/30f8b15f034dcab4352182461f0c6b55d748c5d4))
+
+- **deps**: Update minor updates ([#105](https://github.com/tardigrde/openclaw-deploy/pull/105),
+  [`27f0859`](https://github.com/tardigrde/openclaw-deploy/commit/27f08598a30785941470c0a63e398832eb9c7386))
+
+- **deps**: Update minor updates ([#97](https://github.com/tardigrde/openclaw-deploy/pull/97),
+  [`482fb2f`](https://github.com/tardigrde/openclaw-deploy/commit/482fb2f513a91adf0872ab66ee854b6ed9a31c3e))
+
+- **deps**: Update minor updates
+  ([`023c39e`](https://github.com/tardigrde/openclaw-deploy/commit/023c39eae364717554af7f855af1b5a48ab5d706))
+
+- **deps**: Update patch updates ([#132](https://github.com/tardigrde/openclaw-deploy/pull/132),
+  [`f89c2ec`](https://github.com/tardigrde/openclaw-deploy/commit/f89c2ec3cade6db316ee0333d0d9972e8c021f37))
+
+- **deps**: Update patch updates ([#129](https://github.com/tardigrde/openclaw-deploy/pull/129),
+  [`d52d600`](https://github.com/tardigrde/openclaw-deploy/commit/d52d600760284d1b38580a189b7ae7a057acb073))
+
+- **deps**: Update patch updates ([#125](https://github.com/tardigrde/openclaw-deploy/pull/125),
+  [`f7a5bc9`](https://github.com/tardigrde/openclaw-deploy/commit/f7a5bc92a7c52c58e464038f432ec4e3a31ca250))
+
+- **deps**: Update patch updates ([#123](https://github.com/tardigrde/openclaw-deploy/pull/123),
+  [`eac62ed`](https://github.com/tardigrde/openclaw-deploy/commit/eac62edbc6bf44d471e1b03abaa9cab3807852f2))
+
+- **deps**: Update patch updates ([#122](https://github.com/tardigrde/openclaw-deploy/pull/122),
+  [`a675b76`](https://github.com/tardigrde/openclaw-deploy/commit/a675b76d15633395c76971a1ef6b6eee1077fa92))
+
+- **deps**: Update patch updates ([#120](https://github.com/tardigrde/openclaw-deploy/pull/120),
+  [`1ad0e67`](https://github.com/tardigrde/openclaw-deploy/commit/1ad0e677020d80d7731fdb60d71d5c11893afe3a))
+
+- **deps**: Update patch updates ([#117](https://github.com/tardigrde/openclaw-deploy/pull/117),
+  [`75acb3b`](https://github.com/tardigrde/openclaw-deploy/commit/75acb3bde33de35b333c12088a2f3565e6546fb4))
+
+- **deps**: Update patch updates ([#110](https://github.com/tardigrde/openclaw-deploy/pull/110),
+  [`e386a39`](https://github.com/tardigrde/openclaw-deploy/commit/e386a39b842a85841352820c99df91603c96b32a))
+
+- **deps**: Update patch updates ([#96](https://github.com/tardigrde/openclaw-deploy/pull/96),
+  [`d7bdf5f`](https://github.com/tardigrde/openclaw-deploy/commit/d7bdf5fc34256a569f1a6496373166b3be0a0d7d))
+
+- **deps**: Update patch updates ([#93](https://github.com/tardigrde/openclaw-deploy/pull/93),
+  [`2a2db67`](https://github.com/tardigrde/openclaw-deploy/commit/2a2db674dac493f2343ed9e31b3b63ca9e09d509))
+
+- **deps**: Update patch updates
+  ([`1fa2530`](https://github.com/tardigrde/openclaw-deploy/commit/1fa25305d0d2e6a9c09713f694c86985aefd3497))
+
+- **deps**: Update patch updates to v0.11.19
+  ([#124](https://github.com/tardigrde/openclaw-deploy/pull/124),
+  [`fdc444b`](https://github.com/tardigrde/openclaw-deploy/commit/fdc444bd77ee0676f70b27764cfada4d5936f7f5))
+
+- **deps**: Update patch updates to v0.11.23
+  ([#127](https://github.com/tardigrde/openclaw-deploy/pull/127),
+  [`c1e46e8`](https://github.com/tardigrde/openclaw-deploy/commit/c1e46e86a581b337f3cc232bb64af8754b7b5b79))
+
+### Features
+
+- Validate openclaw config against pinned schema in CI, update example config
+  ([#139](https://github.com/tardigrde/openclaw-deploy/pull/139),
+  [`1949ddb`](https://github.com/tardigrde/openclaw-deploy/commit/1949ddb04b8d1587d9ff0c2c2d42187ae3987298))
+
+
 ## v0.17.2 (2026-04-01)
 
 ### Bug Fixes
