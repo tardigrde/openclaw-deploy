@@ -35,12 +35,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Install SOPS (for native secrets decryption via exec provider)
 # cosign is used at build time to verify the SOPS release signature — no hardcoded hash needed.
 ARG SOPS_VERSION=3.12.2
-COPY --from=gcr.io/projectsigstore/cosign:v3.0.6 /ko-app/cosign /usr/local/bin/cosign
+COPY --from=gcr.io/projectsigstore/cosign:v3.1.3 /ko-app/cosign /usr/local/bin/cosign
 COPY scripts/install-sops.sh /usr/local/bin/install-sops.sh
 RUN bash /usr/local/bin/install-sops.sh "${SOPS_VERSION}"
 
 # Install uv (Python package manager) — manages Python versions and project deps
-ARG UV_VERSION=0.11.29
+ARG UV_VERSION=0.12.3
 RUN curl -LsSf https://astral.sh/uv/${UV_VERSION}/install.sh | sh \
   && mv /root/.local/bin/uv /usr/local/bin/uv \
   && mv /root/.local/bin/uvx /usr/local/bin/uvx \
@@ -49,7 +49,7 @@ RUN curl -LsSf https://astral.sh/uv/${UV_VERSION}/install.sh | sh \
 # Pin versions for reproducible builds — bump explicitly when upgrading
 ARG OPENCLAW_VERSION=2026.7.1
 ARG CLAWHUB_VERSION=0.9.0
-ARG SUMMARIZE_VERSION=0.14.1
+ARG SUMMARIZE_VERSION=0.21.9
 ARG WS_VERSION=8.20.0
 ARG AGENT_BROWSER_VERSION=0.22.3
 # Optional packages (e.g. acpx, claude-code) go in docker/install-optional.sh
