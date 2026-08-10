@@ -208,7 +208,7 @@
     - name: Install SOPS on VPS
       ansible.builtin.shell: |
         export PATH="$HOME/.local/bin:$PATH"
-        SOPS_VERSION=3.12.2
+        SOPS_VERSION=3.13.3
         install-sops.sh "${SOPS_VERSION}" ~/.local/bin/sops
       args:
         executable: /bin/bash
