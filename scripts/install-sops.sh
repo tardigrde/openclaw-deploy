@@ -17,10 +17,10 @@ SOPS_ASSET="sops-v${SOPS_VERSION}.linux.amd64"
 tmpdir=$(mktemp -d)
 trap 'rm -rf "$tmpdir"' EXIT
 
-curl -fsSL "${SOPS_BASE}/${SOPS_ASSET}"              -o "${tmpdir}/sops"
-curl -fsSL "${SOPS_BASE}/sops-v${SOPS_VERSION}.checksums.txt" -o "${tmpdir}/checksums.txt"
+curl -fsSL --proto =https "${SOPS_BASE}/${SOPS_ASSET}"              -o "${tmpdir}/sops"
+curl -fsSL --proto =https "${SOPS_BASE}/sops-v${SOPS_VERSION}.checksums.txt" -o "${tmpdir}/checksums.txt"
 
-if curl -fsSL "${SOPS_BASE}/sops-v${SOPS_VERSION}.checksums.sigstore.json" -o "${tmpdir}/bundle.json" 2>/dev/null; then
+if curl -fsSL --proto =https "${SOPS_BASE}/sops-v${SOPS_VERSION}.checksums.sigstore.json" -o "${tmpdir}/bundle.json" 2>/dev/null; then
   # sops >= 3.13 publishes a cosign bundle instead of the classic
   # .sig/.pem pair. cosign v3.1.x cannot verify this bundle directly
   # ("bundle does not contain cert" / "unsupported tlog public key type:
@@ -43,8 +43,8 @@ EOF
     "${tmpdir}/checksums.txt"
 else
   # sops <= 3.12: classic cosign certificate + signature assets
-  curl -fsSL "${SOPS_BASE}/sops-v${SOPS_VERSION}.checksums.sig" -o "${tmpdir}/checksums.sig"
-  curl -fsSL "${SOPS_BASE}/sops-v${SOPS_VERSION}.checksums.pem" -o "${tmpdir}/checksums.pem"
+  curl -fsSL --proto =https "${SOPS_BASE}/sops-v${SOPS_VERSION}.checksums.sig" -o "${tmpdir}/checksums.sig"
+  curl -fsSL --proto =https "${SOPS_BASE}/sops-v${SOPS_VERSION}.checksums.pem" -o "${tmpdir}/checksums.pem"
   cosign verify-blob \
     --certificate "${tmpdir}/checksums.pem" \
     --signature   "${tmpdir}/checksums.sig" \
