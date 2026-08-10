@@ -1,6 +1,29 @@
 # CHANGELOG
 
 
+## v0.18.1 (2026-08-10)
+
+### Bug Fixes
+
+- Enforce HTTPS for curl (shell:S6506)
+  ([`952dc08`](https://github.com/tardigrde/openclaw-deploy/commit/952dc080a646bc576a31d5dd516f1e6b16b2b3dd))
+
+- **install-sops**: Support sops 3.13+ sigstore bundle verification
+  ([`7daa54b`](https://github.com/tardigrde/openclaw-deploy/commit/7daa54bcea5eb89dafd460c4f3470407b5c2dc38))
+
+- **install-sops**: Verify sops 3.13+ bundles natively with cosign 2.6.5
+  ([`ff6c00d`](https://github.com/tardigrde/openclaw-deploy/commit/ff6c00d4bdfda54a9f096da23d4aac5e32147c22))
+
+### Chores
+
+- **deps**: Update minor updates ([#121](https://github.com/tardigrde/openclaw-deploy/pull/121),
+  [`fe1ac91`](https://github.com/tardigrde/openclaw-deploy/commit/fe1ac913d7dc3315df338f6c6caedc69ba414e86))
+
+- **renovate**: Consolidate config — manual review for actions majors, dedupe Hugo manager
+  ([#140](https://github.com/tardigrde/openclaw-deploy/pull/140),
+  [`45faf52`](https://github.com/tardigrde/openclaw-deploy/commit/45faf52d45c479b570b85900f2dd3a38c5b84fbc))
+
+
 ## v0.18.0 (2026-08-09)
 
 ### Chores
