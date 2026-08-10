@@ -1,6 +1,22 @@
 # CHANGELOG
 
 
+## v0.18.2 (2026-08-10)
+
+### Bug Fixes
+
+- Also pass --ignore-failed-read to tar — warning suppression alone still exits 1
+  ([`32243ef`](https://github.com/tardigrde/openclaw-deploy/commit/32243ef477cd48f5c592c930f7ea7465710659b3))
+
+- **backup**: Ignore tar 'file changed as we read it' warning
+  ([`7de064a`](https://github.com/tardigrde/openclaw-deploy/commit/7de064a3f472b06da1c9191a02bc64015189ee69))
+
+### Chores
+
+- **deps**: Update dependency getsops/sops to v3.13.3
+  ([`7fab751`](https://github.com/tardigrde/openclaw-deploy/commit/7fab751d586ff8e3dd87ae304f840c8fb04a715e))
+
+
 ## v0.18.1 (2026-08-10)
 
 ### Bug Fixes
