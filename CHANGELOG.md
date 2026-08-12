@@ -1,6 +1,19 @@
 # CHANGELOG
 
 
+## v0.18.6 (2026-08-12)
+
+### Bug Fixes
+
+- Use scan-clean owners for agent-browser and find-skills
+  ([`84de00e`](https://github.com/tardigrde/openclaw-deploy/commit/84de00ec0bfda9e989b3a23bf71439ddec32a54b))
+
+### Chores
+
+- Drop yt skill (single owner, security scan not clean)
+  ([`43d9aeb`](https://github.com/tardigrde/openclaw-deploy/commit/43d9aeb8a61e337ec16d5c824e270ae57086105c))
+
+
 ## v0.18.5 (2026-08-12)
 
 ### Bug Fixes
