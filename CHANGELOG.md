@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v0.18.3 (2026-08-12)
+
+### Bug Fixes
+
+- Bump clawhub CLI to 0.23.3 (consistent installedAt origin/lock timestamps)
+  ([`79330b0`](https://github.com/tardigrde/openclaw-deploy/commit/79330b04e42dd3a076a5fc4a00ad1f09e51f6bff))
+
+
 ## v0.18.2 (2026-08-10)
 
 ### Bug Fixes
