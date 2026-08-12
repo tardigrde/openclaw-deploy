@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v0.18.4 (2026-08-12)
+
+### Bug Fixes
+
+- Owner-qualify ClawHub refs in skills manifest (clawhub 0.23.3 requires it)
+  ([`01a74cd`](https://github.com/tardigrde/openclaw-deploy/commit/01a74cdc3237d08a0d90e9c61462c7a77a60062e))
+
+
 ## v0.18.3 (2026-08-12)
 
 ### Bug Fixes
