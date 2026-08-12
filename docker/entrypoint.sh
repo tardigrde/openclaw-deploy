@@ -35,14 +35,15 @@ if [[ -f "$MANIFEST" ]]; then
     line="$(echo "$line" | xargs)"
     [[ -z "$line" ]] && continue
 
-    # Skip if already installed
-    if [[ -d "$WORKDIR/skills/$line" ]]; then
+    # Skip if already installed (manifest refs are @owner/slug; install dir is the bare slug)
+    slug="${line##*/}"
+    if [[ -d "$WORKDIR/skills/$slug" ]]; then
       echo "[entrypoint]   ✓ $line (already installed)"
       continue
     fi
 
     echo "[entrypoint]   → installing $line"
-    clawhub install "$line" --workdir "$WORKDIR" --force || {
+    openclaw skills install "$line" --force --acknowledge-clawhub-risk || {
       echo "[entrypoint] WARNING: Failed to install $line — continuing"
     }
   done < "$MANIFEST"
