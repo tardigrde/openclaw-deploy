@@ -8,7 +8,7 @@
 @therohitdas/yt
 
 # Agent Browser — headless browser for JS-heavy/paywalled pages
-@rez0/agent-browser
+@shifengwang333-ai/agent-browser
 
 # Conventional Commits — format commit messages properly
 @bastos/conventional-commits
@@ -26,7 +26,7 @@
 @spclaudehome/skill-vetter
 
 # Find Skills — search ClawHub for useful skills
-@guipi888/find-skills
+@seanford/find-skills
 
 # Browser Use — browser automation via Python browser-use library
 @jfrux/browser-use-api
