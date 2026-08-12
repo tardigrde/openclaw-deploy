@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v0.18.5 (2026-08-12)
+
+### Bug Fixes
+
+- Use openclaw skills install in entrypoint (flat dirs, bare lockfile keys)
+  ([`191eefb`](https://github.com/tardigrde/openclaw-deploy/commit/191eefbc313440c2742f6834b59627f1e5a68f51))
+
+
 ## v0.18.4 (2026-08-12)
 
 ### Bug Fixes
