@@ -17,7 +17,7 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v4
         with:
-          terraform_version: "1.15.8"
+          terraform_version: "1.15.9"
 
       - name: Install Ansible
         run: pip install "ansible-core>=2.21.2,<3" --quiet
@@ -64,7 +64,7 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v4
         with:
-          terraform_version: "1.15.8"
+          terraform_version: "1.15.9"
 
       - name: Setup TFLint
         uses: terraform-linters/setup-tflint@v6
