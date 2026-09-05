@@ -47,7 +47,7 @@ RUN curl -LsSf https://astral.sh/uv/${UV_VERSION}/install.sh | sh \
   && rm -rf /root/.local
 
 # Pin versions for reproducible builds — bump explicitly when upgrading
-ARG OPENCLAW_VERSION=2026.7.1
+ARG OPENCLAW_VERSION=2026.9.2
 ARG CLAWHUB_VERSION=0.23.3
 ARG SUMMARIZE_VERSION=0.21.11
 ARG WS_VERSION=8.20.0
