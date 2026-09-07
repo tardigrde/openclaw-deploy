@@ -10,7 +10,8 @@ SHELL := /bin/bash
         workspace-sync \
         secrets-generate-key secrets-encrypt secrets-decrypt secrets-edit \
         doctor setup \
-        monitor-enable monitor-disable monitor-status monitor-test
+        monitor-enable monitor-disable monitor-status monitor-test \
+        portal-bridge portal-bridge-stop portal-status
 
 -include Makefile.local
 
@@ -385,6 +386,29 @@ monitor-test: ## Trigger one health check cycle manually (sends alert if checks 
 		'export PATH=/home/openclaw/.local/bin:$$PATH && bash ~/scripts/monitor.sh'
 
 # =============================================================================
+# Portal Bridge (Docker + Tailscale Serve)
+# =============================================================================
+# Portals listen on ephemeral ports inside the gateway container, unreachable
+# from the tailnet. These targets run scripts/portal-bridge.sh on the VPS to
+# forward a portal to a stable tailnet HTTPS port. See docs/guides/portals.md.
+
+define portal-bridge-run
+	$(call check-server-ip)
+	@echo -e "$(BLUE)[PORTAL]$(NC) $(3) on $(SERVER_IP)..."
+	@ssh -i $(SSH_KEY) -o StrictHostKeyChecking=accept-new openclaw@$(SERVER_IP) \
+		"PORTAL=$(PORTAL) PORT=$(PORT) bash -s $2" < scripts/portal-bridge.sh
+endef
+
+portal-bridge: ## Expose an OpenClaw portal on the tailnet (PORTAL=<id> [PORT=<n>])
+	$(call portal-bridge-run, ,start,Bridging portal $(PORTAL))
+
+portal-bridge-stop: ## Tear down a portal bridge (PORT=<n>)
+	$(call portal-bridge-run, ,stop,Removing portal bridge :$(PORT))
+
+portal-status: ## List OpenClaw portals and active portal bridges
+	$(call portal-bridge-run, ,status,Portal status)
+
+# =============================================================================
 # Help
 # =============================================================================
 
@@ -440,6 +464,11 @@ help: ## Show this help message
 	@echo -e "  $(BLUE)monitor-disable$(NC)  Disable health monitoring"
 	@echo -e "  $(GREEN)monitor-status$(NC)  Show monitoring status and recent alerts"
 	@echo -e "  $(GREEN)monitor-test$(NC)    Trigger one health check cycle manually"
+	@echo ""
+	@echo -e "$(BOLD)Portals:$(NC)"
+	@echo -e "  $(GREEN)portal-bridge$(NC)     Expose a portal on the tailnet (PORTAL=<id> [PORT=<n>])"
+	@echo -e "  $(GREEN)portal-bridge-stop$(NC)  Tear down a portal bridge (PORT=<n>)"
+	@echo -e "  $(GREEN)portal-status$(NC)    List portals and active bridges"
 	@echo ""
 	@echo -e "$(BOLD)Secrets (SOPS):$(NC)"
 	@echo -e "  $(GREEN)secrets-generate-key$(NC)  Generate age key (first-time setup)"

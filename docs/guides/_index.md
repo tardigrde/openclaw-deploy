@@ -12,3 +12,4 @@ Feature guides for OpenClaw capabilities enabled by this deployment.
 | Multi-agent setup | [Agents & Sessions](/guides/agents/) |
 | Workspace Git sync | [Workspace Git Sync](/guides/workspace-git-sync/) |
 | Lossless context management | [Lossless Context](/guides/lossless-claw/) |
+| Portals behind Docker + Tailscale | [Portals](/guides/portals/) |
