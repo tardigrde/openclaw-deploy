@@ -10,7 +10,7 @@
 ###############################################################################
 
 # checkov:skip=CKV_DOCKER_2:No suitable health endpoint available in this container
-FROM node:24-bookworm-slim
+FROM node:26-bookworm-slim
 
 # Install runtime dependencies + GitHub CLI in a single layer
 # gnupg is installed only to import the GH CLI signing key, then removed
